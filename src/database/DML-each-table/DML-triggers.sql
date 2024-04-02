@@ -9,27 +9,20 @@ $$ language 'plpgsql';
 CREATE TRIGGER update_users_updated_at
     BEFORE UPDATE
     ON
-        users
-    FOR EACH ROW
-EXECUTE PROCEDURE update_updated_at();
-
-CREATE TRIGGER update_users_updated_at
-    BEFORE UPDATE
-    ON
-        users
+        "user"
     FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at();
 
 CREATE TRIGGER update_posts_updated_at
     BEFORE UPDATE
     ON
-        posts
+        post
     FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at();
 
 CREATE TRIGGER update_comments_updated_at
     BEFORE UPDATE
     ON
-        comments
+        comment
     FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at();

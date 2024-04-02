@@ -13,6 +13,7 @@ CREATE TABLE "user" (
   "open_to_work" boolean,
   "about" varchar,
   "employment_status_id" char(10),
+  "it_field_id" char(10),
   "pronoun_id" char(10),
   "avatar_url" varchar,
   "country_id" char(10),
@@ -152,11 +153,6 @@ CREATE TABLE "it_field" (
   "name" varchar UNIQUE NOT NULL
 );
 
-CREATE TABLE "user_it_field" (
-  "user_id" char(10) NOT NULL,
-  "it_field_id" char(10) NOT NULL
-);
-
 CREATE TABLE "technology" (
   "id" char(10) PRIMARY KEY,
   "name" varchar UNIQUE NOT NULL
@@ -178,8 +174,6 @@ ALTER TABLE "user_role" ADD FOREIGN KEY ("role_id") REFERENCES "role" ("id");
 ALTER TABLE "user_role" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 ALTER TABLE "user_social_network" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 ALTER TABLE "user_social_network" ADD FOREIGN KEY ("social_network_id") REFERENCES "social_network" ("id");
-ALTER TABLE "user_it_field" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "user_it_field" ADD FOREIGN KEY ("it_field_id") REFERENCES "it_field" ("id");
 ALTER TABLE "user_technology" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 ALTER TABLE "user_technology" ADD FOREIGN KEY ("technology_id") REFERENCES "technology" ("id");
 ALTER TABLE "user_language" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
@@ -202,3 +196,4 @@ ALTER TABLE "vote" ADD FOREIGN KEY ("vote_type_id") REFERENCES "vote_type" ("id"
 ALTER TABLE "vote" ADD FOREIGN KEY ("voted_item_id") REFERENCES "comment" ("id");
 ALTER TABLE "report" ADD FOREIGN KEY ("id") REFERENCES "comment" ("id");
 ALTER TABLE "report" ADD FOREIGN KEY ("action_id") REFERENCES "report_action" ("id");
+ALTER TABLE "user" ADD FOREIGN KEY ("it_field_id") REFERENCES "it_field" ("id");

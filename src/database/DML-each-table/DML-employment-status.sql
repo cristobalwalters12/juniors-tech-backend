@@ -1,5 +1,5 @@
-INSERT INTO category (name) VALUES
-("Estudiante"),
-("Sin empleo"),
-("Trabajo en otra industria"),
-("Trabajo en IT");
+INSERT INTO employment_status (id, name) VALUES
+('1ievtJUwmI', 'Estudiante'),
+('96IXKVy8jH', 'Sin empleo'),
+('HDamwxZpk4', 'Trabajo en otra industria'),
+('WsAVPNhJNX', 'Trabajo en IT');
