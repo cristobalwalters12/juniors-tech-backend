@@ -1,3 +1,7 @@
+INSERT INTO aspect_type (id, name) VALUES
+('pOcG-XWN58', 'Publicación'),
+('m6udpXPOt6', 'Comentario');
+
 INSERT INTO category (id, name) VALUES
 ('S5L4FfEnjz', 'Proyectos grupales'),
 ('L1w-xYdnDH', 'Hojas de vida'),
@@ -237,7 +241,7 @@ INSERT INTO it_field (id, name) VALUES
 ('5-l1cCC4vu', 'Redes'),
 ('-Ofa7YVQ6I', 'Web Scraping');
 
-INSERT INTO language (id, name) VALUES
+INSERT INTO "language" (id, name) VALUES
 ('R0mTsUhxr_', 'Alemán'),
 ('pF3yNwyvis', 'Amárico'),
 ('8QplyXt3or', 'Árabe argelino'),
@@ -297,7 +301,18 @@ INSERT INTO report_action (id, name) VALUES
 ('rIDwcR6GbB', 'Elimina publicación'),
 ('4BhmLIjTLQ', 'Silencia usuario');
 
-INSERT INTO role (id, name) VALUES
+INSERT INTO "report_reason" (id, name) VALUES
+('FWLo2VXNHE', 'Spam'),
+('a90dtRdfEP', 'Contenido inapropiado'),
+('QSz3vzQtz2', 'Acoso'),
+('ASU6wJFZJ8', 'Otro');
+
+INSERT INTO "report_type" (id, name) VALUES
+('eXx8aFdM6E', 'Publicación'),
+('FciMP7nq18', 'Comentario'),
+('aSRB2RNW9K', 'Usuario');
+
+INSERT INTO "role" (id, name) VALUES
 ('iBM3mRqi3F', 'administrador'),
 ('8h5NIrFj4K', 'moderador'),
 ('2SbUCqylYo', 'usuario');
@@ -369,23 +384,16 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
-CREATE TRIGGER update_users_updated_at
+CREATE TRIGGER update_user_updated_at
     BEFORE UPDATE
     ON
         "user"
     FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at();
 
-CREATE TRIGGER update_posts_updated_at
+CREATE TRIGGER update_aspect_updated_at
     BEFORE UPDATE
     ON
-        post
-    FOR EACH ROW
-EXECUTE PROCEDURE update_updated_at();
-
-CREATE TRIGGER update_comments_updated_at
-    BEFORE UPDATE
-    ON
-        comment
+        aspect
     FOR EACH ROW
 EXECUTE PROCEDURE update_updated_at();

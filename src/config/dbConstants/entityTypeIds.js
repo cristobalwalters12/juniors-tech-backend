@@ -1,0 +1,12 @@
+const REPORT_TYPES = {
+  POST: 'eXx8aFdM6E',
+  COMMENT: 'FciMP7nq18',
+  USER: 'aSRB2RNW9K'
+}
+
+const ASPECT_TYPES = {
+  POST: 'pOcG-XWN58',
+  COMMENT: 'm6udpXPOt6'
+}
+
+export { REPORT_TYPES, ASPECT_TYPES }
