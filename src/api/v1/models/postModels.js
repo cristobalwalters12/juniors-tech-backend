@@ -2,9 +2,9 @@ import { ASPECT_TYPES, pool } from '../../../config/index.js'
 import { AppError } from '../../helpers/AppError.js'
 
 // TODO: replace tempCurrUserId with that from the jwt
-const tempCurrUserId = 'KrMUeta4ji'
+const tempCurrUserId = 'sYfjpcR8ge'
 
-const create = async ({ id, title, body, categoryId, slug, authorId }) => {
+const create = async ({ id, title, body, categoryId, slug, currUserId }) => {
   const postQuery = `INSERT INTO aspect
                 (id, aspect_type_id, title, body, category_id, slug, author_id)
                 VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -82,4 +82,58 @@ const getById = async ({ postId, currUserId }) => {
   return visiblePostData
 }
 
-export { create, getById }
+const getAll = async (currUserId) => {
+  const selectPosts = `SELECT
+                        A.id,
+                        A.title,
+                        A.body,
+                        A.category_id AS "categoryId",
+                        A.slug,
+                        A.author_id AS "authorId",
+                        U.username,
+                        U.avatar_url AS "avatarUrl",
+                        A.vote_count AS "voteCount",
+                        A.comment_count AS "commentCount",
+                        A.created_at AS "createdAt",
+                        A.updated_at AS "updatedAt",
+                        A.reported_at AS "reportedAt",
+                        U.deleted_at AS "userDeletedAt"
+                      FROM aspect A
+                      LEFT JOIN "user" U
+                      ON A.author_id = U.id
+                      WHERE A.deleted_at IS NULL;`
+
+  const { rows: rawPostsData } = await pool.query(selectPosts)
+
+  const selectPostVotes = `SELECT
+                            V.vote_direction AS "voteDirection",
+                            V.aspect_id AS "aspectId"
+                          FROM aspect A
+                          JOIN vote V
+                          ON A.id = V.aspect_id
+                          WHERE A.aspect_type_id = $1
+                          AND V.user_id = $2;`
+  // TODO: replace tempCurrUserId with that from the jwt
+  const { rows: rawPostsVotes } = await pool.query(selectPostVotes, [ASPECT_TYPES.POST, tempCurrUserId])
+
+  const postVotes = {}
+
+  rawPostsVotes.forEach(({ voteDirection, aspectId }) => {
+    postVotes[aspectId] = voteDirection
+  })
+
+  const visiblePostsData = rawPostsData.map(rawPost => {
+    if (rawPost.userDeletedAt) {
+      rawPost.authorId = null
+      rawPost.username = null
+      rawPost.avatarUrl = null
+    }
+    rawPost.voteDirection = postVotes[rawPost.id] || 0
+    const { userDeletedAt, ...visiblePostData } = rawPost
+    return visiblePostData
+  })
+
+  return visiblePostsData
+}
+
+export { create, getById, getAll }
