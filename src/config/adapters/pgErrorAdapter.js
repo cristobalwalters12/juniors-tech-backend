@@ -1,22 +1,14 @@
 import { AppError } from '../../api/helpers/index.js'
-
-const handleDuplicateDB = ({ detail }) => {
-  const column = detail.match(/(?<=\().+?(?=\))/)
-  return `This ${column} already exists`
-}
-
-const ERR_MSG_GENERATORS = {
-  23505: handleDuplicateDB
-}
+import { DB_ERROR_MESSAGES } from '../index.js'
 
 const isDbAppError = (error) => {
   return error.code && /^22|23/.test(error.code)
 }
 
 const getDbError = (error) => {
-  const msgGenerator = ERR_MSG_GENERATORS[error.code]
-  if (msgGenerator) {
-    return AppError.badRequest(msgGenerator(error))
+  const errorMeesage = DB_ERROR_MESSAGES[error.constraint]
+  if (errorMeesage) {
+    return AppError.badRequest(errorMeesage)
   } else {
     error.statusCode = 500
     return error
