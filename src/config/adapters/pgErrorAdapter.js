@@ -6,9 +6,9 @@ const isDbAppError = (error) => {
 }
 
 const getDbError = (error) => {
-  const errorMeesage = DB_ERROR_MESSAGES[error.constraint]
-  if (errorMeesage) {
-    return AppError.badRequest(errorMeesage)
+  const errorMessage = DB_ERROR_MESSAGES[error.constraint]
+  if (errorMessage) {
+    return AppError.badRequest(errorMessage)
   } else {
     error.statusCode = 500
     return error
