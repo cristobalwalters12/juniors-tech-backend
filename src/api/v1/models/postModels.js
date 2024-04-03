@@ -62,10 +62,8 @@ const getById = async ({ postId, currUserId }) => {
 
   const selectVoteDirection = `SELECT
                                 V.vote_direction AS "voteDirection"
-                              FROM "user" U
-                              LEFT JOIN vote V
-                              ON U.id = V.user_id
-                              WHERE U.id = $1
+                              FROM vote V
+                              WHERE V.user_id = $1
                               AND V.aspect_id = $2;`
   // TODO: replace tempCurrUserId with that from the jwt
   const { rows: [vote] } = await pool.query(selectVoteDirection, [tempCurrUserId, postId])
@@ -136,4 +134,33 @@ const getAll = async (currUserId) => {
   return visiblePostsData
 }
 
-export { create, getById, getAll }
+const update = async ({ postId, title, body, categoryId, slug }) => {
+  const updatePost = `UPDATE aspect SET
+                        title = $1,
+                        body = $2,
+                        category_id = $3,
+                        slug = $4
+                      WHERE aspect.id = $5
+                      RETURNING *`
+  const { rows: [postData] } = await pool.query(updatePost, [title, body, categoryId, slug, postId])
+
+  const selectUsername = `SELECT
+                            username AS authorUsername
+                          FROM "user" U
+                          WHERE U.id = $1;`
+  // TODO: replace tempCurrUserId with that from the jwt
+  const { rows: [username] } = await pool.query(selectUsername, [tempCurrUserId])
+
+  const selectVoteDirection = `SELECT
+                                V.vote_direction AS "voteDirection"
+                              FROM vote V
+                              WHERE V.user_id = $1
+                              AND V.aspect_id = $2;`
+  // TODO: replace tempCurrUserId with that from the jwt
+  const { rows: [vote] } = await pool.query(selectVoteDirection, [tempCurrUserId, postId])
+  postData.voteDirection = vote?.voteDirection || 0
+
+  return { ...postData, ...username }
+}
+
+export { create, getById, getAll, update }

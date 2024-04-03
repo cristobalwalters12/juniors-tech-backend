@@ -28,8 +28,10 @@ const postSchema = Joi.object({
 
 const validate = async ({ body }) => await postSchema.validateAsync(body)
 
-const transform = async ({ body }) => {
-  body.id = getUUID()
+const transform = async ({ body, method }) => {
+  if (method === 'POST') {
+    body.id = getUUID()
+  }
   body.title = body.title.trim()
   body.body = body.body.trim()
   body.slug = slugify(body.title, {
