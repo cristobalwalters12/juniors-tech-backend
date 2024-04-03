@@ -1,4 +1,4 @@
-import { create } from '../models/postModels.js'
+import { create, getById } from '../models/postModels.js'
 
 const createPost = async (req, res) => {
   const data = await create(req.body)
@@ -8,4 +8,12 @@ const createPost = async (req, res) => {
   })
 }
 
-export { createPost }
+const getPostById = async (req, res) => {
+  const data = await getById({ postId: req.params.id })
+  res.status(200).json({
+    status: 'success',
+    data
+  })
+}
+
+export { createPost, getPostById }
