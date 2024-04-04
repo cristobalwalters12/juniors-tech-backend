@@ -163,4 +163,17 @@ const update = async ({ postId, title, body, categoryId, slug }) => {
   return { ...postData, ...username }
 }
 
-export { create, getById, getAll, update }
+const existsById = async (postId) => {
+  const selectPost = `SELECT
+                        id,
+                        author_id AS authorId,
+                        reported_at AS reportedAt
+                      FROM aspect
+                      WHERE
+                        id = $1
+                        AND deleted_at IS NULL;`
+  const { rows: [post] } = await pool.query(selectPost, [postId])
+  return post
+}
+
+export { create, getById, getAll, update, existsById }
