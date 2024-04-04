@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
-import { methodNotAllowedHandler, postExists, uidValidator } from '../middleware/index.js'
+import { isOwnerOrHasRole, isReported, methodNotAllowedHandler, postExists, uidValidator } from '../middleware/index.js'
 import { createPost, getPostById, getPosts, editPostById } from '../controllers/postController.js'
 import { postDto } from '../dtos/postDto.js'
 import { mockUser } from '../middleware/mockUser.js'
@@ -20,6 +20,8 @@ router
     mockUser,
     uidValidator,
     postExists,
+    isOwnerOrHasRole([]),
+    isReported,
     postDto
   ], errorCatcher(editPostById))
   .all(methodNotAllowedHandler)
