@@ -1,4 +1,4 @@
-import { create, getById, getAll, update } from '../models/postModels.js'
+import { create, getById, getAll, update, deleteById } from '../models/postModels.js'
 
 const createPost = async (req, res) => {
   const data = await create({ ...req.body, currUserId: req.user.id })
@@ -32,4 +32,9 @@ const editPostById = async (req, res) => {
   })
 }
 
-export { createPost, getPostById, getPosts, editPostById }
+const deletePostById = async (req, res) => {
+  await deleteById({ postId: req.params.id })
+  res.sendStatus(204)
+}
+
+export { createPost, getPostById, getPosts, editPostById, deletePostById }

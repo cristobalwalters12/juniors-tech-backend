@@ -1,9 +1,10 @@
 import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
 import { isOwnerOrHasRole, isReported, methodNotAllowedHandler, postExists, uidValidator } from '../middleware/index.js'
-import { createPost, getPostById, getPosts, editPostById } from '../controllers/postController.js'
+import { createPost, getPostById, getPosts, editPostById, deletePostById } from '../controllers/postController.js'
 import { postDto } from '../dtos/postDto.js'
 import { mockUser } from '../middleware/mockUser.js'
+import { ROLE_TYPES } from '../../../config/index.js'
 
 const router = Router()
 
@@ -24,6 +25,12 @@ router
     isReported,
     postDto
   ], errorCatcher(editPostById))
+  .delete([
+    mockUser,
+    uidValidator,
+    postExists,
+    isOwnerOrHasRole([ROLE_TYPES.MOD.name, ROLE_TYPES.ADMIN.name])
+  ], errorCatcher(deletePostById))
   .all(methodNotAllowedHandler)
 
 export default router

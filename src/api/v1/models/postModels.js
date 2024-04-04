@@ -173,6 +173,19 @@ const update = async ({ postId, title, body, categoryId, slug, currUserId }) => 
   return { ...postData, ...username }
 }
 
+const deleteById = async ({ postId }) => {
+  const deletePost = `UPDATE aspect
+                      SET deleted_at = NOW()
+                      WHERE id = $1
+                      RETURNING author_id AS "authorId";`
+  const { rows: [author] } = await pool.query(deletePost, [postId])
+
+  const updateAuthor = `UPDATE "user"
+                        SET post_count = post_count - 1
+                        WHERE id = $1;`
+  await pool.query(updateAuthor, [author.authorId])
+}
+
 const existsById = async (postId) => {
   const selectPost = `SELECT
                         id,
@@ -186,4 +199,4 @@ const existsById = async (postId) => {
   return post
 }
 
-export { create, getById, getAll, update, existsById }
+export { create, getById, getAll, update, deleteById, existsById }
