@@ -2,8 +2,9 @@ import { Router } from 'express'
 import { createCategoryController, getCategoriesController, updateCategoryController, deleteCategoryController } from '../controllers/categoryController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
-  methodNotAllowedHandler, TokenValidator
+  methodNotAllowedHandler
 } from '../middleware/index.js'
+import { TokenValidator } from '../middleware/tokenExists.js'
 
 const router = Router()
 router.post('/', TokenValidator, errorCatcher(createCategoryController)).all(methodNotAllowedHandler)
