@@ -65,8 +65,7 @@ const getById = async ({ postId, currUserId }) => {
                               FROM vote V
                               WHERE V.user_id = $1
                               AND V.aspect_id = $2;`
-  // TODO: replace tempCurrUserId with that from the jwt
-  const { rows: [vote] } = await pool.query(selectVoteDirection, [tempCurrUserId, postId])
+  const { rows: [vote] } = await pool.query(selectVoteDirection, [currUserId, postId])
   rawPostData.voteDirection = vote?.voteDirection || 0
 
   if (rawPostData.userDeletedAt) {
