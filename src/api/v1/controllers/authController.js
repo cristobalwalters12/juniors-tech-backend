@@ -1,11 +1,11 @@
 import { AppError } from '../../helpers/AppError.js'
-import { getByEmail } from '../models/usuarioModel.js'
+import { byEmailLogin } from '../models/usuarioModel.js'
 import { bcryptAdapter, jwtAdapter } from '../../../config/index.js'
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body
 
-  const userInDb = await getByEmail(email)
+  const userInDb = await byEmailLogin({ email })
   if (!userInDb) {
     throw AppError.unauthorized('Invalid email or password')
   }
@@ -20,7 +20,7 @@ const loginUser = async (req, res) => {
   }
 
   const { token, expirationDate } = await jwtAdapter.generateRefreshToken({
-    email
+    id: userInDb.id, role: userInDb.role
   })
   res.cookie('token', token, {
     expires: expirationDate,
@@ -28,11 +28,10 @@ const loginUser = async (req, res) => {
     secure: true,
     sameSite: 'None'
   })
-
-  const accessToken = await jwtAdapter.generateAccessToken({ email })
+  const accessToken = await jwtAdapter.generateAccessToken({ id: userInDb.id, role: userInDb.role })
   return res.status(200).json({
     status: 'success',
-    data: { accessToken }
+    data: { accessToken, userInDb }
   })
 }
 
