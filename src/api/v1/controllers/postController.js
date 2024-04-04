@@ -1,4 +1,4 @@
-import { create, getById, getAll, update, deleteById, voteById } from '../models/postModels.js'
+import { create, getById, getAll, update, deleteById, voteById } from '../models/postModel.js'
 
 const createPost = async (req, res) => {
   const data = await create({ ...req.body, currUserId: req.user.id })
