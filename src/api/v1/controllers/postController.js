@@ -1,4 +1,4 @@
-import { create, getById, getAll, update, deleteById, voteById } from '../models/postModel.js'
+import { create, getById, getAll, updateById, deleteById, voteById } from '../models/postModel.js'
 
 const createPost = async (req, res) => {
   const data = await create({ ...req.body, currUserId: req.user.id })
@@ -25,7 +25,11 @@ const getPosts = async (req, res) => {
 }
 
 const editPostById = async (req, res) => {
-  const data = await update({ postId: req.params.id, ...req.body, currUserId: req.user.id })
+  const data = await updateById({
+    postId: req.params.id,
+    currUserId: req.user.id,
+    ...req.body
+  })
   res.status(200).json({
     status: 'success',
     data

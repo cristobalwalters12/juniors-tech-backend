@@ -135,7 +135,7 @@ const getAll = async ({ currUserId }) => {
   return visiblePostsData
 }
 
-const update = async ({ postId, title, body, categoryId, slug, currUserId }) => {
+const updateById = async ({ postId, title, body, categoryId, slug, currUserId }) => {
   const updatePost = `UPDATE aspect SET
                         title = $1,
                         body = $2,
@@ -240,4 +240,4 @@ const existsById = async (postId) => {
   return post
 }
 
-export { create, getById, getAll, update, deleteById, existsById, voteById }
+export { create, getById, getAll, updateById, deleteById, existsById, voteById }
