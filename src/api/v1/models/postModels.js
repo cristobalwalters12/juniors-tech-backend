@@ -2,29 +2,30 @@ import { ASPECT_TYPES, pool } from '../../../config/index.js'
 import { AppError } from '../../helpers/AppError.js'
 
 const create = async ({ id, title, body, categoryId, slug, currUserId }) => {
-  const postQuery = `INSERT INTO aspect
-                (id, aspect_type_id, title, body, category_id, slug, author_id)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
-                RETURNING
-                id,
-                title,
-                body,
-                category_id AS "categoryId",
-                slug,
-                author_id AS "authorId",
-                vote_count AS "voteCount",
-                comment_count AS "commentCount",
-                created_at AS "createdAt",
-                updated_at AS "updatedAt",
-                reported_at AS "reportedAt";`
-  const { rows: [postData] } = await pool.query(postQuery, [id, ASPECT_TYPES.POST, title, body, categoryId, slug, currUserId])
+  const insertPost = `INSERT INTO aspect
+                        (id, aspect_type_id, title, body, category_id, slug, author_id)
+                      VALUES ($1, $2, $3, $4, $5, $6, $7)
+                      RETURNING
+                        id,
+                        title,
+                        body,
+                        category_id AS "categoryId",
+                        slug,
+                        author_id AS "authorId",
+                        vote_count AS "voteCount",
+                        comment_count AS "commentCount",
+                        created_at AS "createdAt",
+                        updated_at AS "updatedAt",
+                        reported_at AS "reportedAt";`
+  const { rows: [postData] } = await pool.query(insertPost, [id, ASPECT_TYPES.POST, title, body, categoryId, slug, currUserId])
 
-  const extraDataQuery = `SELECT
-                            username AS authorUsername
-                          FROM "user" U
-                          WHERE U.id = $1;`
-  const { rows: [extraData] } = await pool.query(extraDataQuery, [currUserId])
-  return { ...postData, ...extraData, voteDirection: 0 }
+  const updateAuthor = `UPDATE "user"
+                        SET post_count = post_count + 1
+                        WHERE id = $1
+                        RETURNING username AS "authorUsername";`
+  const { rows: [author] } = await pool.query(updateAuthor, [currUserId])
+
+  return { ...postData, ...author, voteDirection: 0 }
 }
 
 const getById = async ({ postId, currUserId }) => {
