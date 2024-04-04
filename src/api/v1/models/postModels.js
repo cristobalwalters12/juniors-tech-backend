@@ -20,15 +20,13 @@ const create = async ({ id, title, body, categoryId, slug, currUserId }) => {
                 created_at AS "createdAt",
                 updated_at AS "updatedAt",
                 reported_at AS "reportedAt";`
-  // TODO: replace tempCurrUserId with that from the jwt
-  const { rows: [postData] } = await pool.query(postQuery, [id, ASPECT_TYPES.POST, title, body, categoryId, slug, tempCurrUserId])
+  const { rows: [postData] } = await pool.query(postQuery, [id, ASPECT_TYPES.POST, title, body, categoryId, slug, currUserId])
 
   const extraDataQuery = `SELECT
                             username AS authorUsername
                           FROM "user" U
                           WHERE U.id = $1;`
-  // TODO: replace tempCurrUserId with that from the jwt
-  const { rows: [extraData] } = await pool.query(extraDataQuery, [tempCurrUserId])
+  const { rows: [extraData] } = await pool.query(extraDataQuery, [currUserId])
   return { ...postData, ...extraData, voteDirection: 0 }
 }
 

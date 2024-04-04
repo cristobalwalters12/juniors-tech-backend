@@ -1,7 +1,7 @@
 import { create, getById, getAll, update } from '../models/postModels.js'
 
 const createPost = async (req, res) => {
-  const data = await create(req.body)
+  const data = await create({ ...req.body, currUserId: req.user.id })
   res.status(201).json({
     status: 'success',
     data

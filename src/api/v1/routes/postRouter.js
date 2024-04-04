@@ -9,7 +9,7 @@ const router = Router()
 
 router
   .route('/')
-  .post(postDto, errorCatcher(createPost))
+  .post([mockUser, postDto], errorCatcher(createPost))
   .get(mockUser, getPosts)
   .all(methodNotAllowedHandler)
 
