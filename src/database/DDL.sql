@@ -74,7 +74,6 @@ CREATE TABLE "user" (
   CONSTRAINT existent_country FOREIGN KEY (country_id) REFERENCES country (id),
   CONSTRAINT unique_user_email UNIQUE (email),
   CONSTRAINT unique_user_username UNIQUE (username),
-  CONSTRAINT non_negative_user_score CHECK (score >= 0),
   CONSTRAINT non_negative_user_post_count CHECK (post_count >= 0),
   CONSTRAINT non_negative_user_comment_count CHECK (comment_count >= 0),
   CONSTRAINT min_allowed_age CHECK (EXTRACT(YEAR FROM JUSTIFY_INTERVAL(CURRENT_TIMESTAMP - birthdate)) >= 17)
@@ -139,7 +138,6 @@ CREATE TABLE "aspect" (
   CONSTRAINT existent_aspect_author FOREIGN KEY (author_id) REFERENCES "user" (id),
   CONSTRAINT existent_aspect_category FOREIGN KEY (category_id) REFERENCES category (id),
   CONSTRAINT unique_post_title UNIQUE (title),
-  CONSTRAINT non_negative_aspect_vote_count CHECK (vote_count >= 0),
   CONSTRAINT non_negative_aspect_comment_count CHECK (comment_count >= 0),
   CONSTRAINT single_aspect_type CHECK (
     -- caso publicación
