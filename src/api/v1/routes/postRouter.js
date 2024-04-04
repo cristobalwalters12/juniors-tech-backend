@@ -16,7 +16,7 @@ router
 router
   .route('/:id')
   .get([mockUser, uidValidator], errorCatcher(getPostById))
-  .put([uidValidator, postDto], errorCatcher(editPostById))
+  .put([mockUser, uidValidator, postDto], errorCatcher(editPostById))
   .all(methodNotAllowedHandler)
 
 export default router

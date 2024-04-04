@@ -1,9 +1,6 @@
 import { ASPECT_TYPES, pool } from '../../../config/index.js'
 import { AppError } from '../../helpers/AppError.js'
 
-// TODO: replace tempCurrUserId with that from the jwt
-const tempCurrUserId = 'sYfjpcR8ge'
-
 const create = async ({ id, title, body, categoryId, slug, currUserId }) => {
   const postQuery = `INSERT INTO aspect
                 (id, aspect_type_id, title, body, category_id, slug, author_id)
@@ -130,30 +127,39 @@ const getAll = async ({ currUserId }) => {
   return visiblePostsData
 }
 
-const update = async ({ postId, title, body, categoryId, slug }) => {
+const update = async ({ postId, title, body, categoryId, slug, currUserId }) => {
   const updatePost = `UPDATE aspect SET
                         title = $1,
                         body = $2,
                         category_id = $3,
                         slug = $4
                       WHERE aspect.id = $5
-                      RETURNING *`
+                      RETURNING
+                        id,
+                        title,
+                        body,
+                        category_id AS "categoryId",
+                        slug,
+                        author_id AS "authorId",
+                        vote_count AS "voteCount",
+                        comment_count AS "commentCount",
+                        created_at AS "createdAt",
+                        updated_at AS "updatedAt",
+                        reported_at AS "reportedAt";`
   const { rows: [postData] } = await pool.query(updatePost, [title, body, categoryId, slug, postId])
 
   const selectUsername = `SELECT
                             username AS authorUsername
                           FROM "user" U
                           WHERE U.id = $1;`
-  // TODO: replace tempCurrUserId with that from the jwt
-  const { rows: [username] } = await pool.query(selectUsername, [tempCurrUserId])
+  const { rows: [username] } = await pool.query(selectUsername, [postData.authorId])
 
   const selectVoteDirection = `SELECT
                                 V.vote_direction AS "voteDirection"
                               FROM vote V
                               WHERE V.user_id = $1
                               AND V.aspect_id = $2;`
-  // TODO: replace tempCurrUserId with that from the jwt
-  const { rows: [vote] } = await pool.query(selectVoteDirection, [tempCurrUserId, postId])
+  const { rows: [vote] } = await pool.query(selectVoteDirection, [currUserId, postId])
   postData.voteDirection = vote?.voteDirection || 0
 
   return { ...postData, ...username }

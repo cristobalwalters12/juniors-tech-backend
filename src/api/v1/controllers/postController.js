@@ -25,7 +25,7 @@ const getPosts = async (req, res) => {
 }
 
 const editPostById = async (req, res) => {
-  const data = await update({ postId: req.params.id, ...req.body })
+  const data = await update({ postId: req.params.id, ...req.body, currUserId: req.user.id })
   res.status(200).json({
     status: 'success',
     data
