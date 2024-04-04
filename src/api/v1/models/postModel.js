@@ -140,7 +140,8 @@ const updateById = async ({ postId, title, body, categoryId, slug, currUserId })
                         title = $1,
                         body = $2,
                         category_id = $3,
-                        slug = $4
+                        slug = $4,
+                        updated_at = NOW()
                       WHERE aspect.id = $5
                       RETURNING
                         id,
