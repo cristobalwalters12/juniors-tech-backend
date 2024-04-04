@@ -9,7 +9,7 @@ const createPost = async (req, res) => {
 }
 
 const getPostById = async (req, res) => {
-  const data = await getById({ postId: req.params.id, currUserId: req.user.id })
+  const data = await getById({ postId: req.params.id, currUserId: req?.user?.id })
   res.status(200).json({
     status: 'success',
     data
@@ -17,7 +17,7 @@ const getPostById = async (req, res) => {
 }
 
 const getPosts = async (req, res) => {
-  const data = await getAll({ currUserId: req.user.id })
+  const data = await getAll({ currUserId: req?.user?.id })
   res.status(200).json({
     status: 'success',
     data

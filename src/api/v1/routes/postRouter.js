@@ -15,7 +15,7 @@ router
 
 router
   .route('/:id')
-  .get([mockUser, uidValidator], errorCatcher(getPostById))
+  .get([uidValidator, mockUser], errorCatcher(getPostById))
   .put([
     mockUser,
     uidValidator,

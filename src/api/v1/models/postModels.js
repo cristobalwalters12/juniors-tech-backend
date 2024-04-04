@@ -55,13 +55,18 @@ const getById = async ({ postId, currUserId }) => {
     throw AppError.notFound('La publicación no existe')
   }
 
-  const selectVoteDirection = `SELECT
-                                V.vote_direction AS "voteDirection"
-                              FROM vote V
-                              WHERE V.user_id = $1
-                              AND V.aspect_id = $2;`
-  const { rows: [vote] } = await pool.query(selectVoteDirection, [currUserId, postId])
-  rawPostData.voteDirection = vote?.voteDirection || 0
+  rawPostData.voteDirection = 0
+  if (currUserId !== undefined) {
+    const selectVoteDirection = `SELECT
+                                  V.vote_direction AS "voteDirection"
+                                FROM vote V
+                                WHERE V.user_id = $1
+                                AND V.aspect_id = $2;`
+    const { rows: [vote] } = await pool.query(selectVoteDirection, [currUserId, postId])
+    if (vote) {
+      rawPostData.voteDirection = vote?.voteDirection
+    }
+  }
 
   if (rawPostData.userDeletedAt) {
     rawPostData.authorId = null
@@ -97,7 +102,10 @@ const getAll = async ({ currUserId }) => {
 
   const { rows: rawPostsData } = await pool.query(selectPosts)
 
-  const selectPostVotes = `SELECT
+  const postVotes = {}
+
+  if (currUserId !== undefined) {
+    const selectPostVotes = `SELECT
                             V.vote_direction AS "voteDirection",
                             V.aspect_id AS "aspectId"
                           FROM aspect A
@@ -105,13 +113,12 @@ const getAll = async ({ currUserId }) => {
                           ON A.id = V.aspect_id
                           WHERE A.aspect_type_id = $1
                           AND V.user_id = $2;`
-  const { rows: rawPostsVotes } = await pool.query(selectPostVotes, [ASPECT_TYPES.POST, currUserId])
+    const { rows: rawPostsVotes } = await pool.query(selectPostVotes, [ASPECT_TYPES.POST, currUserId])
 
-  const postVotes = {}
-
-  rawPostsVotes.forEach(({ voteDirection, aspectId }) => {
-    postVotes[aspectId] = voteDirection
-  })
+    rawPostsVotes.forEach(({ voteDirection, aspectId }) => {
+      postVotes[aspectId] = voteDirection
+    })
+  }
 
   const visiblePostsData = rawPostsData.map(rawPost => {
     if (rawPost.userDeletedAt) {
