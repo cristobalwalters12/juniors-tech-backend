@@ -79,7 +79,7 @@ const getById = async ({ postId, currUserId }) => {
   return visiblePostData
 }
 
-const getAll = async (currUserId) => {
+const getAll = async ({ currUserId }) => {
   const selectPosts = `SELECT
                         A.id,
                         A.title,
@@ -110,8 +110,7 @@ const getAll = async (currUserId) => {
                           ON A.id = V.aspect_id
                           WHERE A.aspect_type_id = $1
                           AND V.user_id = $2;`
-  // TODO: replace tempCurrUserId with that from the jwt
-  const { rows: rawPostsVotes } = await pool.query(selectPostVotes, [ASPECT_TYPES.POST, tempCurrUserId])
+  const { rows: rawPostsVotes } = await pool.query(selectPostVotes, [ASPECT_TYPES.POST, currUserId])
 
   const postVotes = {}
 

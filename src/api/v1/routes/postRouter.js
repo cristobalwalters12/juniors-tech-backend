@@ -10,7 +10,7 @@ const router = Router()
 router
   .route('/')
   .post(postDto, errorCatcher(createPost))
-  .get(getPosts)
+  .get(mockUser, getPosts)
   .all(methodNotAllowedHandler)
 
 router

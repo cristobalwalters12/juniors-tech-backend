@@ -17,7 +17,7 @@ const getPostById = async (req, res) => {
 }
 
 const getPosts = async (req, res) => {
-  const data = await getAll()
+  const data = await getAll({ currUserId: req.user.id })
   res.status(200).json({
     status: 'success',
     data
