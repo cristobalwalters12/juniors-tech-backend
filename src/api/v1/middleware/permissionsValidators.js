@@ -19,7 +19,7 @@ const isOwnerOrHasRole = (roles) => (req, res, next) => {
 }
 
 const isReported = (req, res, next) => {
-  if (req.resource.reportedAt !== null) {
+  if (req.resource.hasOpenReport !== null) {
     return next(AppError.unauthorized('No se puede editar hasta que no se resuelva el reporte'))
   }
 

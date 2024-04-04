@@ -16,7 +16,7 @@ const create = async ({ id, title, body, categoryId, slug, currUserId }) => {
                         comment_count AS "commentCount",
                         created_at AS "createdAt",
                         updated_at AS "updatedAt",
-                        reported_at AS "reportedAt";`
+                        has_open_report AS "hasOpenReport";`
   const { rows: [postData] } = await pool.query(insertPost, [id, ASPECT_TYPES.POST, title, body, categoryId, slug, currUserId])
 
   const updateAuthor = `UPDATE "user"
@@ -42,7 +42,7 @@ const getById = async ({ postId, currUserId }) => {
                         A.comment_count AS "commentCount",
                         A.created_at AS "createdAt",
                         A.updated_at AS "updatedAt",
-                        A.reported_at AS "reportedAt",
+                        A.has_open_report AS "hasOpenReport",
                         U.deleted_at AS "userDeletedAt"
                       FROM aspect A
                       LEFT JOIN "user" U
@@ -94,7 +94,7 @@ const getAll = async ({ currUserId }) => {
                         A.comment_count AS "commentCount",
                         A.created_at AS "createdAt",
                         A.updated_at AS "updatedAt",
-                        A.reported_at AS "reportedAt",
+                        A.has_open_report AS "hasOpenReport",
                         U.deleted_at AS "userDeletedAt"
                       FROM aspect A
                       LEFT JOIN "user" U
@@ -153,7 +153,7 @@ const update = async ({ postId, title, body, categoryId, slug, currUserId }) => 
                         comment_count AS "commentCount",
                         created_at AS "createdAt",
                         updated_at AS "updatedAt",
-                        reported_at AS "reportedAt";`
+                        has_open_report AS "hasOpenReport";`
   const { rows: [postData] } = await pool.query(updatePost, [title, body, categoryId, slug, postId])
 
   const selectUsername = `SELECT
@@ -177,7 +177,7 @@ const existsById = async (postId) => {
   const selectPost = `SELECT
                         id,
                         author_id AS "authorId",
-                        reported_at AS "reportedAt"
+                        has_open_report AS "hasOpenReport"
                       FROM aspect
                       WHERE
                         id = $1
