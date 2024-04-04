@@ -9,4 +9,19 @@ const ASPECT_TYPES = {
   COMMENT: 'm6udpXPOt6'
 }
 
-export { REPORT_TYPES, ASPECT_TYPES }
+const ROLE_TYPES = {
+  USER: {
+    id: '2SbUCqylYo',
+    name: 'usuario'
+  },
+  MOD: {
+    id: '8h5NIrFj4K',
+    name: 'moderador'
+  },
+  ADMIN: {
+    id: 'iBM3mRqi3F',
+    name: 'administrador'
+  }
+}
+
+export { REPORT_TYPES, ASPECT_TYPES, ROLE_TYPES }

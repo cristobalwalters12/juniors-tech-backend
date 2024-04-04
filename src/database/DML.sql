@@ -383,17 +383,3 @@ BEGIN
     RETURN NEW;
 END;
 $$ language 'plpgsql';
-
-CREATE TRIGGER update_user_updated_at
-    BEFORE UPDATE
-    ON
-        "user"
-    FOR EACH ROW
-EXECUTE PROCEDURE update_updated_at();
-
-CREATE TRIGGER update_aspect_updated_at
-    BEFORE UPDATE
-    ON
-        aspect
-    FOR EACH ROW
-EXECUTE PROCEDURE update_updated_at();
