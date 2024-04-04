@@ -1,4 +1,4 @@
-import { create, getById, getAll, update, deleteById } from '../models/postModels.js'
+import { create, getById, getAll, update, deleteById, voteById } from '../models/postModels.js'
 
 const createPost = async (req, res) => {
   const data = await create({ ...req.body, currUserId: req.user.id })
@@ -37,4 +37,17 @@ const deletePostById = async (req, res) => {
   res.sendStatus(204)
 }
 
-export { createPost, getPostById, getPosts, editPostById, deletePostById }
+const votePostById = async (req, res) => {
+  const data = await voteById({
+    postId: req.params.id,
+    authorId: req.resource.authorId,
+    currUserId: req.user.id,
+    ...req.body
+  })
+  res.status(200).json({
+    status: 'success',
+    data
+  })
+}
+
+export { createPost, getPostById, getPosts, editPostById, deletePostById, votePostById }

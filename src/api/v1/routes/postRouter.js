@@ -1,10 +1,11 @@
 import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
 import { isOwnerOrHasRole, isReported, methodNotAllowedHandler, postExists, uidValidator } from '../middleware/index.js'
-import { createPost, getPostById, getPosts, editPostById, deletePostById } from '../controllers/postController.js'
+import { createPost, getPostById, getPosts, editPostById, deletePostById, votePostById } from '../controllers/postController.js'
 import { postDto } from '../dtos/postDto.js'
 import { mockUser } from '../middleware/mockUser.js'
 import { ROLE_TYPES } from '../../../config/index.js'
+import { voteDto } from '../dtos/voteDto.js'
 
 const router = Router()
 
@@ -31,6 +32,16 @@ router
     postExists,
     isOwnerOrHasRole([ROLE_TYPES.MOD.name, ROLE_TYPES.ADMIN.name])
   ], errorCatcher(deletePostById))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/:id/vote')
+  .post([
+    mockUser,
+    uidValidator,
+    postExists,
+    voteDto
+  ], errorCatcher(votePostById))
   .all(methodNotAllowedHandler)
 
 export default router
