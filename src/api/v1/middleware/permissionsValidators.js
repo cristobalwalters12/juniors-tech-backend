@@ -1,13 +1,21 @@
-import { ROLE_TYPES } from '../../../config/index.js'
 import { AppError } from '../../helpers/index.js'
 
-const isOwnerModOrAdmin = (req, res, next) => {
+const isOwnerOrHasRole = (roles) => (req, res, next) => {
   const isOwner = req.user.id === req.resource.authorId
-  const isModOrAdmin = req.user.roles.find(role => role === ROLE_TYPES.MOD.name || ROLE_TYPES.ADMIN.name)
 
-  if (!isOwner && !isModOrAdmin) {
-    return next(AppError.unauthorized('No tienes permisos para hacer esta operación'))
+  if (!isOwner) {
+    let hasRole = false
+
+    if (roles.length !== 0) {
+      hasRole = req.user.roles.find(role => roles.includes(role)) !== undefined
+    }
+
+    if (!hasRole) {
+      return next(AppError.unauthorized('No tienes permisos para hacer esta operación'))
+    }
   }
+
+  next()
 }
 
 const isReported = (req, res, next) => {
@@ -18,4 +26,4 @@ const isReported = (req, res, next) => {
   next()
 }
 
-export { isOwnerModOrAdmin, isReported }
+export { isOwnerOrHasRole, isReported }
