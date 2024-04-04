@@ -168,8 +168,8 @@ const update = async ({ postId, title, body, categoryId, slug, currUserId }) => 
 const existsById = async (postId) => {
   const selectPost = `SELECT
                         id,
-                        author_id AS authorId,
-                        reported_at AS reportedAt
+                        author_id AS "authorId",
+                        reported_at AS "reportedAt"
                       FROM aspect
                       WHERE
                         id = $1
