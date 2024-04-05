@@ -156,7 +156,7 @@ CREATE TABLE "vote" (
   CONSTRAINT existent_aspect FOREIGN KEY (aspect_id) REFERENCES aspect (id),
   CONSTRAINT existent_user FOREIGN KEY (user_id) REFERENCES "user" (id),
   CONSTRAINT valid_vote_direction_value CHECK (vote_direction IN (1, -1)),
-  CONSTRAINT single_vote_per_aspect UNIQUE (aspect_id, user_id);
+  CONSTRAINT single_vote_per_aspect UNIQUE (aspect_id, user_id)
 );
 
 CREATE TABLE "report_type" (
