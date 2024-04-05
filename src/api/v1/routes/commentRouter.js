@@ -11,8 +11,13 @@ const router = Router({ mergeParams: true })
 
 router
   .route('/')
-  .get([postExists, mockUser, errorCatcher(getComments)])
+  .get([
+    validateUids(['postId']),
+    postExists,
+    mockUser
+  ], errorCatcher(getComments))
   .post([
+    validateUids(['postId']),
     mockUser,
     commentDto,
     canCreateComment

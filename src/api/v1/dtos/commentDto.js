@@ -4,7 +4,6 @@ import { getUUID } from '../../../config/index.js'
 import { uidSchema } from '../middleware/index.js'
 
 const commentSchema = Joi.object({
-  postId: uidSchema.label('El postId'),
   parentId: uidSchema.label('El parentId'),
   body: Joi.string().trim().min(4).messages({
     'string.min': 'El comentario debe tener al menos 4 caracteres',
@@ -13,7 +12,7 @@ const commentSchema = Joi.object({
   }).required()
 }).options({ abortEarly: false })
 
-const validate = async ({ body, params }) => await commentSchema.validateAsync({ ...body, postId: params.postId })
+const validate = async ({ body }) => await commentSchema.validateAsync(body)
 
 const transform = async ({ body, method }) => {
   if (method === 'POST') {
