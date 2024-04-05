@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
 import { mockUser } from '../middleware/mockUser.js'
 import { commentDto } from '../dtos/commentDto.js'
-import { createComment, getComments, editCommentById, deleteCommentById } from '../controllers/commentController.js'
+import { createComment, getComments, editCommentById, deleteCommentById, voteCommentById } from '../controllers/commentController.js'
 import {
   postExists,
   validateUids,
@@ -14,6 +14,7 @@ import {
   restrictToOwnerOrRoles
 } from '../middleware/index.js'
 import { ROLE_TYPES } from '../../../config/index.js'
+import { voteDto } from '../dtos/voteDto.js'
 
 const router = Router({ mergeParams: true })
 
@@ -50,6 +51,16 @@ router
       ROLE_TYPES.ADMIN.name
     ])
   ], errorCatcher(deleteCommentById))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/:commentId/vote')
+  .post([
+    validateUids(['postId', 'commentId']),
+    mockUser,
+    findAndSetComment,
+    voteDto
+  ], errorCatcher(voteCommentById))
   .all(methodNotAllowedHandler)
 
 export default router

@@ -1,3 +1,4 @@
+import { voteById } from '../models/votingModel.js'
 import { create, getAll, updateById, deleteById } from '../models/commentModel.js'
 
 const createComment = async (req, res) => {
@@ -43,4 +44,14 @@ const deleteCommentById = async (req, res) => {
   res.sendStatus(204)
 }
 
-export { createComment, getComments, editCommentById, deleteCommentById }
+const voteCommentById = async (req, res) => {
+  await voteById({
+    aspectId: req.params.commentId,
+    authorId: req.resource.authorId,
+    currUserId: req.user.id,
+    ...req.body
+  })
+  res.sendStatus(204)
+}
+
+export { createComment, getComments, editCommentById, deleteCommentById, voteCommentById }
