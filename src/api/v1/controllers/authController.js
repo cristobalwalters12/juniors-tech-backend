@@ -1,38 +1,36 @@
 import { AppError } from '../../helpers/AppError.js'
 import { byEmailLogin } from '../models/usuarioModel.js'
-import { bcryptAdapter, jwtAdapter } from '../../../config/index.js'
+import { jwtAdapter } from '../../../config/index.js'
+import bcrypt from 'bcryptjs'
 
 const loginUser = async (req, res) => {
-  const { email, password } = req.body
-
-  const userInDb = await byEmailLogin({ email })
-  if (!userInDb) {
-    throw AppError.unauthorized('Invalid email or password')
+  try {
+    const { email, password } = req.body
+    const user = await byEmailLogin({ email })
+    if (!user) {
+      res.status(404).json({ message: 'User not found' })
+    } else {
+      console.log('este es del login', password)
+      const match = await bcrypt.compare(password, user.password)
+      if (match) {
+        const accessToken = await jwtAdapter.generateAccessToken({ id: user.id, role: user.role })
+        const tokenDecoded = jwtAdapter.decodeAccessToken(accessToken)
+        res.status(200).json({
+          status: 'success',
+          message: 'Token is valid',
+          data: {
+            user,
+            accessToken
+          },
+          tokenDecoded
+        })
+      } else {
+        res.status(400).json({ message: 'Invalid password' })
+      }
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'An error occurred', error: error.message })
   }
-
-  const passwordValid = await bcryptAdapter.compare(
-    password,
-    userInDb.password
-  )
-
-  if (!passwordValid) {
-    throw AppError.unauthorized('Invalid email or password')
-  }
-
-  const { token, expirationDate } = await jwtAdapter.generateRefreshToken({
-    id: userInDb.id, role: userInDb.role
-  })
-  res.cookie('token', token, {
-    expires: expirationDate,
-    httpOnly: true,
-    secure: true,
-    sameSite: 'None'
-  })
-  const accessToken = await jwtAdapter.generateAccessToken({ id: userInDb.id, role: userInDb.role })
-  return res.status(200).json({
-    status: 'success',
-    data: { accessToken, userInDb }
-  })
 }
 
 const logoutUser = async (req, res) => {
