@@ -130,6 +130,7 @@ CREATE TABLE "aspect" (
   "comment_count" INTEGER DEFAULT 0 NOT NULL,
   "created_at" TIMESTAMP DEFAULT (NOW()) NOT NULL,
   "updated_at" TIMESTAMP,
+  "deleted_at" TIMESTAMP,
   "has_open_report" BOOLEAN DEFAULT FALSE NOT NULL,
 
   CONSTRAINT existent_aspect_type FOREIGN KEY (aspect_type_id) REFERENCES aspect_type (id),
