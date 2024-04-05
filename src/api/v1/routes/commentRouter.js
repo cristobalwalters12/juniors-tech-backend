@@ -4,13 +4,13 @@ import { mockUser } from '../middleware/mockUser.js'
 import { commentDto } from '../dtos/commentDto.js'
 import { createComment, getComments, editCommentById } from '../controllers/commentController.js'
 import {
-  canCreateComment,
-  commentExists,
   postExists,
   validateUids,
   methodNotAllowedHandler,
   isReported,
-  restrictToOwner
+  restrictToOwner,
+  canReply,
+  findAndSetComment
 } from '../middleware/index.js'
 
 const router = Router({ mergeParams: true })
@@ -26,7 +26,7 @@ router
     validateUids(['postId']),
     mockUser,
     commentDto,
-    canCreateComment
+    canReply
   ], errorCatcher(createComment))
   .all(methodNotAllowedHandler)
 
@@ -34,7 +34,7 @@ router
   .route('/:commentId')
   .put([
     validateUids(['postId', 'commentId']),
-    commentExists,
+    findAndSetComment,
     mockUser,
     restrictToOwner,
     isReported

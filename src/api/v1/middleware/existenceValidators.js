@@ -1,5 +1,5 @@
 import { AppError } from '../../helpers/AppError.js'
-import { existsById as commentExistsById, parentCommentExist } from '../models/commentModel.js'
+import { existsById as commentExistsById, getAuthDataIfExists } from '../models/commentModel.js'
 import { existsById as existsPostById } from '../models/postModel.js'
 
 const postExists = async (req, res, next) => {
@@ -12,16 +12,16 @@ const postExists = async (req, res, next) => {
   next()
 }
 
-const canCreateComment = async (req, res, next) => {
-  const parentComment = await parentCommentExist(req.body.parentId)
-  if (!parentComment.exists) {
+const canReply = async (req, res, next) => {
+  const ancestorExists = await commentExistsById(req.body.parentId)
+  if (!ancestorExists) {
     return next(AppError.notFound('La publicación o comentario al que intentas responder no existe'))
   }
   next()
 }
 
-const commentExists = async (req, res, next) => {
-  const comment = await commentExistsById({
+const findAndSetComment = async (req, res, next) => {
+  const comment = await getAuthDataIfExists({
     postId: req.params.postId,
     commentId: req.params.commentId
   })
@@ -34,4 +34,4 @@ const commentExists = async (req, res, next) => {
   next()
 }
 
-export { postExists, canCreateComment, commentExists }
+export { postExists, canReply, findAndSetComment }

@@ -136,17 +136,17 @@ const updateById = async ({ commentId, body, currUserId }) => {
   return { ...comment, ...author }
 }
 
-const parentCommentExist = async (parentId) => {
-  const selectParentComment = `SELECT
-                                deleted_at IS NULL AS "exists"
-                              FROM aspect
-                              WHERE id = $1;`
-  const { rows: [parentComment] } = await pool.query(selectParentComment, [parentId])
+const existsById = async (commentId) => {
+  const selectParentComment = `SELECT EXISTS(
+                                SELECT 1 FROM aspect
+                                WHERE id = $1
+                                AND deleted_at IS NULL);`
+  const { rows: [comment] } = await pool.query(selectParentComment, [commentId])
 
-  return parentComment
+  return comment.exists
 }
 
-const existsById = async ({ postId, commentId }) => {
+const getAuthDataIfExists = async ({ postId, commentId }) => {
   const selectPost = `SELECT
                         id,
                         author_id AS "authorId",
@@ -161,4 +161,4 @@ const existsById = async ({ postId, commentId }) => {
   return comment
 }
 
-export { create, getAll, updateById, existsById, parentCommentExist }
+export { create, getAll, updateById, existsById, getAuthDataIfExists }
