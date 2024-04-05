@@ -7,8 +7,10 @@ const uidSchema = Joi.string().trim().length(10).messages({
   'any.required': '{{#label}} es obligatorio'
 }).required()
 
-const validate = async ({ params: { id } }) => await uidSchema.label('El id').validateAsync(id)
+const validate = async (req, ids) => await Promise.all(ids.map(id =>
+  uidSchema.label(`El ${id}`).validateAsync(req.params[id])
+))
 
-const uidValidator = pathVariablesValidatorBuilder(validate)
+const validateUids = (ids) => pathVariablesValidatorBuilder(validate, ids)
 
-export { uidValidator, uidSchema }
+export { validateUids, uidSchema }

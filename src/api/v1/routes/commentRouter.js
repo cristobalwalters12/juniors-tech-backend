@@ -5,6 +5,7 @@ import { commentDto } from '../dtos/commentDto.js'
 import { createComment, getComments, editCommentById } from '../controllers/commentController.js'
 import { canCreateComment, postExists } from '../middleware/existenceValidators.js'
 import { methodNotAllowedHandler } from '../middleware/methodNotAllowedHandler.js'
+import { validateUids } from '../middleware/validateUids.js'
 
 const router = Router({ mergeParams: true })
 
@@ -20,7 +21,10 @@ router
 
 router
   .route('/:commentId')
-  .put(mockUser, errorCatcher(editCommentById))
+  .put([
+    validateUids(['postId', 'commentId']),
+    mockUser
+  ], errorCatcher(editCommentById))
   .all(methodNotAllowedHandler)
 
 export default router
