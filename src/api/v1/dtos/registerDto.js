@@ -1,6 +1,5 @@
 import Joi from 'joi'
 import { reqBodyValidatorBuilder } from '../../helpers/index.js'
-import { bcryptAdapter } from '../../../config/index.js'
 
 const registerSchema = Joi.object({
   email: Joi.string().email().required().max(50),
@@ -14,12 +13,10 @@ const validate = async ({ body }) => await registerSchema.validateAsync(body)
 
 const transform = async ({ body }) => {
   const email = body.email.toLowerCase()
-  const password = await bcryptAdapter.hash(body.password)
 
   return {
     ...body,
-    email,
-    password
+    email
   }
 }
 
