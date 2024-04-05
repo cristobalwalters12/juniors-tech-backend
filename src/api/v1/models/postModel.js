@@ -107,13 +107,13 @@ const getAll = async ({ currUserId }) => {
 
   if (currUserId !== undefined) {
     const selectPostVotes = `SELECT
-                            V.vote_direction AS "voteDirection",
-                            V.aspect_id AS "aspectId"
-                          FROM aspect A
-                          JOIN vote V
-                          ON A.id = V.aspect_id
-                          WHERE A.aspect_type_id = $1
-                          AND V.user_id = $2;`
+                              V.vote_direction AS "voteDirection",
+                              V.aspect_id AS "aspectId"
+                            FROM aspect A
+                            JOIN vote V
+                            ON A.id = V.aspect_id
+                            WHERE A.aspect_type_id = $1
+                            AND V.user_id = $2;`
     const { rows: rawPostsVotes } = await pool.query(selectPostVotes, [ASPECT_TYPES.POST, currUserId])
 
     rawPostsVotes.forEach(({ voteDirection, aspectId }) => {
@@ -178,8 +178,9 @@ const deleteById = async ({ postId }) => {
   const deletePost = `UPDATE aspect
                       SET deleted_at = NOW()
                       WHERE id = $1
+                      OR post_id = $2
                       RETURNING author_id AS "authorId";`
-  const { rows: [author] } = await pool.query(deletePost, [postId])
+  const { rows: [author] } = await pool.query(deletePost, [postId, postId])
 
   const updateAuthor = `UPDATE "user"
                         SET post_count = post_count - 1
