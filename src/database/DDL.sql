@@ -148,10 +148,7 @@ CREATE TABLE "user_language" (
   "language_id" char(10) NOT NULL
 );
 
-CREATE TABLE "it_field" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
-);
+
 
 CREATE TABLE "technology" (
   "id" char(10) PRIMARY KEY,
