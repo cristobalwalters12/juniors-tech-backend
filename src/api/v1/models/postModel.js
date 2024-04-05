@@ -88,7 +88,7 @@ const getAll = async ({ currUserId }) => {
                         A.category_id AS "categoryId",
                         A.slug,
                         A.author_id AS "authorId",
-                        U.username,
+                        U.username AS "authorUsername",
                         U.avatar_url AS "avatarUrl",
                         A.vote_count AS "voteCount",
                         A.comment_count AS "commentCount",
@@ -158,7 +158,7 @@ const updateById = async ({ postId, title, body, categoryId, slug, currUserId })
   const { rows: [postData] } = await pool.query(updatePost, [title, body, categoryId, slug, postId])
 
   const selectUsername = `SELECT
-                            username AS authorUsername
+                            username AS "authorUsername"
                           FROM "user" U
                           WHERE U.id = $1;`
   const { rows: [username] } = await pool.query(selectUsername, [postData.authorId])
