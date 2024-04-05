@@ -130,6 +130,7 @@ CREATE TABLE "aspect" (
   "comment_count" INTEGER DEFAULT 0 NOT NULL,
   "created_at" TIMESTAMP DEFAULT (NOW()) NOT NULL,
   "updated_at" TIMESTAMP,
+  "deleted_at" TIMESTAMP,
   "has_open_report" BOOLEAN DEFAULT FALSE NOT NULL,
 
   CONSTRAINT existent_aspect_type FOREIGN KEY (aspect_type_id) REFERENCES aspect_type (id),
@@ -156,7 +157,7 @@ CREATE TABLE "vote" (
   CONSTRAINT existent_aspect FOREIGN KEY (aspect_id) REFERENCES aspect (id),
   CONSTRAINT existent_user FOREIGN KEY (user_id) REFERENCES "user" (id),
   CONSTRAINT valid_vote_direction_value CHECK (vote_direction IN (1, -1)),
-  CONSTRAINT single_vote_per_aspect UNIQUE (aspect_id, user_id);
+  CONSTRAINT single_vote_per_aspect UNIQUE (aspect_id, user_id)
 );
 
 CREATE TABLE "report_type" (
