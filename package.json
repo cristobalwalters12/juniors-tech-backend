@@ -80,6 +80,9 @@
     ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
+    ],
+    "transformIgnorePatterns": [
+      "node_modules/(?!(nanoid)/)"
     ]
   }
 }

@@ -2,198 +2,202 @@ CREATE DATABASE juniors_tech;
 
 \c juniors_tech
 
-CREATE TABLE "user" (
-  "id" char(10) PRIMARY KEY,
-  "email" varchar UNIQUE NOT NULL,
-  "username" varchar UNIQUE NOT NULL,
-  "password" varchar NOT NULL,
-  "score" int DEFAULT 0,
-  "post_count" int DEFAULT 0,
-  "comment_count" int DEFAULT 0,
-  "open_to_work" boolean,
-  "about" varchar,
-  "employment_status_id" char(10),
-  "it_field_id" char(10),
-  "pronoun_id" char(10),
-  "avatar_url" varchar,
-  "country_id" char(10),
-  "birthdate" date NOT NULL,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp,
-  "deleted_at" timestamp,
-  "muted_at" timestamp
-);
-
-CREATE TABLE "post" (
-  "id" char(10) PRIMARY KEY,
-  "title" varchar UNIQUE,
-  "body" text NOT NULL,
-  "slug" varchar NOT NULL,
-  "author_id" char(10) NOT NULL,
-  "category_id" char(10) NOT NULL,
-  "vote_count" int DEFAULT 0,
-  "comment_count" int DEFAULT 0,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp,
-  "reported_at" timestamp,
-  "deleted_at" timestamp
-);
-
-CREATE TABLE "comment" (
-  "id" char(10) PRIMARY KEY,
-  "body" text NOT NULL,
-  "parent_id" char(10),
-  "post_id" char(10),
-  "author_id" char(10) NOT NULL,
-  "vote_count" int DEFAULT 0,
-  "comment_count" int DEFAULT 0,
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp,
-  "reported_at" timestamp,
-  "deleted_at" timestamp
-);
-
-CREATE TABLE "vote" (
-  "id" char(10) PRIMARY KEY,
-  "vote_direction" smallint NOT NULL,
-  "vote_type_id" char(10) NOT NULL,
-  "voted_item_id" char(10) NOT NULL,
-  "user_id" char(10)
-);
-
-CREATE TABLE "vote_type" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar NOT NULL
-);
-
-CREATE TABLE "report" (
-  "id" char(10) PRIMARY KEY,
-  "reported_item_id" char(10) NOT NULL,
-  "report_author_id" char(10) NOT NULL,
-  "report_type_id" char(10) NOT NULL,
-  "report_reason_id" char(10) NOT NULL,
-  "action_id" char(10),
-  "created_at" timestamp DEFAULT (now()),
-  "updated_at" timestamp
-);
-
-CREATE TABLE "report_type" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
-);
-
-CREATE TABLE "report_reason" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
-);
-
-CREATE TABLE "report_action" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
-);
-
 CREATE TABLE "employment_status" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
 );
 
 CREATE TABLE "country" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
 );
 
 CREATE TABLE "pronoun" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
 );
 
 CREATE TABLE "role" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
-);
-
-CREATE TABLE "user_role" (
-  "user_id" char(10) NOT NULL,
-  "role_id" char(10) NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
 );
 
 CREATE TABLE "education" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
-);
-
-CREATE TABLE "user_education" (
-  "user_id" char(10) NOT NULL,
-  "education_id" char(10) NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
 );
 
 CREATE TABLE "social_network" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
-);
-
-CREATE TABLE "user_social_network" (
-  "user_id" char(10) NOT NULL,
-  "social_network_id" char(10) NOT NULL,
-  "url" varchar UNIQUE NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
 );
 
 CREATE TABLE "language" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
-);
-
-CREATE TABLE "user_language" (
-  "user_id" char(10) NOT NULL,
-  "language_id" char(10) NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
 );
 
 CREATE TABLE "it_field" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
 );
 
 CREATE TABLE "technology" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
+);
+
+CREATE TABLE "user" (
+  "id" CHAR(10) PRIMARY KEY,
+  "email" VARCHAR NOT NULL,
+  "username" VARCHAR NOT NULL,
+  "password" VARCHAR NOT NULL,
+  "score" INTEGER DEFAULT 0 NOT NULL,
+  "post_count" INTEGER DEFAULT 0 NOT NULL,
+  "comment_count" INTEGER DEFAULT 0 NOT NULL,
+  "open_to_work" BOOLEAN,
+  "about" VARCHAR,
+  "employment_status_id" CHAR(10),
+  "it_field_id" CHAR(10),
+  "pronoun_id" CHAR(10),
+  "avatar_url" VARCHAR,
+  "country_id" CHAR(10),
+  "birthdate" DATE NOT NULL,
+  "created_at" TIMESTAMP DEFAULT (NOW()) NOT NULL,
+  "updated_at" TIMESTAMP,
+  "deleted_at" TIMESTAMP,
+  "muted_at" TIMESTAMP,
+
+  CONSTRAINT existent_employment_status FOREIGN KEY (employment_status_id) REFERENCES employment_status (id),
+  CONSTRAINT existent_it_field FOREIGN KEY (it_field_id) REFERENCES it_field (id),
+  CONSTRAINT existent_pronoun FOREIGN KEY (pronoun_id) REFERENCES pronoun (id),
+  CONSTRAINT existent_country FOREIGN KEY (country_id) REFERENCES country (id),
+  CONSTRAINT unique_user_email UNIQUE (email),
+  CONSTRAINT unique_user_username UNIQUE (username),
+  CONSTRAINT non_negative_user_post_count CHECK (post_count >= 0),
+  CONSTRAINT non_negative_user_comment_count CHECK (comment_count >= 0),
+  CONSTRAINT min_allowed_age CHECK (EXTRACT(YEAR FROM JUSTIFY_INTERVAL(CURRENT_TIMESTAMP - birthdate)) >= 17)
+);
+
+CREATE TABLE "user_role" (
+  "user_id" CHAR(10) NOT NULL,
+  "role_id" CHAR(10) NOT NULL
+);
+
+CREATE TABLE "user_education" (
+  "user_id" CHAR(10) NOT NULL,
+  "education_id" CHAR(10) NOT NULL
+);
+
+CREATE TABLE "user_social_network" (
+  "user_id" CHAR(10) NOT NULL,
+  "social_network_id" CHAR(10) NOT NULL,
+  "url" VARCHAR UNIQUE NOT NULL
+);
+
+CREATE TABLE "user_language" (
+  "user_id" CHAR(10) NOT NULL,
+  "language_id" CHAR(10) NOT NULL
 );
 
 CREATE TABLE "user_technology" (
-  "user_id" char(10) NOT NULL,
-  "technology_id" char(10) NOT NULL
+  "user_id" CHAR(10) NOT NULL,
+  "technology_id" CHAR(10) NOT NULL
 );
 
 CREATE TABLE "category" (
-  "id" char(10) PRIMARY KEY,
-  "name" varchar UNIQUE NOT NULL
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR NOT NULL,
+  CONSTRAINT unique_post_category UNIQUE (name)
 );
 
-ALTER TABLE "user" ADD FOREIGN KEY ("pronoun_id") REFERENCES "pronoun" ("id");
-ALTER TABLE "user" ADD FOREIGN KEY ("country_id") REFERENCES "country" ("id");
-ALTER TABLE "user_role" ADD FOREIGN KEY ("role_id") REFERENCES "role" ("id");
-ALTER TABLE "user_role" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "user_social_network" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "user_social_network" ADD FOREIGN KEY ("social_network_id") REFERENCES "social_network" ("id");
-ALTER TABLE "user_technology" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "user_technology" ADD FOREIGN KEY ("technology_id") REFERENCES "technology" ("id");
-ALTER TABLE "user_language" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "user_language" ADD FOREIGN KEY ("language_id") REFERENCES "language" ("id");
-ALTER TABLE "vote" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "post" ADD FOREIGN KEY ("author_id") REFERENCES "user" ("id");
-ALTER TABLE "post" ADD FOREIGN KEY ("category_id") REFERENCES "category" ("id");
-ALTER TABLE "user" ADD FOREIGN KEY ("employment_status_id") REFERENCES "employment_status" ("id");
-ALTER TABLE "report" ADD FOREIGN KEY ("reported_item_id") REFERENCES "user" ("id");
-ALTER TABLE "report" ADD FOREIGN KEY ("reported_item_id") REFERENCES "post" ("id");
-ALTER TABLE "vote" ADD FOREIGN KEY ("voted_item_id") REFERENCES "post" ("id");
-ALTER TABLE "user_education" ADD FOREIGN KEY ("education_id") REFERENCES "education" ("id");
-ALTER TABLE "user_education" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-ALTER TABLE "report" ADD FOREIGN KEY ("report_type_id") REFERENCES "report_type" ("id");
-ALTER TABLE "report" ADD FOREIGN KEY ("report_reason_id") REFERENCES "report_reason" ("id");
-ALTER TABLE "comment" ADD FOREIGN KEY ("post_id") REFERENCES "post" ("id");
-ALTER TABLE "comment" ADD FOREIGN KEY ("parent_id") REFERENCES "comment" ("id");
-ALTER TABLE "comment" ADD FOREIGN KEY ("author_id") REFERENCES "user" ("id");
-ALTER TABLE "vote" ADD FOREIGN KEY ("vote_type_id") REFERENCES "vote_type" ("id");
-ALTER TABLE "vote" ADD FOREIGN KEY ("voted_item_id") REFERENCES "comment" ("id");
-ALTER TABLE "report" ADD FOREIGN KEY ("id") REFERENCES "comment" ("id");
-ALTER TABLE "report" ADD FOREIGN KEY ("action_id") REFERENCES "report_action" ("id");
-ALTER TABLE "user" ADD FOREIGN KEY ("it_field_id") REFERENCES "it_field" ("id");
+CREATE TABLE "aspect_type" (
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
+);
+
+CREATE TABLE "aspect" (
+  "id" CHAR(10) PRIMARY KEY,
+  "aspect_type_id" CHAR(10) NOT NULL,
+  "title" VARCHAR(300),
+  "body" TEXT NOT NULL,
+  "slug" VARCHAR,
+  "parent_id" CHAR(10),
+  "post_id" CHAR(10),
+  "author_id" CHAR(10) NOT NULL,
+  "category_id" CHAR(10),
+  "vote_count" INTEGER DEFAULT 0 NOT NULL,
+  "comment_count" INTEGER DEFAULT 0 NOT NULL,
+  "created_at" TIMESTAMP DEFAULT (NOW()) NOT NULL,
+  "updated_at" TIMESTAMP,
+  "deleted_at" TIMESTAMP,
+  "has_open_report" BOOLEAN DEFAULT FALSE NOT NULL,
+
+  CONSTRAINT existent_aspect_type FOREIGN KEY (aspect_type_id) REFERENCES aspect_type (id),
+  CONSTRAINT existent_parent_comment FOREIGN KEY (parent_id) REFERENCES aspect (id),
+  CONSTRAINT existent_post_id FOREIGN KEY (post_id) REFERENCES aspect (id),
+  CONSTRAINT existent_aspect_author FOREIGN KEY (author_id) REFERENCES "user" (id),
+  CONSTRAINT existent_aspect_category FOREIGN KEY (category_id) REFERENCES category (id),
+  CONSTRAINT unique_post_title UNIQUE (title),
+  CONSTRAINT non_negative_aspect_comment_count CHECK (comment_count >= 0),
+  CONSTRAINT single_aspect_type CHECK (
+    -- caso publicación
+    (NUM_NULLS(title, slug, category_id) = 0 AND NUM_NONNULLS(parent_id, post_id) = 0)
+    OR
+    -- caso comentario
+    (NUM_NULLS(parent_id, post_id) = 0 AND NUM_NONNULLS(title, slug, category_id) = 0))
+);
+
+CREATE TABLE "vote" (
+  "id" CHAR(10) PRIMARY KEY,
+  "vote_direction" smallint NOT NULL,
+  "aspect_id" CHAR(10) NOT NULL,
+  "user_id" CHAR(10) NOT NULL,
+
+  CONSTRAINT existent_aspect FOREIGN KEY (aspect_id) REFERENCES aspect (id),
+  CONSTRAINT existent_user FOREIGN KEY (user_id) REFERENCES "user" (id),
+  CONSTRAINT valid_vote_direction_value CHECK (vote_direction IN (1, -1)),
+  CONSTRAINT single_vote_per_aspect UNIQUE (aspect_id, user_id)
+);
+
+CREATE TABLE "report_type" (
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
+);
+
+CREATE TABLE "report_reason" (
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
+);
+
+CREATE TABLE "report_action" (
+  "id" CHAR(10) PRIMARY KEY,
+  "name" VARCHAR UNIQUE NOT NULL
+);
+
+CREATE TABLE "report" (
+  "id" CHAR(10) PRIMARY KEY,
+  "reported_by" CHAR(10) NOT NULL,
+  "report_type_id" CHAR(10) NOT NULL,
+  "report_reason_id" CHAR(10) NOT NULL,
+  "report_action_id" CHAR(10),
+  "created_at" TIMESTAMP DEFAULT (NOW()) NOT NULL,
+  "updated_at" TIMESTAMP,
+
+  CONSTRAINT existent_report_author FOREIGN KEY (reported_by) REFERENCES "user" (id),
+  CONSTRAINT existent_report_type FOREIGN KEY (report_type_id) REFERENCES report_type (id),
+  CONSTRAINT existent_report_reason FOREIGN KEY (report_reason_id) REFERENCES report_reason (id),
+  CONSTRAINT existent_report_action FOREIGN KEY (report_action_id) REFERENCES report_action (id)
+);
+
+CREATE TABLE "reported_item" (
+  "id" CHAR(10) PRIMARY KEY,
+  "report_id" CHAR(10),
+  "aspect_id" CHAR(10),
+  "user_id" CHAR(10),
+
+  CONSTRAINT existent_report FOREIGN KEY (report_id) REFERENCES report (id),
+  CONSTRAINT existent_reported_aspect FOREIGN KEY (aspect_id) REFERENCES aspect (id),
+  CONSTRAINT existent_reported_user FOREIGN KEY (user_id) REFERENCES "user" (id),
+  CONSTRAINT single_report_type CHECK (NUM_NONNULLS(report_id, aspect_id, user_id) = 1)
+);
