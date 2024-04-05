@@ -20,12 +20,20 @@ const create = async ({ id, postId, parentId, body, currUserId }) => {
   const { rows: [commentData] } = await pool.query(insertComment, [id, ASPECT_TYPES.COMMENT, postId, parentId, body, currUserId])
 
   const updateAuthor = `UPDATE "user"
-                        SET post_count = post_count + 1
+                        SET comment_count = comment_count + 1
                         WHERE id = $1
                         RETURNING
                           username AS "authorUsername",
                           avatar_url AS "avatarUrl";`
-  const { rows: [author] } = await pool.query(updateAuthor, [currUserId])
+
+  const updateAncestors = `UPDATE aspect
+                        SET comment_count = comment_count + 1
+                        WHERE id IN ($1, $2);`
+
+  const [{ rows: [author] }] = await Promise.all([
+    pool.query(updateAuthor, [currUserId]),
+    pool.query(updateAncestors, [postId, parentId])
+  ])
 
   return { ...commentData, ...author, voteDirection: 0 }
 }
