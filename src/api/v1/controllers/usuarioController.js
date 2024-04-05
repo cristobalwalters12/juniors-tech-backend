@@ -1,4 +1,4 @@
-import { createUser, getByEmail, getUsers, getUserByUsername } from '../models/usuarioModel.js'
+import { createUser, getByEmail, getUsers, getUserByUsername, updateUser, validateEmailById } from '../models/usuarioModel.js'
 import { jwtAdapter } from '../../../config/adapters/jwtAdapter.js'
 const createUserjwtController = async (req, res) => {
   const { email, password, username, birthdate } = req.body
@@ -49,4 +49,42 @@ const getUserByUsernameController = async (req, res) => {
   }
 }
 
-export { createUserjwtController, getUsersController, getUserByUsernameController }
+const updateUserController = async (req, res) => {
+  try {
+    console.log(req._id)
+    const id = req.params.id
+    const fields = req.body
+    const user = await validateEmailById(id)
+    if (!user) {
+      res.status(404).json({
+        error: 404,
+        message: 'El usuario no existe'
+      })
+    } else if (user.isMuted) {
+      res.status(404).json({
+        error: 404,
+        message: 'El usuario ha sido silenciado'
+      })
+    } else if (user.isDeleted) {
+      res.status(404).json({
+        error: 404,
+        message: 'El usuario ha sido eliminado'
+      })
+    } else if (req._id !== id) {
+      res.status(403).json({
+        error: 403,
+        message: 'El ID del token no coincide con el ID del usuario'
+      })
+    } else {
+      const updatedUser = await updateUser(id, fields)
+      res.json({
+        message: 'Usuario actualizado',
+        user: updatedUser
+      })
+    }
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: error.message })
+  }
+}
+export { createUserjwtController, getUsersController, getUserByUsernameController, updateUserController }

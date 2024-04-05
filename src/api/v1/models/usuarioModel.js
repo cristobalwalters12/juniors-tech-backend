@@ -102,7 +102,7 @@ const getUserByUsername = async (username) => {
   console.log(username)
   const Userquery = {
     text: `
-      SELECT 
+    SELECT 
     u.id,
     u.username,
     u.score,
@@ -165,4 +165,105 @@ const getUserByUsername = async (username) => {
   return user
 }
 
-export { createUser, getByEmail, byEmailLogin, getUsers, getUserByUsername }
+const validateEmailById = async (id) => {
+  const query = {
+    text: 'SELECT * FROM "user" WHERE id = $1',
+    values: [id]
+  }
+  const response = await pool.query(query)
+  const user = response.rows[0]
+
+  if (!user) {
+    throw new Error('El usuario no existe')
+  } else if (user.muted_at) {
+    throw new Error('El usuario ha sido silenciado')
+  } else if (user.deleted_at) {
+    throw new Error('El usuario ha sido eliminado')
+  }
+
+  return user
+}
+const updateUser = async (id, fields) => {
+  const userRes = await pool.query('SELECT * FROM "user" WHERE id = $1 AND deleted_at IS NULL AND muted_at IS NULL', [id])
+  if (userRes.rowCount === 0) {
+    throw new Error('User does not exist or is deleted or muted')
+  }
+  const userFields = ['open_to_work', 'about', 'employment_status_id', 'pronoun_id', 'avatar_url', 'country_id', 'it_field_id']
+  const userValues = userFields.map(field => fields[field])
+  const updateUserText = `UPDATE "user" SET (${userFields.join(', ')}) = ROW(${userValues.map((_, i) => `$${i + 2}`).join(', ')}) WHERE id = $1`
+  await pool.query(updateUserText, [id, ...userValues])
+
+  const relations = ['language', 'technology', 'education', 'social_network']
+  const relationIdFields = {
+    language: 'language_id',
+    technology: 'technology_id',
+    education: 'education_id',
+    social_network: 'social_network_id'
+  }
+  for (const relation of relations) {
+    const relationTable = `user_${relation}`
+    const relationIdField = relationIdFields[relation]
+    const deleteRelationText = `DELETE FROM "${relationTable}" WHERE user_id = $1`
+    await pool.query(deleteRelationText, [id])
+    if (Array.isArray(fields[relation])) {
+      if (relation === 'social_network') {
+        for (const relationId of fields[relation]) {
+          const url = 'https://www.linkedin.com/in/'
+          const insertRelationText = `INSERT INTO "${relationTable}" (user_id, ${relationIdField}, url) VALUES ($1, $2, $3)`
+          await pool.query(insertRelationText, [id, relationId, url])
+        }
+      } else {
+        for (const relationId of fields[relation]) {
+          const insertRelationText = `INSERT INTO "${relationTable}" (user_id, ${relationIdField}) VALUES ($1, $2)`
+          await pool.query(insertRelationText, [id, relationId])
+        }
+      }
+    }
+  }
+  const updatedUserRes = await pool.query(`
+  SELECT 
+  u.id,
+  u.username,
+  u.score,
+  u.post_count,
+  u.open_to_work as "openToWork",
+  u.about,
+  u.employment_status_id as "employmentStatusId",
+  p.name AS pronoun, 
+  u.avatar_url as "avatarUrl",
+  u.created_at as "createdAt",
+  u.muted_at as "mutedAt",
+  u.deleted_at as "deletedAt",
+  c.id AS "countryId", 
+  ARRAY_AGG(DISTINCT ul.language_id) AS languages, 
+  itf.id AS "itField", 
+  ARRAY_AGG(DISTINCT ut.technology_id) AS technologies, 
+  ARRAY_AGG(DISTINCT ue.education_id) AS education, 
+  ARRAY_AGG(DISTINCT usn.url) AS social_networks, 
+  ARRAY_AGG(DISTINCT ur.role_id) AS roles
+  FROM 
+    "user" u 
+  LEFT JOIN 
+    "pronoun" p ON u.pronoun_id = p.id 
+  LEFT JOIN 
+    "country" c ON u.country_id = c.id 
+  LEFT JOIN 
+    "user_language" ul ON u.id = ul.user_id 
+  LEFT JOIN 
+    "it_field" itf ON u.it_field_id = itf.id 
+  LEFT JOIN 
+    "user_technology" ut ON u.id = ut.user_id 
+  LEFT JOIN 
+    "user_education" ue ON u.id = ue.user_id 
+  LEFT JOIN 
+    "user_social_network" usn ON u.id = usn.user_id 
+  LEFT JOIN 
+    "user_role" ur ON u.id = ur.user_id 
+  WHERE 
+    u.id = $1
+  GROUP BY 
+    u.id, p.name, c.id, itf.id;
+    `, [id])
+  return updatedUserRes.rows[0]
+}
+export { createUser, getByEmail, byEmailLogin, validateEmailById, getUsers, getUserByUsername, updateUser }
