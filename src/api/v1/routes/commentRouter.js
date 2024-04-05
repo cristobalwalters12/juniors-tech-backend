@@ -2,7 +2,7 @@ import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
 import { mockUser } from '../middleware/mockUser.js'
 import { commentDto } from '../dtos/commentDto.js'
-import { createComment, getComments, editCommentById } from '../controllers/commentController.js'
+import { createComment, getComments, editCommentById, deleteCommentById } from '../controllers/commentController.js'
 import {
   postExists,
   validateUids,
@@ -39,6 +39,7 @@ router
     restrictToOwner,
     isReported
   ], errorCatcher(editCommentById))
+  .delete(errorCatcher(deleteCommentById))
   .all(methodNotAllowedHandler)
 
 export default router

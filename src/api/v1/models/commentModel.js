@@ -136,6 +136,20 @@ const updateById = async ({ commentId, body, currUserId }) => {
   return { ...comment, ...author }
 }
 
+const deleteById = async (commentId) => {
+  const deleteComment = `UPDATE aspect
+                          SET deleted_at = NOW()
+                          WHERE id = $1
+                          RETURNING author_id AS "authorId";`
+
+  const { rows: [author] } = await pool.query(deleteComment, [commentId])
+
+  const updateAuthor = `UPDATE "user"
+                        SET comment_count = comment_count - 1
+                        WHERE id = $1;`
+  await pool.query(updateAuthor, [author.authorId])
+}
+
 const existsById = async (commentId) => {
   const selectParentComment = `SELECT EXISTS(
                                 SELECT 1 FROM aspect
@@ -161,4 +175,4 @@ const getAuthDataIfExists = async ({ postId, commentId }) => {
   return comment
 }
 
-export { create, getAll, updateById, existsById, getAuthDataIfExists }
+export { create, getAll, updateById, deleteById, existsById, getAuthDataIfExists }

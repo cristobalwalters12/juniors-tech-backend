@@ -1,4 +1,4 @@
-import { create, getAll, updateById } from '../models/commentModel.js'
+import { create, getAll, updateById, deleteById } from '../models/commentModel.js'
 
 const createComment = async (req, res) => {
   const data = await create({
@@ -38,4 +38,9 @@ const editCommentById = async (req, res) => {
   })
 }
 
-export { createComment, getComments, editCommentById }
+const deleteCommentById = async (req, res) => {
+  await deleteById(req.params.commentId)
+  res.sendStatus(204)
+}
+
+export { createComment, getComments, editCommentById, deleteCommentById }
