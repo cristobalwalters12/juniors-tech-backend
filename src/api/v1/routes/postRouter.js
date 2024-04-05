@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
-import { restrictToOwner, restrictToOwnerOrRoles, isReported, methodNotAllowedHandler, postExists, uidValidator } from '../middleware/index.js'
+import { restrictToOwner, restrictToOwnerOrRoles, isReported, methodNotAllowedHandler, postExists, validateUids } from '../middleware/index.js'
 import { createPost, getPostById, getPosts, editPostById, deletePostById, votePostById } from '../controllers/postController.js'
 import { postDto } from '../dtos/postDto.js'
 import { mockUser } from '../middleware/mockUser.js'
@@ -17,10 +17,10 @@ router
 
 router
   .route('/:id')
-  .get([uidValidator, mockUser], errorCatcher(getPostById))
+  .get([validateUids(['id']), mockUser], errorCatcher(getPostById))
   .put([
     mockUser,
-    uidValidator,
+    validateUids(['id']),
     postExists,
     restrictToOwner,
     isReported,
@@ -28,7 +28,7 @@ router
   ], errorCatcher(editPostById))
   .delete([
     mockUser,
-    uidValidator,
+    validateUids(['id']),
     postExists,
     restrictToOwnerOrRoles([
       ROLE_TYPES.MOD.name,
@@ -41,7 +41,7 @@ router
   .route('/:id/vote')
   .post([
     mockUser,
-    uidValidator,
+    validateUids(['id']),
     postExists,
     voteDto
   ], errorCatcher(votePostById))

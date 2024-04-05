@@ -16,10 +16,9 @@ const reqBodyValidatorBuilder =
   }
 
 const pathVariablesValidatorBuilder =
-  (validate, transform) => async (req, res, next) => {
+  (validate, params) => async (req, res, next) => {
     try {
-      await validate(req)
-      if (transform) req.params = await transform(req)
+      await validate(req, params)
       next()
     } catch (error) {
       if (error.name === 'ValidationError') {
