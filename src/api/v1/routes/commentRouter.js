@@ -10,8 +10,10 @@ import {
   isReported,
   restrictToOwner,
   canReply,
-  findAndSetComment
+  findAndSetComment,
+  restrictToOwnerOrRoles
 } from '../middleware/index.js'
+import { ROLE_TYPES } from '../../../config/index.js'
 
 const router = Router({ mergeParams: true })
 
@@ -39,7 +41,15 @@ router
     restrictToOwner,
     isReported
   ], errorCatcher(editCommentById))
-  .delete(errorCatcher(deleteCommentById))
+  .delete([
+    validateUids(['postId', 'commentId']),
+    findAndSetComment,
+    mockUser,
+    restrictToOwnerOrRoles([
+      ROLE_TYPES.MOD.name,
+      ROLE_TYPES.ADMIN.name
+    ])
+  ], errorCatcher(deleteCommentById))
   .all(methodNotAllowedHandler)
 
 export default router
