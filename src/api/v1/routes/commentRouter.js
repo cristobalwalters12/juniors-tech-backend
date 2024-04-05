@@ -3,7 +3,7 @@ import { errorCatcher } from '../../helpers/index.js'
 import { mockUser } from '../middleware/mockUser.js'
 import { commentDto } from '../dtos/commentDto.js'
 import { createComment, getComments, editCommentById } from '../controllers/commentController.js'
-import { canCreateComment, postExists } from '../middleware/existenceValidators.js'
+import { canCreateComment, commentExists, postExists } from '../middleware/existenceValidators.js'
 import { methodNotAllowedHandler } from '../middleware/methodNotAllowedHandler.js'
 import { validateUids } from '../middleware/validateUids.js'
 
@@ -28,6 +28,7 @@ router
   .route('/:commentId')
   .put([
     validateUids(['postId', 'commentId']),
+    commentExists,
     mockUser
   ], errorCatcher(editCommentById))
   .all(methodNotAllowedHandler)

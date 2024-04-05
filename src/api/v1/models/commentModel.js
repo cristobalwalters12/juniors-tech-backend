@@ -146,4 +146,19 @@ const parentCommentExist = async (parentId) => {
   return parentComment
 }
 
-export { create, getAll, updateById, parentCommentExist }
+const existsById = async ({ postId, commentId }) => {
+  const selectPost = `SELECT
+                        id,
+                        author_id AS "authorId",
+                        has_open_report AS "hasOpenReport"
+                      FROM aspect
+                      WHERE
+                        id = $1
+                        AND aspect_type_id = $2
+                        AND post_id = $3
+                        AND deleted_at IS NULL;`
+  const { rows: [comment] } = await pool.query(selectPost, [commentId, ASPECT_TYPES.COMMENT, postId])
+  return comment
+}
+
+export { create, getAll, updateById, existsById, parentCommentExist }

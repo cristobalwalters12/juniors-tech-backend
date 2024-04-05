@@ -1,5 +1,5 @@
 import { AppError } from '../../helpers/AppError.js'
-import { parentCommentExist } from '../models/commentModel.js'
+import { existsById as commentExistsById, parentCommentExist } from '../models/commentModel.js'
 import { existsById as existsPostById } from '../models/postModel.js'
 
 const postExists = async (req, res, next) => {
@@ -20,4 +20,18 @@ const canCreateComment = async (req, res, next) => {
   next()
 }
 
-export { postExists, canCreateComment }
+const commentExists = async (req, res, next) => {
+  const comment = await commentExistsById({
+    postId: req.params.postId,
+    commentId: req.params.commentId
+  })
+
+  if (comment === undefined) {
+    return next(AppError.notFound('El comentario no existe'))
+  }
+
+  req.resource = comment
+  next()
+}
+
+export { postExists, canCreateComment, commentExists }
