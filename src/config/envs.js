@@ -13,7 +13,6 @@ const database =
   process.env.NODE_ENV === 'test'
     ? process.env.DB_TEST_NAME
     : process.env.DB_NAME
-
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET
 
