@@ -207,8 +207,9 @@ const updateUser = async (id, fields) => {
     await pool.query(deleteRelationText, [id])
     if (Array.isArray(fields[relation])) {
       if (relation === 'social_network') {
-        for (const relationId of fields[relation]) {
-          const url = 'https://www.linkedin.com/in/'
+        for (const socialNetwork of fields[relation]) {
+          const url = socialNetwork.url
+          const relationId = socialNetwork.id
           const insertRelationText = `INSERT INTO "${relationTable}" (user_id, ${relationIdField}, url) VALUES ($1, $2, $3)`
           await pool.query(insertRelationText, [id, relationId, url])
         }
