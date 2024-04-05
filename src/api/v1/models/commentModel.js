@@ -30,4 +30,14 @@ const create = async ({ id, postId, parentId, body, currUserId }) => {
   return { ...postData, ...author, voteDirection: 0 }
 }
 
-export { create }
+const parentCommentExist = async (parentId) => {
+  const selectParentComment = `SELECT
+                                deleted_at IS NULL AS "exists"
+                              FROM aspect
+                              WHERE id = $1;`
+  const { rows: [parentComment] } = await pool.query(selectParentComment, [parentId])
+
+  return parentComment
+}
+
+export { create, parentCommentExist }
