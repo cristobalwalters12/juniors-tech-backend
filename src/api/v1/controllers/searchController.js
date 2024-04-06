@@ -1,9 +1,9 @@
-import { searchMisc } from '../models/miscModels.js'
+import { searchModel } from '../models/searchModel.js'
 
-const searchMiscController = async (req, res) => {
+const searchController = async (req, res) => {
   try {
     const query = req.query
-    const results = await searchMisc(query)
+    const results = await searchModel(query)
     res.status(200).json(results)
   } catch (error) {
     console.error(error)
@@ -11,4 +11,4 @@ const searchMiscController = async (req, res) => {
   }
 }
 
-export { searchMiscController }
+export { searchController }

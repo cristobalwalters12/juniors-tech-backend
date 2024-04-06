@@ -30,7 +30,7 @@ const validate = async ({ body }) => await postSchema.validateAsync(body)
 
 const transform = async ({ body, method }) => {
   if (method === 'POST') {
-    body.id = getUUID()
+    body.postId = getUUID()
   }
   body.title = body.title.trim()
   body.body = body.body.trim()

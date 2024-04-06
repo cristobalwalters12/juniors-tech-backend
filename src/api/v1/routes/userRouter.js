@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { createUserjwtController, getUsersController, getUserByUsernameController, updateUserController } from '../controllers/usuarioController.js'
+import { createUserjwtController, getUsersController, getUserByUsernameController, updateUserController } from '../controllers/userController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
   methodNotAllowedHandler, jwtValidator

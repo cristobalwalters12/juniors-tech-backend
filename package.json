@@ -5,10 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon src/server.js",
+    "dev": "NODE_ENV=development nodemon src/server.js",
     "dev:win": "cross-env NODE_ENV=development nodemon src/server.js",
-    "test": "NODE_ENV=test jest --verbose --coverage --forceExit --detectOpenHandles",
-    "test:win": "cross-env NODE_ENV=test jest --verbose --coverage --forceExit --detectOpenHandles",
+    "test": "NODE_ENV=test jest --verbose --forceExit --detectOpenHandles",
+    "test:win": "cross-env NODE_ENV=test jest --verbose --forceExit --detectOpenHandles",
     "start": "node src/server.js",
     "lint": "eslint . --ext js --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "npx eslint . --fix",

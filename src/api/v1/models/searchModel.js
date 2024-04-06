@@ -2,7 +2,7 @@ import { pool } from '../../../config/dbConnection.js'
 
 const toSnakeCase = (str) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
 
-const searchMisc = async (query) => {
+const searchModel = async (query) => {
   const fields = [
     'country',
     'technology',
@@ -32,4 +32,4 @@ const searchMisc = async (query) => {
   return data
 }
 
-export { searchMisc }
+export { searchModel }

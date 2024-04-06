@@ -1,9 +1,17 @@
 import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
-import { restrictToOwner, restrictToOwnerOrRoles, isReported, methodNotAllowedHandler, postExists, validateUids } from '../middleware/index.js'
+import {
+  restrictToOwner,
+  restrictToOwnerOrRoles,
+  isReported,
+  methodNotAllowedHandler,
+  postExists,
+  validateUids,
+  requireLoggedIn,
+  setUserIfLoggedIn
+} from '../middleware/index.js'
 import { createPost, getPostById, getPosts, editPostById, deletePostById, votePostById } from '../controllers/postController.js'
 import { postDto } from '../dtos/postDto.js'
-import { mockUser } from '../middleware/mockUser.js'
 import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
 
@@ -11,24 +19,24 @@ const router = Router()
 
 router
   .route('/')
-  .post([mockUser, postDto], errorCatcher(createPost))
-  .get(mockUser, getPosts)
+  .post([requireLoggedIn, postDto], errorCatcher(createPost))
+  .get(setUserIfLoggedIn, getPosts)
   .all(methodNotAllowedHandler)
 
 router
-  .route('/:id')
-  .get([validateUids(['id']), mockUser], errorCatcher(getPostById))
+  .route('/:postId')
+  .get([validateUids(['postId']), setUserIfLoggedIn], errorCatcher(getPostById))
   .put([
-    mockUser,
-    validateUids(['id']),
+    requireLoggedIn,
+    validateUids(['postId']),
     postExists,
     restrictToOwner,
     isReported,
     postDto
   ], errorCatcher(editPostById))
   .delete([
-    mockUser,
-    validateUids(['id']),
+    requireLoggedIn,
+    validateUids(['postId']),
     postExists,
     restrictToOwnerOrRoles([
       ROLE_TYPES.MOD.name,
@@ -38,10 +46,10 @@ router
   .all(methodNotAllowedHandler)
 
 router
-  .route('/:id/vote')
+  .route('/:postId/vote')
   .post([
-    mockUser,
-    validateUids(['id']),
+    requireLoggedIn,
+    validateUids(['postId']),
     postExists,
     voteDto
   ], errorCatcher(votePostById))
