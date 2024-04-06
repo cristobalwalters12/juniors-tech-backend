@@ -1,4 +1,5 @@
-import { create, getById, getAll, updateById, deleteById, voteById } from '../models/postModel.js'
+import { create, getById, getAll, updateById, deleteById } from '../models/postModel.js'
+import { voteById } from '../models/votingModel.js'
 
 const createPost = async (req, res) => {
   const data = await create({ ...req.body, currUserId: req.user.id })
@@ -43,7 +44,7 @@ const deletePostById = async (req, res) => {
 
 const votePostById = async (req, res) => {
   await voteById({
-    postId: req.params.id,
+    aspectId: req.params.id,
     authorId: req.resource.authorId,
     currUserId: req.user.id,
     ...req.body
