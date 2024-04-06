@@ -4,7 +4,7 @@ const hasRole = (req, roles) => {
   return req.user.roles.find(role => roles.includes(role)) !== undefined
 }
 
-const isOwner = (req) => req.user.id === req.resource.authorId
+const isOwner = (req) => req.user.id === req.resource.ownerId
 
 const restrictToRoles = (roles) => (req, res, next) => {
   if (!hasRole(req, roles)) {
