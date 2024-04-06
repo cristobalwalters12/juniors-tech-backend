@@ -14,4 +14,11 @@ const getAll = async () => {
   return mods
 }
 
-export { getAll }
+const promoteToMod = async (userId) => {
+  const updateUserRole = `INSERT INTO user_role
+                          (user_id, role_id)
+                          VALUES ($1, $2);`
+  await pool.query(updateUserRole, [userId, ROLE_TYPES.MOD.id])
+}
+
+export { getAll, promoteToMod }

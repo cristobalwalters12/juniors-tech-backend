@@ -4,13 +4,17 @@ import {
   getUsersController,
   getUserByUsernameController,
   updateUserController,
-  getMods
+  getMods,
+  promoteUserToMod
 } from '../controllers/userController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
-  methodNotAllowedHandler, jwtValidator,
+  methodNotAllowedHandler,
+  jwtValidator,
   requireLoggedIn,
-  restrictToRoles
+  restrictToRoles,
+  findAndSetUser,
+  canBeMod
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
 import { ROLE_TYPES } from '../../../config/index.js'
@@ -29,6 +33,17 @@ router.get('/mods', [
   .all(methodNotAllowedHandler)
 
 router.get('/:username', errorCatcher(getUserByUsernameController)).all(methodNotAllowedHandler)
+
+router
+  .route('/:username/mod')
+  .post([
+    requireLoggedIn,
+    restrictToRoles([ROLE_TYPES.ADMIN.name]),
+    findAndSetUser,
+    canBeMod
+  ], errorCatcher(promoteUserToMod))
+  .all(methodNotAllowedHandler)
+
 router.put('/:id', jwtValidator, errorCatcher(updateUserController)).all(methodNotAllowedHandler)
 
 export default router

@@ -1,6 +1,7 @@
 import { createUser, getByEmail, getUsers, getUserByUsername, updateUser, validateEmailById } from '../models/userModel.js'
 import { jwtAdapter } from '../../../config/adapters/jwtAdapter.js'
-import { getAll } from '../models/moderatorModel.js'
+import { getAll, promoteToMod } from '../models/moderatorModel.js'
+import { ROLE_TYPES } from '../../../config/index.js'
 const createUserjwtController = async (req, res) => {
   const { email, password, username, birthdate } = req.body
   const user = await getByEmail({ email })
@@ -97,10 +98,23 @@ const getMods = async (req, res) => {
   })
 }
 
+const promoteUserToMod = async (req, res) => {
+  await promoteToMod(req.resource.ownerId)
+  res.status(200).json({
+    status: 'success',
+    data: {
+      id: req.resource.ownerId,
+      username: req.params.username,
+      roles: [...req.resource.roles, ROLE_TYPES.MOD.name]
+    }
+  })
+}
+
 export {
   createUserjwtController,
   getUsersController,
   getUserByUsernameController,
   updateUserController,
-  getMods
+  getMods,
+  promoteUserToMod
 }

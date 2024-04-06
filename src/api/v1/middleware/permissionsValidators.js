@@ -1,3 +1,4 @@
+import { ROLE_TYPES } from '../../../config/index.js'
 import { AppError } from '../../helpers/index.js'
 
 const hasRole = (req, roles) => {
@@ -35,9 +36,23 @@ const isReported = (req, res, next) => {
   next()
 }
 
+const canBeMod = (req, res, next) => {
+  if (req.user.id === req.resource.ownerId) {
+    return next(AppError.badRequest('No puedes autopromoverte a moderador'))
+  }
+  if (req.resource.roles.includes(ROLE_TYPES.MOD.name)) {
+    return next(AppError.badRequest('El usuario ya es moderador'))
+  }
+  if (req.resource.isMuted) {
+    return next(AppError.badRequest('Un usuario silenciado no puede ser moderador'))
+  }
+  next()
+}
+
 export {
   restrictToRoles,
   restrictToOwnerOrRoles,
   restrictToOwner,
-  isReported
+  isReported,
+  canBeMod
 }
