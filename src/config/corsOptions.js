@@ -1,6 +1,6 @@
-import { ALLOWED_ORIGIN } from './envs.js'
+import { ALLOWED_ORIGIN, PORT } from './envs.js'
 
-const whiteList = [ALLOWED_ORIGIN]
+const whiteList = [ALLOWED_ORIGIN, `http://localhost:${PORT}`]
 
 const corsOptions = {
   origin: function (origin, callback) {
