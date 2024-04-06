@@ -1,7 +1,7 @@
 import { ASPECT_TYPES, pool } from '../../../config/index.js'
 import { AppError } from '../../helpers/AppError.js'
 
-const create = async ({ id, title, body, categoryId, slug, currUserId }) => {
+const create = async ({ postId, title, body, categoryId, slug, currUserId }) => {
   const insertPost = `INSERT INTO aspect
                         (id, aspect_type_id, title, body, category_id, slug, author_id)
                       VALUES ($1, $2, $3, $4, $5, $6, $7)
@@ -17,7 +17,7 @@ const create = async ({ id, title, body, categoryId, slug, currUserId }) => {
                         created_at AS "createdAt",
                         updated_at AS "updatedAt",
                         has_open_report AS "hasOpenReport";`
-  const { rows: [postData] } = await pool.query(insertPost, [id, ASPECT_TYPES.POST, title, body, categoryId, slug, currUserId])
+  const { rows: [postData] } = await pool.query(insertPost, [postId, ASPECT_TYPES.POST, title, body, categoryId, slug, currUserId])
 
   const updateAuthor = `UPDATE "user"
                         SET post_count = post_count + 1

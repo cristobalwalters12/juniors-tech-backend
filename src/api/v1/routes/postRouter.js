@@ -16,11 +16,11 @@ router
   .all(methodNotAllowedHandler)
 
 router
-  .route('/:id')
-  .get([validateUids(['id']), mockUser], errorCatcher(getPostById))
+  .route('/:postId')
+  .get([validateUids(['postId']), mockUser], errorCatcher(getPostById))
   .put([
     mockUser,
-    validateUids(['id']),
+    validateUids(['postId']),
     postExists,
     restrictToOwner,
     isReported,
@@ -28,7 +28,7 @@ router
   ], errorCatcher(editPostById))
   .delete([
     mockUser,
-    validateUids(['id']),
+    validateUids(['postId']),
     postExists,
     restrictToOwnerOrRoles([
       ROLE_TYPES.MOD.name,
@@ -38,10 +38,10 @@ router
   .all(methodNotAllowedHandler)
 
 router
-  .route('/:id/vote')
+  .route('/:postId/vote')
   .post([
     mockUser,
-    validateUids(['id']),
+    validateUids(['postId']),
     postExists,
     voteDto
   ], errorCatcher(votePostById))
