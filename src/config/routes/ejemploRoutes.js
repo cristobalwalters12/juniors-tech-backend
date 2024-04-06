@@ -1,69 +1,53 @@
 // fuente: https://github.com/FabianPinoP/swagger-tutorial
 
 import express from 'express'
-// import { loginUser } from "../../src/api/v1/controllers/loginController.js";
-// import { validparameters } from "../../middlewares/validateParametersLogin.js";
+import { loginUser } from '../../api/v1/controllers/authController'
+
 const router = express.Router()
 
 /**
  * @swagger
  * tags:
- *   name: Login
- *   description: autenticación de usuarios
+ *   name: Auth
+ *   description: Endpoints para la autenticación de usuarios
  */
 
 /**
  * @swagger
- * components:
- *   schemas:
- *     Login:
- *       type: object
- *       required:
- *         - email
- *         - password
- *       properties:
- *         email:
- *           type: string
- *           description: The user's email
- *         password:
- *           type: string
- *           description: The user's password
- *       example:
- *         email: example@test.com
- *         password: secretPassword
- */
-
-/**
- * @swagger
- * /auth_user:
+ * /auth/login:
  *   post:
- *     summary: Autenticar un usuario
- *     tags: [Login]
+ *     summary: Iniciar sesion
+ *     tags: [Auth]
  *     requestBody:
- *       required: true
+ *       requerid: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
  *             properties:
- *               user:
- *                 $ref: '#/components/schemas/Login'
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *             example:
+ *               email: jajajajaj@hola.com
+ *               password: "Aa1234567"
  *     responses:
- *       '200':
- *         description: Success
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: The user's token
- *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjI4NzU1MjIyfQ.2cQ8V2X4cXyK7KbXvZIc3q5jRrFq3Zb8w7q0wJxX1mM"
- *       '400':
- *         description: Bad Request
+ *       200:
+ *         description: Cuenta creada con éxito
+ *         schema:
+ *           type: object
+ *           properties:
+ *             id:
+ *               type: string
+ *             username:
+ *               type: string
+ *             avatar:
+ *               type: string
+ *             roles:
+ *               type: string
+ *             token:
+ *               type: string
  */
 
-// router.post("/auth_user", validparameters, loginUser);
-
-export default router
+router.post('/auth', loginUser)
