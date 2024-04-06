@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { promisify } from 'util'
 import { AppError } from '../../api/helpers/index.js'
-import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from '../index.js'
+import { ACCESS_TOKEN_SECRET } from '../index.js'
 
 const JWT_ERRORS = {
   TokenExpiredError: 'Token expired',
@@ -10,7 +10,7 @@ const JWT_ERRORS = {
 
 const jwtAdapter = {
   generateAccessToken: async (payload) => {
-    const expiresInS = 900 // 15 minutes
+    const expiresInS = 86400 // 1 day
     const token = await promisify(jwt.sign)(payload, ACCESS_TOKEN_SECRET, {
       algorithm: 'HS256',
       expiresIn: expiresInS
@@ -18,21 +18,8 @@ const jwtAdapter = {
     return token
   },
 
-  generateRefreshToken: async (payload) => {
-    const expiresInS = 604800 // 7 days
-    const expirationDate = new Date(Date.now() + expiresInS * 1000)
-    const token = await promisify(jwt.sign)(payload, REFRESH_TOKEN_SECRET, {
-      algorithm: 'HS256',
-      expiresIn: expiresInS
-    })
-    return { token, expirationDate }
-  },
-
   decodeAccessToken: async (token) =>
-    await decodeToken(token, ACCESS_TOKEN_SECRET),
-
-  decodeRefreshToken: async (token) =>
-    await decodeToken(token, REFRESH_TOKEN_SECRET)
+    await decodeToken(token, ACCESS_TOKEN_SECRET)
 }
 
 const decodeToken = async (token, secret) => {
