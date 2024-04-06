@@ -85,78 +85,6 @@ const router = express.Router()
  *         - voteDirection: 0
  */
 
-// /**
-//  * @swagger
-//  * components:
-//  *   schemas:
-//  *     user:
-//  *       type: object
-//  *       required:
-//  *         - username
-//  *         - avatar
-//  *         - countryId
-//  *         - score
-//  *         - itFieldId
-//  *         - openToWork
-//  *         - languages
-//  *         - technologies
-//  *       properties:
-//  *         id: Numb
-//  *         username:
-//  *           type: string
-//  *           description: The user's username
-//  *         avatar:
-//  *           type: string
-//  *           description: The user's avatar
-//  *         countryId:
-//  *           type: string
-//  *           description: The user's country
-//  *         score:
-//  *           type: Number
-//  *           description: The user's score
-//  *         itFieldId:
-//  *           type: string
-//  *           description: The user's it filed
-//  *         openToWork:
-//  *           type: boolean
-//  *           description: The user's open to work
-//  *         languages:
-//  *           type: string
-//  *           description: The user's lenguages
-//  *         technologies:
-//  *           type: string
-//  *           description: The user's technologies
-//  *       example:
-//  *         username: Jayne_Kuhic
-//  *         avatar: https://docs.material-tailwind.com/img/face-3.jpg
-//  *         countryId: chile
-//  *         score: 0
-//  *         itFieldId: sha
-//  *         openToWork: True
-//  *         languages: sda
-//  *         technologies: asd
-//  */
-
-/**
- * @swagger
- * /user:
- *   get:
- *     summary: Take all the users
- *     tags: [user]
- *     responses:
- *       '200':
- *         description: success
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 user:
- *                   type: array
- *                   items:
- *                     $ref: '#/components/schemas/user'
- */
-
 /**
  * @swagger
  * /posts:
@@ -211,45 +139,6 @@ const router = express.Router()
  *               items:
  *                 $ref: '#/components/schemas/posts'
  */
-
-// /**
-//  * @swagger
-//  * /sign-up:
-//  *   post:
-//  *     summary: Crear cuenta
-//  *     tags: [user]
-//  *     requestBody:
-//  *       requerid: true
-//  *       content:
-//  *         application/json:
-//  *           schema:
-//  *             type: object
-//  *             properties:
-//  *               email:
-//  *                 type: string
-//  *               username:
-//  *                 type: string
-//  *               password:
-//  *                 type: string
-//  *               birthdate:
-//  *                 type: Date
-//  *     responses:
-//  *       200:
-//  *         description: Cuenta creada con éxito
-//  *         schema:
-//  *           type: object
-//  *           properties:
-//  *             id:
-//  *               type: string
-//  *             username:
-//  *               type: string
-//  *             avatar:
-//  *               type: string
-//  *             roles:
-//  *               type: string
-//  *             token:
-//  *               type: string
-//  */
 
 router.post('/posts', createPost)
 router.get('/posts', getPosts)

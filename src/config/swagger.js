@@ -6,9 +6,9 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'Plan de viajes API',
+      title: 'Foro Juniors.tech API',
       version: '1.0.0',
-      description: 'API para el manejo de viajes y usuarios'
+      description: 'API para el manejo del foro'
     },
     servers: [
       {

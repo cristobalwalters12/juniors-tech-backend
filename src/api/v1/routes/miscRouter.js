@@ -6,6 +6,6 @@ import {
 } from '../middleware/index.js'
 
 const router = Router()
-router.post('/search', errorCatcher(searchMiscController)).all(methodNotAllowedHandler)
+router.get('/', errorCatcher(searchMiscController)).all(methodNotAllowedHandler)
 
 export default router
