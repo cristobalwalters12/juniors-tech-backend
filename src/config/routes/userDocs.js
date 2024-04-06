@@ -159,7 +159,7 @@ const router = express.Router()
 
 /**
  * @swagger
- * /user:
+ * /users:
  *   get:
  *     summary: Take all the users
  *     tags: [user]

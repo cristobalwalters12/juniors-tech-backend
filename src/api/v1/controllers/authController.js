@@ -1,4 +1,4 @@
-import { byEmailLogin } from '../models/usuarioModel.js'
+import { byEmailLogin } from '../models/userModel.js'
 import { jwtAdapter, bcryptAdapter } from '../../../config/index.js'
 
 const loginUser = async (req, res) => {

@@ -27,7 +27,7 @@ describe('Testing routes', () => {
   })
 
   test('GET /users', async () => {
-    const response = await request(app).get('/api/v1/usuarios')
+    const response = await request(app).get('/api/v1/users')
     expect(response.status).toBe(200)
   })
 })

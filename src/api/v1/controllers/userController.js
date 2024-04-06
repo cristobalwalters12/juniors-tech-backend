@@ -1,4 +1,4 @@
-import { createUser, getByEmail, getUsers, getUserByUsername, updateUser, validateEmailById } from '../models/usuarioModel.js'
+import { createUser, getByEmail, getUsers, getUserByUsername, updateUser, validateEmailById } from '../models/userModel.js'
 import { jwtAdapter } from '../../../config/adapters/jwtAdapter.js'
 const createUserjwtController = async (req, res) => {
   const { email, password, username, birthdate } = req.body

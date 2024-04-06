@@ -1,11 +1,11 @@
 import { Router } from 'express'
-import { searchMiscController } from '../controllers/miscController.js'
+import { searchController } from '../controllers/searchController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
   methodNotAllowedHandler
 } from '../middleware/index.js'
 
 const router = Router()
-router.post('/search', errorCatcher(searchMiscController)).all(methodNotAllowedHandler)
+router.get('/', errorCatcher(searchController)).all(methodNotAllowedHandler)
 
 export default router
