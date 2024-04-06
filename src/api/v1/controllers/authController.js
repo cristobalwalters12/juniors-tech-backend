@@ -1,33 +1,32 @@
 import { byEmailLogin } from '../models/userModel.js'
 import { jwtAdapter, bcryptAdapter } from '../../../config/index.js'
+import { AppError } from '../../helpers/AppError.js'
 
 const loginUser = async (req, res) => {
-  try {
-    const { email, password } = req.body
-    const user = await byEmailLogin({ email })
-    if (!user) {
-      res.status(404).json({ message: 'User not found' })
-    } else {
-      const match = await bcryptAdapter.compare(password, user.password)
-      if (match) {
-        const accessToken = await jwtAdapter.generateAccessToken({ id: user.id, role: user.role })
-        const tokenDecoded = jwtAdapter.decodeAccessToken(accessToken)
-        res.status(200).json({
-          status: 'success',
-          message: 'Token is valid',
-          data: {
-            user,
-            accessToken
-          },
-          tokenDecoded
-        })
-      } else {
-        res.status(400).json({ message: 'Invalid password' })
-      }
-    }
-  } catch (error) {
-    res.status(500).json({ message: 'An error occurred', error: error.message })
+  const { email, password: plainPassword } = req.body
+  const userData = await byEmailLogin(email)
+
+  if (userData === undefined) {
+    throw AppError.unauthorized('Correo o contraseña inválidos')
   }
+
+  if (userData.deleted) {
+    throw AppError.unauthorized('Esta cuenta está desactivada')
+  }
+
+  const match = await bcryptAdapter.compare(plainPassword, userData.password)
+  if (!match) {
+    throw AppError.unauthorized('Correo o contraseña inválidos')
+  }
+
+  const accessToken = await jwtAdapter.generateAccessToken({ id: userData.id, roles: userData.roles })
+  const { password, totalDaysMuted, ...user } = userData
+  user.accessToken = accessToken
+
+  return res.status(200).json({
+    status: 'success',
+    data: user
+  })
 }
 
 export { loginUser }
