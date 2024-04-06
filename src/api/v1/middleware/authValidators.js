@@ -19,8 +19,8 @@ const requireLoggedIn = async (req, res, next) => {
     if (token === null) {
       throw AppError.unauthorized('No se encontró el Bearer token')
     }
-    const { id, role } = await jwtAdapter.decodeAccessToken(token)
-    req.user = { id, roles: [role] }
+    const { id, roles } = await jwtAdapter.decodeAccessToken(token)
+    req.user = { id, roles }
     return next()
   } catch (error) {
     return next(error)
