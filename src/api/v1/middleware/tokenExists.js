@@ -1,16 +1,12 @@
-import { jwtAdapter } from '../../../config/index.js'
 import { AppError } from '../../helpers/index.js'
 
-const jwtValidator = async (req, res, next) => {
+const TokenValidator = async (req, res, next) => {
   try {
     const token = getTokenFromHeaders(req)
     if (!token) {
       throw AppError.unauthorized('Bearer token not found')
     }
 
-    const { id, role } = await jwtAdapter.decodeAccessToken(token)
-    req._id = id
-    req._role = role
     return next()
   } catch (error) {
     next(error)
@@ -25,4 +21,4 @@ const getTokenFromHeaders = (req) => {
   return null
 }
 
-export { jwtValidator }
+export { TokenValidator }
