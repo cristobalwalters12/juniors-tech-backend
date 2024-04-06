@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
-import { mockUser } from '../middleware/mockUser.js'
 import { commentDto } from '../dtos/commentDto.js'
 import { createComment, getComments, editCommentById, deleteCommentById, voteCommentById } from '../controllers/commentController.js'
 import {
@@ -11,7 +10,9 @@ import {
   restrictToOwner,
   canReply,
   findAndSetComment,
-  restrictToOwnerOrRoles
+  restrictToOwnerOrRoles,
+  setUserIfLoggedIn,
+  requireLoggedIn
 } from '../middleware/index.js'
 import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
@@ -23,11 +24,11 @@ router
   .get([
     validateUids(['postId']),
     postExists,
-    mockUser
+    setUserIfLoggedIn
   ], errorCatcher(getComments))
   .post([
     validateUids(['postId']),
-    mockUser,
+    requireLoggedIn,
     commentDto,
     canReply
   ], errorCatcher(createComment))
@@ -38,14 +39,14 @@ router
   .put([
     validateUids(['postId', 'commentId']),
     findAndSetComment,
-    mockUser,
+    requireLoggedIn,
     restrictToOwner,
     isReported
   ], errorCatcher(editCommentById))
   .delete([
     validateUids(['postId', 'commentId']),
     findAndSetComment,
-    mockUser,
+    requireLoggedIn,
     restrictToOwnerOrRoles([
       ROLE_TYPES.MOD.name,
       ROLE_TYPES.ADMIN.name
@@ -57,7 +58,7 @@ router
   .route('/:commentId/vote')
   .post([
     validateUids(['postId', 'commentId']),
-    mockUser,
+    requireLoggedIn,
     findAndSetComment,
     voteDto
   ], errorCatcher(voteCommentById))
