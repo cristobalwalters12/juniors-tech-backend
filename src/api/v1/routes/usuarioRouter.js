@@ -8,7 +8,7 @@ import { registerDto } from '../dtos/registerDto.js'
 
 const router = Router()
 router.post('/sign-up', registerDto, errorCatcher(createUserjwtController)).all(methodNotAllowedHandler)
-router.get('/users', errorCatcher(getUsersController)).all(methodNotAllowedHandler)
+router.get('/', errorCatcher(getUsersController)).all(methodNotAllowedHandler)
 router.get('/:username', errorCatcher(getUserByUsernameController)).all(methodNotAllowedHandler)
 router.put('/:id', jwtValidator, errorCatcher(updateUserController)).all(methodNotAllowedHandler)
 export default router
