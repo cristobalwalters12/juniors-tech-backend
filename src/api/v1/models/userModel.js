@@ -37,24 +37,30 @@ const getByEmail = async ({ email }) => {
   return response.rows[0]
 }
 
-const byEmailLogin = async ({ email }) => {
+const byEmailLogin = async (email) => {
   const query = {
-    text: `SELECT "user".id,"user".email,"user".username,"user".avatar_url, "user".password,"role".name
-             FROM "user"
-             JOIN user_role ON "user".id = user_role.user_id
-             JOIN "role" ON user_role.role_id = "role".id
-             WHERE "user".email = $1;`,
+    text: `SELECT
+            U.id,
+            U.username,
+            U.avatar_url AS "avatarUrl",
+            U.password,
+            ARRAY_AGG(DISTINCT R.name) AS roles,
+            U.muted_at AS "mutedAt",
+            EXTRACT(day from CURRENT_DATE - U.updated_at) AS "totalDaysMuted",
+            U.deleted_at IS NOT NULL AS "deleted"
+          FROM "user" U
+          JOIN user_role UR ON U.id = UR.user_id
+          JOIN "role" R ON UR.role_id = R.id
+          WHERE U.email = $1
+          GROUP BY U.id;`,
     values: [email]
   }
-  const response = await pool.query(query)
-  const user = response.rows[0]
-  return {
-    id: user.id,
-    username: user.username,
-    avatar_url: user.avatar_url,
-    password: user.password,
-    role: user.name
+  const { rows: [user] } = await pool.query(query)
+  if (user?.totalDaysMuted >= 15) {
+    const unmuteUser = 'UPDATE "user" SET muted_at = NULL WHERE U.id = $1'
+    await pool.query(unmuteUser, user.id)
   }
+  return user
 }
 
 const getUsers = async (page, size) => {
