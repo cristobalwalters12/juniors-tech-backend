@@ -1,7 +1,5 @@
-import { AppError } from '../../helpers/AppError.js'
 import { byEmailLogin } from '../models/usuarioModel.js'
-import { jwtAdapter } from '../../../config/index.js'
-import bcrypt from 'bcryptjs'
+import { jwtAdapter, bcryptAdapter } from '../../../config/index.js'
 
 const loginUser = async (req, res) => {
   try {
@@ -10,8 +8,7 @@ const loginUser = async (req, res) => {
     if (!user) {
       res.status(404).json({ message: 'User not found' })
     } else {
-      console.log('este es del login', password)
-      const match = await bcrypt.compare(password, user.password)
+      const match = await bcryptAdapter.compare(password, user.password)
       if (match) {
         const accessToken = await jwtAdapter.generateAccessToken({ id: user.id, role: user.role })
         const tokenDecoded = jwtAdapter.decodeAccessToken(accessToken)
@@ -33,22 +30,4 @@ const loginUser = async (req, res) => {
   }
 }
 
-const logoutUser = async (req, res) => {
-  res.clearCookie('token')
-  res.status(204).send()
-}
-
-const refreshToken = async (req, res) => {
-  const refreshToken = req.cookies.token
-  if (!refreshToken) throw AppError.unauthorized('Token not found')
-
-  const { email } = await jwtAdapter.decodeRefreshToken(refreshToken)
-  const accessToken = await jwtAdapter.generateAccessToken({ email })
-
-  return res.status(200).json({
-    status: 'success',
-    data: { accessToken }
-  })
-}
-
-export { loginUser, logoutUser, refreshToken }
+export { loginUser }
