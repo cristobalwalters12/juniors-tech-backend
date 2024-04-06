@@ -139,26 +139,6 @@ const router = express.Router()
 
 /**
  * @swagger
- * /posts:
- *   post:
- *     summary: Crear comentario
- *     tags: [posts]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             $ref: '#/components/schemas/posts'
- *       responses:
- *         200:
- *           description: new posts created
- *         400:
- *           description: bad request
- */
-
-/**
- * @swagger
  * /user:
  *   get:
  *     summary: Take all the users
@@ -180,6 +160,44 @@ const router = express.Router()
 /**
  * @swagger
  * /posts:
+ *   post:
+ *     summary: Crear comentario
+ *     tags:
+ *       - posts
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - body
+ *               - categoryId
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 description: Título de la publicación
+ *               body:
+ *                 type: string
+ *                 description: Cuerpo de la publicación
+ *               categoryId:
+ *                 type: string
+ *                 description: ID de la categoría de la publicación
+ *             example:
+ *               title: "Hola"
+ *               body: "Soy un body"
+ *               categoryId: "L1w-xYdnDH"
+ *     responses:
+ *       200:
+ *         description: Comentario creado exitosamente
+ *       400:
+ *         description: Solicitud incorrecta
+ */
+
+/**
+ * @swagger
+ * /posts:
  *   get:
  *     summary: obtener todos las publicaciones
  *     tags: [posts]
@@ -190,8 +208,8 @@ const router = express.Router()
  *           application/json:
  *             schema:
  *               type: array
- *                 items:
- *                   $ref: '#/components/schemas/posts'
+ *               items:
+ *                 $ref: '#/components/schemas/posts'
  */
 
 // /**
@@ -214,8 +232,7 @@ const router = express.Router()
 //  *               password:
 //  *                 type: string
 //  *               birthdate:
-//  *                 type: string
-//  *                 format: date
+//  *                 type: Date
 //  *     responses:
 //  *       200:
 //  *         description: Cuenta creada con éxito
