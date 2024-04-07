@@ -80,4 +80,48 @@ const getUserReports = async () => {
   return reports
 }
 
-export { getPostReports, getCommentReports, getUserReports }
+const createReport = async ({
+  reportId,
+  reportedBy,
+  reportedItemId,
+  reportType,
+  reportRelationshipId,
+  reportReasonId
+}) => {
+  const insertReport = `WITH R AS (
+                          INSERT INTO report
+                            (id, reported_by, report_type_id, report_reason_id)
+                          VALUES ($1, $2, $3, $4)
+                          RETURNING created_at, reported_by
+                        )
+                        SELECT
+                          R.created_at AS "createdAt",
+                          U.username AS "reportedBy"
+                        FROM R
+                        JOIN "user" U
+                        ON R.reported_by = U.id;`
+
+  const insertReportRelationship = `INSERT INTO reported_item
+                                      (id, report_id, ${reportType.column})
+                                    VALUES ($1, $2, $3)`
+
+  const updateReportedResource = `UPDATE "${reportType.table}"
+                                  SET has_open_report = TRUE
+                                  WHERE id = $1;`
+
+  const [{ rows: [report] }] = await Promise.all([
+    pool.query(insertReport, [reportId, reportedBy, reportType.id, reportReasonId]),
+    pool.query(insertReportRelationship, [reportRelationshipId, reportId, reportedItemId]),
+    pool.query(updateReportedResource, [reportedItemId])
+  ])
+
+  return {
+    reportId,
+    reportedBy: report.reportedBy,
+    reportedItemId,
+    reportReasonId,
+    createdAt: report.createdAt
+  }
+}
+
+export { getPostReports, getCommentReports, getUserReports, createReport }

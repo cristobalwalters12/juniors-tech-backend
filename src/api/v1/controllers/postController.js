@@ -1,4 +1,6 @@
+import { REPORT_TYPES } from '../../../config/index.js'
 import { create, getById, getAll, updateById, deleteById } from '../models/postModel.js'
+import { createReport } from '../models/reportModel.js'
 import { voteById } from '../models/votingModel.js'
 
 const createPost = async (req, res) => {
@@ -52,4 +54,27 @@ const votePostById = async (req, res) => {
   res.sendStatus(204)
 }
 
-export { createPost, getPostById, getPosts, editPostById, deletePostById, votePostById }
+const reportPostById = async (req, res) => {
+  const data = await createReport({
+    reportId: req.body.reportId,
+    reportedBy: req.user.id,
+    reportedItemId: req.params.postId,
+    reportType: REPORT_TYPES.POST,
+    reportRelationshipId: req.body.relationshipId,
+    reportReasonId: req.body.reportReasonId
+  })
+  res.status(201).json({
+    status: 'success',
+    data
+  })
+}
+
+export {
+  createPost,
+  getPostById,
+  getPosts,
+  editPostById,
+  deletePostById,
+  votePostById,
+  reportPostById
+}
