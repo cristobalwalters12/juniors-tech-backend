@@ -15,7 +15,14 @@ const options = {
       }
     ]
   },
-  apis: ['src/config/routes/*.js']
+  apis: [
+    'src/config/routes/logindocs.js',
+    'src/config/routes/usersDocs.js',
+    'src/config/routes/postsDocs.js',
+    'src/config/routes/commentsDocs.js',
+    'src/config/routes/voteDocs.js',
+    'src/config/routes/searchDocs.js'
+  ]
 }
 
 const specs = swaggerJsdoc(options)
