@@ -1,4 +1,4 @@
-import { getPostReports } from '../models/reportModel.js'
+import { getPostReports, getCommentReports } from '../models/reportModel.js'
 
 const getPostTypeReports = async (req, res) => {
   const data = await getPostReports()
@@ -8,4 +8,12 @@ const getPostTypeReports = async (req, res) => {
   })
 }
 
-export { getPostTypeReports }
+const getCommentTypeReports = async (req, res) => {
+  const data = await getCommentReports()
+  res.status(200).json({
+    status: 'success',
+    data
+  })
+}
+
+export { getPostTypeReports, getCommentTypeReports }
