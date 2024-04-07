@@ -291,6 +291,15 @@ const getUserAuthDataIfExists = async (username) => {
   return user
 }
 
+const desactivateUser = async (id) => {
+  const query = {
+    text: 'UPDATE "user" SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1',
+    values: [id]
+  }
+  const response = await pool.query(query)
+  return response.rows[0]
+}
+
 export {
   createUser,
   getByEmail,
@@ -299,5 +308,6 @@ export {
   getUsers,
   getUserByUsername,
   updateUser,
-  getUserAuthDataIfExists
+  getUserAuthDataIfExists,
+  desactivateUser
 }

@@ -7,7 +7,8 @@ import {
   getMods,
   promoteUserToMod,
   muteUser,
-  demoteMod
+  demoteMod,
+  desactivateUserController
 } from '../controllers/userController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
@@ -65,5 +66,5 @@ router
   .all(methodNotAllowedHandler)
 
 router.put('/:id', jwtValidator, errorCatcher(updateUserController)).all(methodNotAllowedHandler)
-
+router.put('/:id/desactivate', jwtValidator, errorCatcher(desactivateUserController)).all(methodNotAllowedHandler)
 export default router
