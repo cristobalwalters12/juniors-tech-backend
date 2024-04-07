@@ -40,7 +40,7 @@ Abrir la terminal en la carpeta raíz y ejecutar:
 
 Para instalar las dependencias y levantar el proyecto completo, usando la base de datos de desarrollo.
 
-### Testing
+## Guía de ejecución
 
 Este proyecto usa dos ambientes (desarrollo y testing) que se configuran por medio de variables de entorno, desde los scripts del [package.json](./package.json). De ahí que **para los usuarios de Windows, los scripts son diferentes.**
 
@@ -63,3 +63,9 @@ Abrir la terminal en la carpeta raíz y ejecutar:
 ```
 
 Para ejecutar los tests, usando la base de datos de pruebas.
+
+## API Rest Foro
+
+## Url para Api rest de nuestro foro
+
+- [API Rest](http://localhost:3000/api/v1/docs)
