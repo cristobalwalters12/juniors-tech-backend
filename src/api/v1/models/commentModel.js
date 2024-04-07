@@ -162,15 +162,19 @@ const existsById = async (commentId) => {
 
 const getAuthDataIfExists = async ({ postId, commentId }) => {
   const selectPost = `SELECT
-                        id,
-                        author_id AS "authorId",
-                        has_open_report AS "hasOpenReport"
-                      FROM aspect
+                        A.id,
+                        A.author_id AS "ownerId",
+                        A.has_open_report AS "hasOpenReport",
+                        U.muted_at IS NOT NULL AS "isOwnerMuted",
+                        TO_CHAR(U.muted_at + INTERVAL '15' DAY, 'dd-mm-yyy') AS "ownerMutedUntil"
+                      FROM aspect A
+                      JOIN "user" U
+                      ON A.author_id = U.id
                       WHERE
-                        id = $1
-                        AND aspect_type_id = $2
-                        AND post_id = $3
-                        AND deleted_at IS NULL;`
+                        A.id = $1
+                        AND A.aspect_type_id = $2
+                        AND A.post_id = $3
+                        AND A.deleted_at IS NULL;`
   const { rows: [comment] } = await pool.query(selectPost, [commentId, ASPECT_TYPES.COMMENT, postId])
   return comment
 }
