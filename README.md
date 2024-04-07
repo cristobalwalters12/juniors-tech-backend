@@ -40,7 +40,7 @@ Abrir la terminal en la carpeta raíz y ejecutar:
 
 Para instalar las dependencias y levantar el proyecto completo, usando la base de datos de desarrollo.
 
-## Guía de ejecución
+### Testing
 
 Este proyecto usa dos ambientes (desarrollo y testing) que se configuran por medio de variables de entorno, desde los scripts del [package.json](./package.json). De ahí que **para los usuarios de Windows, los scripts son diferentes.**
 
