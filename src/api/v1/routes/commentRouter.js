@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
-import { commentDto } from '../dtos/commentDto.js'
+import { createCommentDto, editCommentDto } from '../dtos/commentDto.js'
 import { createComment, getComments, editCommentById, deleteCommentById, voteCommentById } from '../controllers/commentController.js'
 import {
   postExists,
@@ -12,7 +12,8 @@ import {
   findAndSetComment,
   restrictToOwnerOrRoles,
   setUserIfLoggedIn,
-  requireLoggedIn
+  requireLoggedIn,
+  isMuted
 } from '../middleware/index.js'
 import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
@@ -29,8 +30,9 @@ router
   .post([
     validateUids(['postId']),
     requireLoggedIn,
-    commentDto,
-    canReply
+    isMuted,
+    canReply,
+    createCommentDto
   ], errorCatcher(createComment))
   .all(methodNotAllowedHandler)
 
@@ -38,10 +40,12 @@ router
   .route('/:commentId')
   .put([
     validateUids(['postId', 'commentId']),
-    findAndSetComment,
     requireLoggedIn,
+    findAndSetComment,
     restrictToOwner,
-    isReported
+    isReported,
+    isMuted,
+    editCommentDto
   ], errorCatcher(editCommentById))
   .delete([
     validateUids(['postId', 'commentId']),

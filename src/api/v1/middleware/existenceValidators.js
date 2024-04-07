@@ -1,6 +1,7 @@
 import { AppError } from '../../helpers/AppError.js'
 import { existsById as commentExistsById, getAuthDataIfExists } from '../models/commentModel.js'
 import { existsById as existsPostById } from '../models/postModel.js'
+import { getUserAuthDataIfExists } from '../models/userModel.js'
 
 const postExists = async (req, res, next) => {
   const resource = await existsPostById(req.params.postId)
@@ -33,4 +34,13 @@ const findAndSetComment = async (req, res, next) => {
   next()
 }
 
-export { postExists, canReply, findAndSetComment }
+const findAndSetUser = async (req, res, next) => {
+  const user = await getUserAuthDataIfExists(req.params.username)
+  if (user === undefined) {
+    return next(AppError.notFound('El usuario no existe'))
+  }
+  req.resource = user
+  next()
+}
+
+export { postExists, canReply, findAndSetComment, findAndSetUser }

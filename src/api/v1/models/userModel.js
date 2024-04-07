@@ -37,24 +37,30 @@ const getByEmail = async ({ email }) => {
   return response.rows[0]
 }
 
-const byEmailLogin = async ({ email }) => {
+const byEmailLogin = async (email) => {
   const query = {
-    text: `SELECT "user".id,"user".email,"user".username,"user".avatar_url, "user".password,"role".name
-             FROM "user"
-             JOIN user_role ON "user".id = user_role.user_id
-             JOIN "role" ON user_role.role_id = "role".id
-             WHERE "user".email = $1;`,
+    text: `SELECT
+            U.id,
+            U.username,
+            U.avatar_url AS "avatarUrl",
+            U.password,
+            ARRAY_AGG(DISTINCT R.name) AS roles,
+            U.muted_at AS "mutedAt",
+            EXTRACT(day from CURRENT_DATE - U.updated_at) AS "totalDaysMuted",
+            U.deleted_at IS NOT NULL AS "deleted"
+          FROM "user" U
+          JOIN user_role UR ON U.id = UR.user_id
+          JOIN "role" R ON UR.role_id = R.id
+          WHERE U.email = $1
+          GROUP BY U.id;`,
     values: [email]
   }
-  const response = await pool.query(query)
-  const user = response.rows[0]
-  return {
-    id: user.id,
-    username: user.username,
-    avatar_url: user.avatar_url,
-    password: user.password,
-    role: user.name
+  const { rows: [user] } = await pool.query(query)
+  if (user?.totalDaysMuted >= 15) {
+    const unmuteUser = 'UPDATE "user" SET muted_at = NULL WHERE U.id = $1'
+    await pool.query(unmuteUser, user.id)
   }
+  return user
 }
 
 const getUsers = async (page, size) => {
@@ -183,7 +189,21 @@ const validateEmailById = async (id) => {
 
   return user
 }
+
+const toSnakeCase = (str) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+
+const convertKeysToSnakeCase = (obj) => {
+  const newObj = {}
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const newKey = toSnakeCase(key)
+      newObj[newKey] = obj[key]
+    }
+  }
+  return newObj
+}
 const updateUser = async (id, fields) => {
+  fields = convertKeysToSnakeCase(fields)
   const userRes = await pool.query('SELECT * FROM "user" WHERE id = $1 AND deleted_at IS NULL AND muted_at IS NULL', [id])
   if (userRes.rowCount === 0) {
     throw new Error('User does not exist or is deleted or muted')
@@ -267,4 +287,58 @@ const updateUser = async (id, fields) => {
     `, [id])
   return updatedUserRes.rows[0]
 }
-export { createUser, getByEmail, byEmailLogin, validateEmailById, getUsers, getUserByUsername, updateUser }
+
+const getUserAuthDataIfExists = async (username) => {
+  const selectUser = `SELECT
+                        U.id AS "ownerId",
+                        ARRAY_AGG(DISTINCT R.name) AS roles,
+                        U.muted_at IS NOT NULL AS "isMuted"
+                      FROM "user" U
+                      JOIN user_role UR
+                      ON U.id = UR.user_id
+                      JOIN role R
+                      ON UR.role_id = R.id
+                      WHERE U.username = $1
+                        AND U.deleted_at IS NULL
+                      GROUP BY U.id;`
+  const { rows: [user] } = await pool.query(selectUser, [username])
+  return user
+}
+
+const desactivateUser = async (id) => {
+  const query = {
+    text: 'UPDATE "user" SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1',
+    values: [id]
+  }
+  const response = await pool.query(query)
+  return response.rows[0]
+}
+
+const isAccountOwnerMuted = async (userId) => {
+  const selectAccount = `SELECT
+                          muted_at IS NOT NULL AS "isOwnerMuted",
+                          TO_CHAR(muted_at + INTERVAL '15' DAY, 'dd-mm-yyyy') AS "ownerMutedUntil"
+                        FROM "user"
+                        WHERE id = $1;`
+  const { rows: [account] } = await pool.query(selectAccount, [userId])
+  if (account && account.isOwnerMuted) {
+    return account
+  }
+  return {
+    isOwnerMuted: false,
+    ownerMutedUntil: null
+  }
+}
+
+export {
+  createUser,
+  getByEmail,
+  byEmailLogin,
+  validateEmailById,
+  getUsers,
+  getUserByUsername,
+  updateUser,
+  getUserAuthDataIfExists,
+  desactivateUser,
+  isAccountOwnerMuted
+}
