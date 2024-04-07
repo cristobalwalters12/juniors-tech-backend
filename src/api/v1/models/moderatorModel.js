@@ -21,4 +21,9 @@ const promoteToMod = async (userId) => {
   await pool.query(updateUserRole, [userId, ROLE_TYPES.MOD.id])
 }
 
-export { getAll, promoteToMod }
+const mute = async (userId) => {
+  const muteUser = 'UPDATE "user" SET muted_at = NOW() WHERE id = $1'
+  await pool.query(muteUser, [userId])
+}
+
+export { getAll, promoteToMod, mute }

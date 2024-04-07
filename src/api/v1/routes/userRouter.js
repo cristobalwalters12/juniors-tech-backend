@@ -5,7 +5,8 @@ import {
   getUserByUsernameController,
   updateUserController,
   getMods,
-  promoteUserToMod
+  promoteUserToMod,
+  muteUser
 } from '../controllers/userController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
@@ -14,7 +15,8 @@ import {
   requireLoggedIn,
   restrictToRoles,
   findAndSetUser,
-  canBeMod
+  canBeMod,
+  canBeMuted
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
 import { ROLE_TYPES } from '../../../config/index.js'
@@ -42,6 +44,16 @@ router
     findAndSetUser,
     canBeMod
   ], errorCatcher(promoteUserToMod))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/:username/mute')
+  .post([
+    requireLoggedIn,
+    restrictToRoles([ROLE_TYPES.MOD.name, ROLE_TYPES.ADMIN.name]),
+    findAndSetUser,
+    canBeMuted
+  ], errorCatcher(muteUser))
   .all(methodNotAllowedHandler)
 
 router.put('/:id', jwtValidator, errorCatcher(updateUserController)).all(methodNotAllowedHandler)
