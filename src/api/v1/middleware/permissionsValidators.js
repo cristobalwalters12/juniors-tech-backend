@@ -1,5 +1,6 @@
 import { ROLE_TYPES } from '../../../config/index.js'
 import { AppError } from '../../helpers/index.js'
+import { isAccountOwnerMuted } from '../models/userModel.js'
 
 const hasRole = (req, roles) => {
   return req.user.roles.find(role => roles.includes(role)) !== undefined
@@ -72,11 +73,24 @@ const canBeMuted = (req, res, next) => {
   next()
 }
 
+const isMuted = async (req, res, next) => {
+  let user = req.resource
+  if (typeof user?.isOwnerMuted !== 'boolean') {
+    user = await isAccountOwnerMuted(req.user.id)
+  }
+  if (user.isOwnerMuted) {
+    return next(AppError.unauthorized(`Estás silenciado. Debes esperar hasta el ${
+      user.ownerMutedUntil} para poder realizar esta operación`))
+  }
+  next()
+}
+
 export {
   restrictToRoles,
   restrictToOwnerOrRoles,
   restrictToOwner,
   isReported,
+  isMuted,
   canBeMod,
   canDemoteMod,
   canBeMuted
