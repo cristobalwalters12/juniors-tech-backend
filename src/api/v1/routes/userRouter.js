@@ -6,7 +6,8 @@ import {
   updateUserController,
   getMods,
   promoteUserToMod,
-  muteUser
+  muteUser,
+  demoteMod
 } from '../controllers/userController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
@@ -16,7 +17,8 @@ import {
   restrictToRoles,
   findAndSetUser,
   canBeMod,
-  canBeMuted
+  canBeMuted,
+  canDemoteMod
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
 import { ROLE_TYPES } from '../../../config/index.js'
@@ -44,6 +46,12 @@ router
     findAndSetUser,
     canBeMod
   ], errorCatcher(promoteUserToMod))
+  .delete([
+    requireLoggedIn,
+    restrictToRoles([ROLE_TYPES.ADMIN.name]),
+    findAndSetUser,
+    canDemoteMod
+  ], errorCatcher(demoteMod))
   .all(methodNotAllowedHandler)
 
 router
