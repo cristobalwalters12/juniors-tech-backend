@@ -189,7 +189,21 @@ const validateEmailById = async (id) => {
 
   return user
 }
+
+const toSnakeCase = (str) => str.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+
+const convertKeysToSnakeCase = (obj) => {
+  const newObj = {}
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const newKey = toSnakeCase(key)
+      newObj[newKey] = obj[key]
+    }
+  }
+  return newObj
+}
 const updateUser = async (id, fields) => {
+  fields = convertKeysToSnakeCase(fields)
   const userRes = await pool.query('SELECT * FROM "user" WHERE id = $1 AND deleted_at IS NULL AND muted_at IS NULL', [id])
   if (userRes.rowCount === 0) {
     throw new Error('User does not exist or is deleted or muted')
@@ -291,6 +305,15 @@ const getUserAuthDataIfExists = async (username) => {
   return user
 }
 
+const desactivateUser = async (id) => {
+  const query = {
+    text: 'UPDATE "user" SET deleted_at = CURRENT_TIMESTAMP WHERE id = $1',
+    values: [id]
+  }
+  const response = await pool.query(query)
+  return response.rows[0]
+}
+
 export {
   createUser,
   getByEmail,
@@ -299,5 +322,6 @@ export {
   getUsers,
   getUserByUsername,
   updateUser,
-  getUserAuthDataIfExists
+  getUserAuthDataIfExists,
+  desactivateUser
 }
