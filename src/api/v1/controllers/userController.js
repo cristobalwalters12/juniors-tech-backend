@@ -1,5 +1,7 @@
 import { createUser, getByEmail, getUsers, getUserByUsername, updateUser, validateEmailById } from '../models/userModel.js'
 import { jwtAdapter } from '../../../config/adapters/jwtAdapter.js'
+import { getAll, promoteToMod, mute, demote } from '../models/moderatorModel.js'
+import { ROLE_TYPES } from '../../../config/index.js'
 const createUserjwtController = async (req, res) => {
   const { email, password, username, birthdate } = req.body
   const user = await getByEmail({ email })
@@ -87,4 +89,44 @@ const updateUserController = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
-export { createUserjwtController, getUsersController, getUserByUsernameController, updateUserController }
+
+const getMods = async (req, res) => {
+  const data = await getAll()
+  res.status(200).json({
+    status: 'success',
+    data
+  })
+}
+
+const promoteUserToMod = async (req, res) => {
+  await promoteToMod(req.resource.ownerId)
+  res.status(200).json({
+    status: 'success',
+    data: {
+      id: req.resource.ownerId,
+      username: req.params.username,
+      roles: [...req.resource.roles, ROLE_TYPES.MOD.name]
+    }
+  })
+}
+
+const demoteMod = async (req, res) => {
+  await demote(req.resource.ownerId)
+  res.sendStatus(204)
+}
+
+const muteUser = async (req, res) => {
+  await mute(req.resource.ownerId)
+  res.sendStatus(204)
+}
+
+export {
+  createUserjwtController,
+  getUsersController,
+  getUserByUsernameController,
+  updateUserController,
+  getMods,
+  promoteUserToMod,
+  demoteMod,
+  muteUser
+}

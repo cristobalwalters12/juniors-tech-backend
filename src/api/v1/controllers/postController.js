@@ -45,7 +45,7 @@ const deletePostById = async (req, res) => {
 const votePostById = async (req, res) => {
   await voteById({
     aspectId: req.params.postId,
-    authorId: req.resource.authorId,
+    authorId: req.resource.ownerId,
     currUserId: req.user.id,
     ...req.body
   })

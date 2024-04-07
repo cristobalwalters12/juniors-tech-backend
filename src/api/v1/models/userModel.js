@@ -273,4 +273,31 @@ const updateUser = async (id, fields) => {
     `, [id])
   return updatedUserRes.rows[0]
 }
-export { createUser, getByEmail, byEmailLogin, validateEmailById, getUsers, getUserByUsername, updateUser }
+
+const getUserAuthDataIfExists = async (username) => {
+  const selectUser = `SELECT
+                        U.id AS "ownerId",
+                        ARRAY_AGG(DISTINCT R.name) AS roles,
+                        U.muted_at IS NOT NULL AS "isMuted"
+                      FROM "user" U
+                      JOIN user_role UR
+                      ON U.id = UR.user_id
+                      JOIN role R
+                      ON UR.role_id = R.id
+                      WHERE U.username = $1
+                        AND U.deleted_at IS NULL
+                      GROUP BY U.id;`
+  const { rows: [user] } = await pool.query(selectUser, [username])
+  return user
+}
+
+export {
+  createUser,
+  getByEmail,
+  byEmailLogin,
+  validateEmailById,
+  getUsers,
+  getUserByUsername,
+  updateUser,
+  getUserAuthDataIfExists
+}

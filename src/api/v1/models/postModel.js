@@ -191,7 +191,7 @@ const deleteById = async ({ postId }) => {
 const existsById = async (postId) => {
   const selectPost = `SELECT
                         id,
-                        author_id AS "authorId",
+                        author_id AS "ownerId",
                         has_open_report AS "hasOpenReport"
                       FROM aspect
                       WHERE
