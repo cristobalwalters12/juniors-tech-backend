@@ -57,4 +57,27 @@ const getCommentReports = async () => {
   return reports
 }
 
-export { getPostReports, getCommentReports }
+const getUserReports = async () => {
+  const selectReports = `SELECT
+                          R.id AS "reportId",
+                          U.username AS "reportedUser",
+                          R.reported_by AS "reportedBy",
+                          RA.username AS "reportByUsername",
+                          R.report_reason_id AS "reportReasonId",
+                          R.report_action_id AS "reportActionId",
+                          R.created_at AS "createdAt",
+                          R.updated_at AS "updatedAt"
+                        FROM "user" RA
+                        LEFT JOIN report R
+                        ON RA.id = R.reported_by
+                        LEFT JOIN reported_item RI
+                        ON R.id = RI.report_id
+                        LEFT JOIN "user" U
+                        ON RI.user_id = U.id
+                        WHERE
+                        R.report_type_id = $1;`
+  const { rows: reports } = await pool.query(selectReports, [REPORT_TYPES.USER])
+  return reports
+}
+
+export { getPostReports, getCommentReports, getUserReports }
