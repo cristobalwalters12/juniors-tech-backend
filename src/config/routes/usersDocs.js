@@ -33,31 +33,31 @@ const router = express.Router()
  *       properties:
  *         id:
  *           type: string
- *           description: id user
+ *           description: id delusuario
  *         username:
  *           type: string
- *           description: The user's username
+ *           description: username del usuario
  *         avatar:
  *           type: string
- *           description: The user's avatar
+ *           description: Avatar del usuario
  *         countryId:
  *           type: string
- *           description: The user's country
+ *           description: Pais del usuario
  *         score:
  *           type: Number
- *           description: The user's score
+ *           description: Puntaje del usuario
  *         itFieldId:
  *           type: string
- *           description: The user's it filed
+ *           description: Desempeño del usuario
  *         openToWork:
  *           type: boolean
- *           description: The user's open to work
+ *           description: Estado actual del usuario
  *         languages:
  *           type: string
- *           description: The user's lenguages
+ *           description: Lenguaje de programacion del usuario
  *         technologies:
  *           type: string
- *           description: The user's technologies
+ *           description: tecnologias del usuario
  *       example:
  *         username: Jayne_Kuhic
  *         avatar: https://docs.material-tailwind.com/img/face-3.jpg
@@ -71,7 +71,7 @@ const router = express.Router()
 
 /**
  * @swagger
- * /usuarios:
+ * /users:
  *   get:
  *     summary: retornar todos los usuarios
  *     tags: [usuarios]
@@ -91,7 +91,125 @@ const router = express.Router()
 
 /**
  * @swagger
- * /usuarios/sign-up:
+ * /users/{username}:
+ *   get:
+ *     summary: retorna un usuario por username
+ *     tags: [usuarios]
+ *   parameters:
+ *     - in: path
+ *       name: username
+ *       schema:
+ *         type: string
+ *       required: true
+ *       description: username del usuario
+ *   responses:
+ *     200:
+ *       description: retorna un usuario por username
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: ID del usuario.
+ *         username:
+ *           type: string
+ *           description: Nombre de usuario del usuario.
+ *         score:
+ *           type: number
+ *           description: Puntuación del usuario.
+ *         postCount:
+ *           type: number
+ *           description: Cantidad de publicaciones del usuario.
+ *         commentCount:
+ *           type: number
+ *           description: Cantidad de comentarios del usuario.
+ *         openToWork:
+ *           type: boolean
+ *           description: Indica si el usuario está abierto a oportunidades laborales.
+ *         about:
+ *           type: string
+ *           description: Descripción o información sobre el usuario.
+ *         employmentStatusId:
+ *           type: string
+ *           description: ID del estado laboral del usuario.
+ *         pronoun:
+ *           type: string
+ *           description: Pronombre del usuario.
+ *         avatarUrl:
+ *           type: string
+ *           description: URL del avatar del usuario.
+ *         countryId:
+ *           type: string
+ *           description: ID del país del usuario.
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Fecha de creación del usuario.
+ *         mutedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Fecha en la que el usuario fue silenciado.
+ *         languages:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Lista de IDs de los idiomas que habla el usuario.
+ *         itFieldId:
+ *           type: string
+ *           description: ID del campo de TI en el que trabaja el usuario.
+ *         technologies:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Lista de IDs de las tecnologías que utiliza el usuario.
+ *         education:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Lista de IDs de la educación del usuario.
+ *         social_networks:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Lista de URLs de las redes sociales del usuario.
+ *         roles:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: Lista de IDs de los roles del usuario.
+ *       example:
+ *         id: abc123
+ *         username: usuario123
+ *         score: 100
+ *         postCount: 10
+ *         commentCount: 20
+ *         openToWork: true
+ *         about: Lorem ipsum dolor sit amet...
+ *         employmentStatusId: emp123
+ *         pronoun: they/them
+ *         avatarUrl: http://example.com/avatar.png
+ *         countryId: country123
+ *         createdAt: '2024-04-06T12:00:00Z'
+ *         mutedAt: '2024-04-05T12:00:00Z'
+ *         languages:
+ *           - GmF16qvoh5
+ *           - zMnto3e8tN
+ *         itFieldId: MDfP4QzwC8
+ *         technologies:
+ *           - _84RNpgyTx
+ *           - _mnxA7nz8c
+ *         education:
+ *           - UWLfRUVGkb
+ *           - HfozUT_PsC
+ *         social_networks:
+ *           - 7jstZPmPng
+ *           - ep54y-_428
+ *         roles: 2SbUCqylYo
+ *     404:
+ *       description: El usuario no existe
+ */
+
+/**
+ * @swagger
+ * /users/sign-up:
  *   post:
  *     summary: Crear cuenta
  *     tags: [usuarios]
@@ -135,33 +253,7 @@ const router = express.Router()
 
 /**
  * @swagger
- * /usuarios/{username}:
- *   get:
- *     summary: retorna un usuario por username
- *     tags: [usuarios]
- *   parameters:
- *     - in: path
- *       name: username
- *       schema:
- *         type: string
- *       required: true
- *       description: usuario username
- *   responses:
- *     200:
- *       description: retorna un usuario por username
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             items:
- *               $ref: '#/components/schemas/usuarios'
- *     400:
- *       description: bad request
- */
-
-/**
- * @swagger
- * /usuarios/{id}:
+ * /users/{id}:
  *   put:
  *     summary: Actualizar un usuario por ID
  *     tags: [usuarios]
@@ -181,41 +273,41 @@ const router = express.Router()
  *           schema:
  *             type: object
  *             properties:
- *               openToWork:
+ *               open_to_work:
  *                 type: boolean
  *                 description: Abierto a ofertas de tranajo.
  *               about:
  *                 type: string
  *                 description: Acerca del usuario.
- *               employmentStatusId:
+ *               employment_status_id:
  *                 type: string
  *                 description: Estado del usuario.
- *               pronoun:
+ *               pronoun_id:
  *                 type: string
  *                 description: Pronombre del usuario.
- *               avatarUrl:
+ *               avatar_url:
  *                 type: string
  *                 description: Url de avatar del usuario.
- *               countryId:
+ *               country_id:
  *                 type: string
  *                 description: Pais del usuario.
- *               languages:
+ *               language:
  *                 type: string
  *                 description: Lenguage de programacion del usuario.
- *               itFieldId:
+ *               it_field_id:
  *                 type: string
  *                 description: Desempeño del usuario.
- *               technologies:
+ *               technology:
  *                 type: string
  *                 description:  del usuario.
  *               education:
  *                 type: string
  *                 description: Formacion del usuario.
- *               social_networks:
+ *               social_network:
  *                 type: string
  *                 description: Redes sociales del usuario.
  *             example:
- *               openToWork: true
+ *               open_to_work: true
  *               about: "estoy asombrado"
  *               employmentStatusId: "1ievtJUwmI"
  *               pronoun: "X_cRRyLmCz"
@@ -277,7 +369,7 @@ const router = express.Router()
  *                   example: Error al actualizar el usuario
  */
 
-router.get('/usuarios', getUsersController)
-router.get('/usuarios/:username', getUserByUsernameController)
-router.put('/usuarios/:id', updateUserController)
-router.post('/usuarios', createUserjwtController)
+router.get('/users', getUsersController)
+router.get('/users/:username', getUserByUsernameController)
+router.put('/users/:id', updateUserController)
+router.post('/users', createUserjwtController)

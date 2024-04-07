@@ -1,22 +1,91 @@
 // import { createUser } from '../../api/v1/controllers/usuarioController'
 // import { getUsers } from '../../api/v1/models/usuarioModel'
 import express from 'express'
-import { getPosts, createPost } from '../../api/v1/controllers/postController'
+import { getPosts, createPost, editPostById, deletePostById } from '../../api/v1/controllers/postController'
 
 const router = express.Router()
 
 /**
  * @swagger
  * tags:
- *   name: posts
+ *   name: Publicaciones
  *   description: manejo de publicaciones y comentarios
  */
 
 /**
  * @swagger
  * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
  *   schemas:
- *     posts:
+ *     UpdatePostRequest:
+ *       type: object
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: Nuevo título de la publicación
+ *         body:
+ *           type: string
+ *           description: Nuevo cuerpo de la publicación
+ *         categoryId:
+ *           type: string
+ *           description: Nuevo ID de la categoría de la publicación
+ *       required:
+ *         - title
+ *         - body
+ *         - categoryId
+ *     UpdatedPost:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: ID de la publicación actualizada
+ *         title:
+ *           type: string
+ *           description: Título actualizado de la publicación
+ *         body:
+ *           type: string
+ *           description: Cuerpo actualizado de la publicación
+ *         categoryId:
+ *           type: string
+ *           description: ID de la categoría actualizada de la publicación
+ *         slug:
+ *           type: string
+ *           description: Slug actualizado de la publicación
+ *         authorId:
+ *           type: string
+ *           description: ID del autor de la publicación
+ *         voteCount:
+ *           type: number
+ *           description: Cantidad de votos de la publicación
+ *         commentCount:
+ *           type: number
+ *           description: Cantidad de comentarios de la publicación
+ *         createdAt:
+ *           type: string
+ *           format: date-time
+ *           description: Fecha y hora de creación de la publicación
+ *         updatedAt:
+ *           type: string
+ *           format: date-time
+ *           description: Fecha y hora de actualización de la publicación
+ *         hasOpenReport:
+ *           type: boolean
+ *           description: Indicador de si la publicación tiene reportes abiertos
+ *       example:
+ *         - title: hola hola
+ *         - body: como estamos
+ *         - category: Hojas de vida
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Publicaciones:
  *       type: object
  *       required:
  *         - id
@@ -89,9 +158,10 @@ const router = express.Router()
  * @swagger
  * /posts:
  *   post:
- *     summary: Crear comentario
- *     tags:
- *       - posts
+ *     summary: Crear una publicacion
+ *     tags: [Publicaciones]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -118,7 +188,7 @@ const router = express.Router()
  *               categoryId: "L1w-xYdnDH"
  *     responses:
  *       200:
- *         description: Comentario creado exitosamente
+ *         description: Publicaciones creado exitosamente
  *       400:
  *         description: Solicitud incorrecta
  */
@@ -128,7 +198,7 @@ const router = express.Router()
  * /posts:
  *   get:
  *     summary: obtener todos las publicaciones
- *     tags: [posts]
+ *     tags: [Publicaciones]
  *     responses:
  *       '200':
  *         description: success
@@ -137,8 +207,76 @@ const router = express.Router()
  *             schema:
  *               type: array
  *               items:
- *                 $ref: '#/components/schemas/posts'
+ *                 $ref: '#/components/schemas/Publicaciones'
+ *       '404':
+ *         description: Error al obtener todas las publicaciones
+ */
+
+/**
+ * @swagger
+ * /posts/{postId}:
+ *   put:
+ *     summary: Actualizar una publicación por su ID
+ *     tags: [Publicaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         schema:
+ *           type: string
+ *           required: true
+ *           description: ID de la publicación a actualizar
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdatePostRequest'
+ *     responses:
+ *       '200':
+ *         description: Publicación actualizada con éxito
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UpdatedPost'
+ *       '400':
+ *         description: Error en la solicitud, revise los parámetros
+ *       '401':
+ *         description: No autorizado, token JWT inválido o no proporcionado
+ *       '403':
+ *         description: Prohibido, el usuario no tiene permiso para editar esta publicación
+ *       '404':
+ *         description: No se encontró la publicación con el ID especificado
+ *       '500':
+ *         description: Error interno del servidor, inténtelo de nuevo más tarde
+ */
+
+/**
+ * @swagger
+ * /posts/{postId}:
+ *   delete:
+ *     summary: Eliminar un post por su ID
+ *     tags: [Publicaciones]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID del post a eliminar
+ *     responses:
+ *       '204':
+ *         description: Post eliminado exitosamente
+ *       '404':
+ *         description: El post con el ID proporcionado no fue encontrado
+ *       '500':
+ *         description: Error interno del servidor al eliminar el post
  */
 
 router.post('/posts', createPost)
 router.get('/posts', getPosts)
+router.put('/posts/:postId', editPostById)
+router.delete('/posts/:postId', deletePostById)
