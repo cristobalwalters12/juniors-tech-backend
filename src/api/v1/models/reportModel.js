@@ -24,7 +24,7 @@ const getPostReports = async () => {
                         ON P.author_id = PA.id
                         WHERE
                         R.report_type_id = $1;`
-  const { rows: reports } = await pool.query(selectReports, [REPORT_TYPES.POST])
+  const { rows: reports } = await pool.query(selectReports, [REPORT_TYPES.POST.id])
   return reports
 }
 
@@ -53,7 +53,7 @@ const getCommentReports = async () => {
                         ON C.author_id = CA.id
                         WHERE
                         R.report_type_id = $1;`
-  const { rows: reports } = await pool.query(selectReports, [REPORT_TYPES.COMMENT])
+  const { rows: reports } = await pool.query(selectReports, [REPORT_TYPES.COMMENT.id])
   return reports
 }
 
@@ -76,7 +76,7 @@ const getUserReports = async () => {
                         ON RI.user_id = U.id
                         WHERE
                         R.report_type_id = $1;`
-  const { rows: reports } = await pool.query(selectReports, [REPORT_TYPES.USER])
+  const { rows: reports } = await pool.query(selectReports, [REPORT_TYPES.USER.id])
   return reports
 }
 
