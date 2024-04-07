@@ -6,7 +6,7 @@ import {
   postExists,
   validateUids,
   methodNotAllowedHandler,
-  isReported,
+  protectReportedFromEdit,
   restrictToOwner,
   canReply,
   findAndSetComment,
@@ -43,7 +43,7 @@ router
     requireLoggedIn,
     findAndSetComment,
     restrictToOwner,
-    isReported,
+    protectReportedFromEdit,
     isMuted,
     editCommentDto
   ], errorCatcher(editCommentById))

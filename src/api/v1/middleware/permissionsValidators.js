@@ -8,6 +8,8 @@ const hasRole = (req, roles) => {
 
 const isOwner = (req) => req.user.id === req.resource.ownerId
 
+const isReported = (req) => req.resource.hasOpenReport
+
 const restrictToRoles = (roles) => (req, res, next) => {
   if (!hasRole(req, roles)) {
     return next(AppError.unauthorized('No tienes permisos para hacer esta operación'))
@@ -29,11 +31,10 @@ const restrictToOwner = (req, res, next) => {
   next()
 }
 
-const isReported = (req, res, next) => {
-  if (req.resource.hasOpenReport) {
+const protectReportedFromEdit = (req, res, next) => {
+  if (isReported(req)) {
     return next(AppError.unauthorized('No se puede editar el recurso mientras tenga un reporte abierto'))
   }
-
   next()
 }
 
@@ -89,7 +90,7 @@ export {
   restrictToRoles,
   restrictToOwnerOrRoles,
   restrictToOwner,
-  isReported,
+  protectReportedFromEdit,
   isMuted,
   canBeMod,
   canDemoteMod,

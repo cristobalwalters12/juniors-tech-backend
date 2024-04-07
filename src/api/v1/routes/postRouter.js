@@ -3,7 +3,7 @@ import { errorCatcher } from '../../helpers/index.js'
 import {
   restrictToOwner,
   restrictToOwnerOrRoles,
-  isReported,
+  protectReportedFromEdit,
   methodNotAllowedHandler,
   postExists,
   validateUids,
@@ -33,7 +33,7 @@ router
     postExists,
     restrictToOwner,
     isMuted,
-    isReported,
+    protectReportedFromEdit,
     postDto
   ], errorCatcher(editPostById))
   .delete([
