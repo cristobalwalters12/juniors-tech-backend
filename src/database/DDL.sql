@@ -199,5 +199,5 @@ CREATE TABLE "reported_item" (
   CONSTRAINT existent_report FOREIGN KEY (report_id) REFERENCES report (id),
   CONSTRAINT existent_reported_aspect FOREIGN KEY (aspect_id) REFERENCES aspect (id),
   CONSTRAINT existent_reported_user FOREIGN KEY (user_id) REFERENCES "user" (id),
-  CONSTRAINT single_report_type CHECK (NUM_NONNULLS(report_id, aspect_id, user_id) = 1)
+  CONSTRAINT single_report_type CHECK (NUM_NONNULLS(aspect_id, user_id) = 1)
 );
