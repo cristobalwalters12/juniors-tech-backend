@@ -314,6 +314,22 @@ const desactivateUser = async (id) => {
   return response.rows[0]
 }
 
+const isAccountOwnerMuted = async (userId) => {
+  const selectAccount = `SELECT
+                          muted_at IS NOT NULL AS "isOwnerMuted",
+                          TO_CHAR(muted_at + INTERVAL '15' DAY, 'dd-mm-yyyy') AS "ownerMutedUntil"
+                        FROM "user"
+                        WHERE id = $1;`
+  const { rows: [account] } = await pool.query(selectAccount, [userId])
+  if (account && account.isOwnerMuted) {
+    return account
+  }
+  return {
+    isOwnerMuted: false,
+    ownerMutedUntil: null
+  }
+}
+
 export {
   createUser,
   getByEmail,
@@ -323,5 +339,6 @@ export {
   getUserByUsername,
   updateUser,
   getUserAuthDataIfExists,
-  desactivateUser
+  desactivateUser,
+  isAccountOwnerMuted
 }
