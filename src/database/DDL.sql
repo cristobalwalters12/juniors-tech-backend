@@ -67,6 +67,7 @@ CREATE TABLE "user" (
   "updated_at" TIMESTAMP,
   "deleted_at" TIMESTAMP,
   "muted_at" TIMESTAMP,
+  "has_open_report" BOOLEAN DEFAULT FALSE NOT NULL
 
   CONSTRAINT existent_employment_status FOREIGN KEY (employment_status_id) REFERENCES employment_status (id),
   CONSTRAINT existent_it_field FOREIGN KEY (it_field_id) REFERENCES it_field (id),
