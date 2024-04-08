@@ -194,14 +194,24 @@ const existsById = async (postId) => {
                         A.author_id AS "ownerId",
                         A.has_open_report AS "hasOpenReport",
                         U.muted_at IS NOT NULL AS "isOwnerMuted",
-                        TO_CHAR(U.muted_at + INTERVAL '15' DAY, 'dd-mm-yyy') AS "ownerMutedUntil"
+                        TO_CHAR(U.muted_at + INTERVAL '15' DAY, 'dd-mm-yyy') AS "ownerMutedUntil",
+                        COALESCE(ARRAY_AGG(DISTINCT R.report_reason_id) filter (
+                          WHERE R.report_reason_id IS NOT NULL
+                          AND R.report_action_id IS NULL
+                          AND R.updated_at IS NULL
+                        ), '{}') AS "reportReasons"
                       FROM aspect A
                       JOIN "user" U
-                      ON A.author_id = U.id
+                        ON A.author_id = U.id
+                      LEFT JOIN reported_item RI
+                        ON A.id = RI.aspect_id
+                      LEFT JOIN report R
+                        ON RI.report_id = R.id
                       WHERE
                         A.id = $1
                         AND A.aspect_type_id = $2
-                        AND A.deleted_at IS NULL;`
+                        AND A.deleted_at IS NULL
+                      GROUP BY A.id, U.muted_at;`
   const { rows: [post] } = await pool.query(selectPost, [postId, ASPECT_TYPES.POST])
   return post
 }

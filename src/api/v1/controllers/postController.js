@@ -1,6 +1,6 @@
-import { REPORT_TYPES } from '../../../config/index.js'
+import { REPORT_ACTIONS, REPORT_TYPES } from '../../../config/index.js'
 import { create, getById, getAll, updateById, deleteById } from '../models/postModel.js'
-import { createReport } from '../models/reportModel.js'
+import { createReport, closeReports } from '../models/reportModel.js'
 import { voteById } from '../models/votingModel.js'
 
 const createPost = async (req, res) => {
@@ -69,6 +69,19 @@ const reportPostById = async (req, res) => {
   })
 }
 
+const ignorePostReportsByReason = async (req, res) => {
+  const data = await closeReports({
+    reportType: REPORT_TYPES.POST,
+    reportActionId: REPORT_ACTIONS.IGNORE_REPORT,
+    reportReasonId: req.body.reportReasonId,
+    reportedItemId: req.params.postId
+  })
+  res.status(200).json({
+    status: 'success',
+    data
+  })
+}
+
 export {
   createPost,
   getPostById,
@@ -76,5 +89,6 @@ export {
   editPostById,
   deletePostById,
   votePostById,
-  reportPostById
+  reportPostById,
+  ignorePostReportsByReason
 }
