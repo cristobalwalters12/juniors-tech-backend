@@ -67,12 +67,14 @@ const canBeMuted = (req, res, next) => {
   if (req.user.id === req.resource.ownerId) {
     return next(AppError.unauthorized('Solo puedes silenciar a otros usuarios'))
   }
-  if (req.resource.isMuted) {
+  if (req.resource.isOwnerMuted) {
     return next(AppError.badRequest('El usuario ya está silenciado'))
   }
   if (req.resource.roles.includes(ROLE_TYPES.ADMIN.name)) {
     return next(AppError.unauthorized('No puedes silenciar a un administrador'))
   }
+  req.report = req.report || {}
+  req.report.reportedItemId = req.resource.ownerId
   next()
 }
 

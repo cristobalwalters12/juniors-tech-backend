@@ -117,8 +117,22 @@ const demoteMod = async (req, res) => {
 }
 
 const muteUser = async (req, res) => {
-  await mute(req.resource.ownerId)
-  res.sendStatus(204)
+  if (!req.report.exists) {
+    await createReport({
+      reportType: REPORT_TYPES.USER,
+      ...req.report
+    })
+  }
+  await mute(req.report.reportedItemId)
+  const data = await closeReportsByReasonId({
+    reportType: REPORT_TYPES.USER,
+    reportActionId: REPORT_ACTIONS.MUTE_USER,
+    ...req.report
+  })
+  res.status(200).json({
+    status: 'success',
+    data
+  })
 }
 
 const reportUser = async (req, res) => {

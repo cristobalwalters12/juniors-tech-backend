@@ -22,10 +22,11 @@ import {
   canBeMod,
   canBeMuted,
   canDemoteMod,
-  canCloseReport
+  canCloseReport,
+  checkForReportOfType
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
-import { ROLE_TYPES } from '../../../config/index.js'
+import { REPORT_TYPES, ROLE_TYPES } from '../../../config/index.js'
 import { closeReportDto, createReportDto } from '../dtos/reportDto.js'
 
 const router = Router()
@@ -65,7 +66,8 @@ router
     requireLoggedIn,
     restrictToRoles([ROLE_TYPES.MOD.name, ROLE_TYPES.ADMIN.name]),
     findAndSetUser,
-    canBeMuted
+    canBeMuted,
+    checkForReportOfType(REPORT_TYPES.USER)
   ], errorCatcher(muteUser))
   .all(methodNotAllowedHandler)
 

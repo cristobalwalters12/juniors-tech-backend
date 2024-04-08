@@ -125,6 +125,23 @@ const createReport = async ({
   }
 }
 
+const reportExistById = async ({ reportId, reportType }) => {
+  const selectReport = `SELECT
+                          R.id AS "reportId",
+                          R.updated_at IS NULL AS "isOpen",
+                          R.reported_by AS "reportedBy",
+                          R.report_type_id AS "reportTypeId",
+                          R.report_reason_id AS "reportReasonId",
+                          RI.${reportType.column} AS "reportedItemId"
+                        FROM report R
+                        JOIN reported_item RI
+                          ON R.id = RI.report_id
+                        WHERE R.id = $1
+                          AND R.report_type_id = $2;`
+  const { rows: [report] } = await pool.query(selectReport, [reportId, reportType.id])
+  return report
+}
+
 const closeReportsByReasonId = async ({ reportType, reportActionId, reportReasonId, reportedItemId }) => {
   const updateReportActions = `UPDATE report R
                               SET report_action_id = $1,
@@ -203,6 +220,7 @@ export {
   getCommentReports,
   getUserReports,
   createReport,
+  reportExistById,
   closeReportsByReasonId,
   closeAllReportsByResourceId
 }
