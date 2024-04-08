@@ -124,7 +124,7 @@ const createReport = async ({
   }
 }
 
-const closeReports = async ({ reportType, reportActionId, reportReasonId, reportedItemId }) => {
+const closeReportsByReasonId = async ({ reportType, reportActionId, reportReasonId, reportedItemId }) => {
   const updateReportActions = `UPDATE report R
                               SET report_action_id = $1,
                               updated_at = NOW()
@@ -169,4 +169,4 @@ const closeReports = async ({ reportType, reportActionId, reportReasonId, report
   }
 }
 
-export { getPostReports, getCommentReports, getUserReports, createReport, closeReports }
+export { getPostReports, getCommentReports, getUserReports, createReport, closeReportsByReasonId }
