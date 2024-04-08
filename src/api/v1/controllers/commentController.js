@@ -1,6 +1,6 @@
 import { voteById } from '../models/votingModel.js'
 import { create, getAll, updateById, deleteById } from '../models/commentModel.js'
-import { closeReportsByReasonId, createReport } from '../models/reportModel.js'
+import { closeAllReportsByResourceId, closeReportsByReasonId, createReport } from '../models/reportModel.js'
 import { REPORT_ACTIONS, REPORT_TYPES } from '../../../config/index.js'
 
 const createComment = async (req, res) => {
@@ -43,6 +43,11 @@ const editCommentById = async (req, res) => {
 
 const deleteCommentById = async (req, res) => {
   await deleteById(req.params.commentId)
+  await closeAllReportsByResourceId({
+    reportType: REPORT_TYPES.COMMENT,
+    reportActionId: REPORT_ACTIONS.DELETE_COMMENT,
+    reportedItemId: req.params.commentId
+  })
   res.sendStatus(204)
 }
 
