@@ -130,7 +130,7 @@ const closeReportsByReasonId = async ({ reportType, reportActionId, reportReason
                               SET report_action_id = $1,
                               updated_at = NOW()
                               FROM reported_item RI
-                              JOIN ${reportType.table} RT
+                              JOIN "${reportType.table}" RT
                                 ON RT.id = RI.${reportType.column}
                               WHERE R.id = RI.report_id
                                 AND RI.${reportType.column} = $2
@@ -156,7 +156,7 @@ const closeReportsByReasonId = async ({ reportType, reportActionId, reportReason
 
   const hasOpenReports = reasons.openReportReasons.length !== 0
   if (!hasOpenReports) {
-    const updateStatus = `UPDATE ${reportType.table}
+    const updateStatus = `UPDATE "${reportType.table}"
                           SET has_open_report = FALSE
                           WHERE id = $1;`
     await pool.query(updateStatus, [reportedItemId])
@@ -175,7 +175,7 @@ const closeAllReportsByResourceId = async ({ reportType, reportActionId, reporte
                               SET report_action_id = $1,
                               updated_at = NOW()
                               FROM reported_item RI
-                              JOIN ${reportType.table} RT
+                              JOIN "${reportType.table}" RT
                                 ON RT.id = RI.${reportType.column}
                               WHERE R.id = RI.report_id
                                 AND RI.${reportType.column} = $2
@@ -185,7 +185,7 @@ const closeAllReportsByResourceId = async ({ reportType, reportActionId, reporte
                                 R.created_at AS "createdAt";`
   const { rows: closedReports } = await pool.query(updateReportActions, [reportActionId, reportedItemId])
 
-  const updateStatus = `UPDATE ${reportType.table}
+  const updateStatus = `UPDATE "${reportType.table}"
                         SET has_open_report = FALSE
                         WHERE id = $1;`
   await pool.query(updateStatus, [reportedItemId])
