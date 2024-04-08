@@ -8,9 +8,7 @@ import {
   validateUids,
   requireLoggedIn,
   setUserIfLoggedIn,
-  isMuted,
-  restrictToRoles,
-  canCloseReport
+  isMuted
 } from '../middleware/index.js'
 import {
   createPost,
@@ -19,13 +17,11 @@ import {
   editPostById,
   deletePostById,
   votePostById,
-  reportPostById,
-  ignorePostReportsByReason
+  reportPostById
 } from '../controllers/postController.js'
 import { postDto } from '../dtos/postDto.js'
-import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
-import { createReportDto, closeReportDto } from '../dtos/reportDto.js'
+import { createReportDto } from '../dtos/reportDto.js'
 
 const router = Router()
 
@@ -73,17 +69,6 @@ router
     postExists,
     createReportDto
   ], errorCatcher(reportPostById))
-  .delete([
-    requireLoggedIn,
-    restrictToRoles([
-      ROLE_TYPES.MOD.name,
-      ROLE_TYPES.ADMIN.name
-    ]),
-    validateUids(['postId']),
-    postExists,
-    closeReportDto,
-    canCloseReport
-  ], errorCatcher(ignorePostReportsByReason))
   .all(methodNotAllowedHandler)
 
 export default router

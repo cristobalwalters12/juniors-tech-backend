@@ -1,6 +1,6 @@
 import { voteById } from '../models/votingModel.js'
 import { create, getAll, updateById, deleteById } from '../models/commentModel.js'
-import { closeAllReportsByResourceId, closeReportsByReasonId, createReport } from '../models/reportModel.js'
+import { closeAllReportsByResourceId, createReport } from '../models/reportModel.js'
 import { REPORT_ACTIONS, REPORT_TYPES } from '../../../config/index.js'
 
 const createComment = async (req, res) => {
@@ -76,25 +76,11 @@ const reportCommentById = async (req, res) => {
   })
 }
 
-const ignoreCommentReportsByReason = async (req, res) => {
-  const data = await closeReportsByReasonId({
-    reportType: REPORT_TYPES.POST,
-    reportActionId: REPORT_ACTIONS.IGNORE_REPORT,
-    reportReasonId: req.body.reportReasonId,
-    reportedItemId: req.params.commentId
-  })
-  res.status(200).json({
-    status: 'success',
-    data
-  })
-}
-
 export {
   createComment,
   getComments,
   editCommentById,
   deleteCommentById,
   voteCommentById,
-  reportCommentById,
-  ignoreCommentReportsByReason
+  reportCommentById
 }

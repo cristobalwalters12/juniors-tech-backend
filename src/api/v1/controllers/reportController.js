@@ -1,4 +1,5 @@
-import { getPostReports, getCommentReports, getUserReports } from '../models/reportModel.js'
+import { REPORT_ACTIONS } from '../../../config/index.js'
+import { getPostReports, getCommentReports, getUserReports, closeReasonRelatedReports } from '../models/reportModel.js'
 
 const getPostTypeReports = async (req, res) => {
   const data = await getPostReports()
@@ -24,4 +25,15 @@ const getUserTypeReports = async (req, res) => {
   })
 }
 
-export { getPostTypeReports, getCommentTypeReports, getUserTypeReports }
+const ignoreReport = async (req, res) => {
+  const data = await closeReasonRelatedReports({
+    reportActionId: REPORT_ACTIONS.IGNORE_REPORT,
+    ...req.report
+  })
+  res.status(200).json({
+    status: 'success',
+    data
+  })
+}
+
+export { getPostTypeReports, getCommentTypeReports, getUserTypeReports, ignoreReport }
