@@ -7,7 +7,8 @@ import {
   editCommentById,
   deleteCommentById,
   voteCommentById,
-  reportCommentById
+  reportCommentById,
+  ignoreCommentReportsByReason
 } from '../controllers/commentController.js'
 import {
   postExists,
@@ -20,11 +21,13 @@ import {
   restrictToOwnerOrRoles,
   setUserIfLoggedIn,
   requireLoggedIn,
-  isMuted
+  isMuted,
+  restrictToRoles,
+  canIgnoreReport
 } from '../middleware/index.js'
 import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
-import { createReportDto } from '../dtos/reportDto.js'
+import { closeReportDto, createReportDto } from '../dtos/reportDto.js'
 
 const router = Router({ mergeParams: true })
 
@@ -84,6 +87,17 @@ router
     findAndSetComment,
     createReportDto
   ], errorCatcher(reportCommentById))
+  .delete([
+    requireLoggedIn,
+    restrictToRoles([
+      ROLE_TYPES.MOD.name,
+      ROLE_TYPES.ADMIN.name
+    ]),
+    validateUids(['postId']),
+    findAndSetComment,
+    closeReportDto,
+    canIgnoreReport
+  ], errorCatcher(ignoreCommentReportsByReason))
   .all(methodNotAllowedHandler)
 
 export default router
