@@ -124,4 +124,49 @@ const createReport = async ({
   }
 }
 
-export { getPostReports, getCommentReports, getUserReports, createReport }
+const closeReports = async ({ reportType, reportActionId, reportReasonId, reportedItemId }) => {
+  const updateReportActions = `UPDATE report R
+                              SET report_action_id = $1,
+                              updated_at = NOW()
+                              FROM reported_item RI
+                              JOIN ${reportType.table} RT
+                                ON RT.id = RI.${reportType.column}
+                              WHERE R.id = RI.report_id
+                                AND RI.${reportType.column} = $2
+                                AND R.report_reason_id = $3
+                                AND R.updated_at IS NULL
+                              RETURNING
+                                R.id AS "reportId",
+                                R.created_at AS "createdAt";`
+  const { rows: closedReports } = await pool.query(updateReportActions, [reportActionId, reportedItemId, reportReasonId])
+
+  const checkForOpenReports = `SELECT
+                                COALESCE(ARRAY_AGG(DISTINCT R.report_reason_id)
+                                  FILTER (WHERE R.report_reason_id IS NOT NULL), '{}')
+                                  AS "openReportReasons"
+                              FROM reported_item RI
+                              JOIN report R
+                              ON RI.report_id = R.id
+                                WHERE RI.${reportType.column} = $1
+                                AND R.report_reason_id <> $2
+                                AND R.report_action_id IS NULL
+                                AND R.updated_at IS NULL;`
+  const { rows: [reasons] } = await pool.query(checkForOpenReports, [reportedItemId, reportReasonId])
+
+  const hasOpenReports = reasons.openReportReasons.length !== 0
+  if (!hasOpenReports) {
+    const updateStatus = `UPDATE ${reportType.table}
+                          SET has_open_report = FALSE
+                          WHERE id = $1;`
+    await pool.query(updateStatus, [reportedItemId])
+  }
+
+  return {
+    reportedItemId,
+    closedReports,
+    openReportReasonsId: reasons.openReportReasons,
+    hasOpenReports
+  }
+}
+
+export { getPostReports, getCommentReports, getUserReports, createReport, closeReports }
