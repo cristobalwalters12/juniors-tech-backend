@@ -1,11 +1,9 @@
 import { getUUID } from '../../../config/index.js'
 import { AppError } from '../../helpers/AppError.js'
-import { reportReasonSchema } from '../dtos/reportDto.js'
 import { existsById as commentExistsById, getAuthDataIfExists } from '../models/commentModel.js'
 import { existsById as existsPostById } from '../models/postModel.js'
 import { reportExistById } from '../models/reportModel.js'
 import { getUserAuthDataIfExists } from '../models/userModel.js'
-import { uidSchema } from './validateUids.js'
 
 const postExists = async (req, res, next) => {
   const resource = await existsPostById(req.params.postId)
@@ -50,29 +48,27 @@ const findAndSetUser = async (req, res, next) => {
 const checkForReportOfType = (reportType) => async (req, res, next) => {
   const reportId = req.body.reportId
   let report = {}
-  try {
-    if (reportId) {
-      await uidSchema.label('El reportId').validateAsync(req.body.reportId)
-      report = await reportExistById({ reportId, reportType })
-      if (report === undefined) {
-        throw AppError.notFound('El reporte no existe')
-      }
-      if (!report.isOpen) {
-        throw AppError.badRequest('El reporte ya está cerrado')
-      }
-      report.exists = true
-    } else {
-      await reportReasonSchema.validateAsync(req.body.reportReasonId)
-      report.reportId = getUUID()
-      report.reportedBy = req.user.id
-      report.reportTypeId = reportType.id
-      report.reportReasonId = req.body.reportReasonId
-      report.exists = false
+  if (reportId) {
+    report = await reportExistById({ reportId, reportType })
+    if (report === undefined) {
+      return next(AppError.notFound('El reporte no existe'))
     }
-  } catch (error) {
-    next(error)
+    if (!report.isOpen) {
+      return next(AppError.badRequest('El reporte ya está cerrado'))
+    }
+    if (report.reportedItemId !== req.resource.id) {
+      return next(AppError.badRequest('El reporte no corresponde al recurso'))
+    }
+    report.exists = true
+  } else {
+    report.reportId = getUUID()
+    report.reportedBy = req.user.id
+    report.reportTypeId = reportType.id
+    report.reportReasonId = req.body.reportReasonId
+    report.exists = false
   }
   report.reportRelationshipId = getUUID()
+  report.reportType = reportType
   req.report = req.report ? { ...req.report, ...report } : report
   next()
 }

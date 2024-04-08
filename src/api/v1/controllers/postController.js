@@ -40,12 +40,22 @@ const editPostById = async (req, res) => {
 }
 
 const deletePostById = async (req, res) => {
-  await deleteById({ postId: req.params.postId })
+  const postId = req.params.postId
+
+  if (req?.report?.exists === false) {
+    await createReport({
+      ...req.report,
+      reportedItemId: postId
+    })
+  }
+
+  await deleteById(postId)
   await closeAllReportsByResourceId({
     reportType: REPORT_TYPES.POST,
     reportActionId: REPORT_ACTIONS.DELETE_POST,
-    reportedItemId: req.params.postId
+    reportedItemId: postId
   })
+
   res.sendStatus(204)
 }
 

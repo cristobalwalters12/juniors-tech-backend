@@ -16,7 +16,10 @@ const createReportSchema = Joi.object({
 const closeReportSchema = Joi.object({
   reportId: uidSchema.label('El reportId'),
   reportReasonId: reportReasonSchema
-}).xor('reportId', 'reportReasonId').messages()
+}).xor('reportId', 'reportReasonId').messages({
+  'object.xor': 'Solo puedes indicar uno de los campos: el reportId o el reportReasonId',
+  'object.missing': 'Debes indicar un valor o para reportId o para reportReasonId'
+})
 
 const validateCreateReport = async ({ body }) => await createReportSchema.validateAsync(body)
 const validateIgnoreReport = async ({ body }) => await closeReportSchema.validateAsync(body)

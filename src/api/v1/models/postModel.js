@@ -174,7 +174,7 @@ const updateById = async ({ postId, title, body, categoryId, slug, currUserId })
   return { ...postData, ...username }
 }
 
-const deleteById = async ({ postId }) => {
+const deleteById = async (postId) => {
   const deletePost = `UPDATE aspect
                       SET deleted_at = NOW()
                       WHERE id = $1

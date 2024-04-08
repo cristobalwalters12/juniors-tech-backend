@@ -136,9 +136,8 @@ const reportExistById = async ({ reportId, reportType }) => {
                         FROM report R
                         JOIN reported_item RI
                           ON R.id = RI.report_id
-                        WHERE R.id = $1
-                          AND R.report_type_id = $2;`
-  const { rows: [report] } = await pool.query(selectReport, [reportId, reportType.id])
+                        WHERE R.id = $1;`
+  const { rows: [report] } = await pool.query(selectReport, [reportId])
   return report
 }
 

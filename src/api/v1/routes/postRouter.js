@@ -2,7 +2,6 @@ import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
 import {
   restrictToOwner,
-  restrictToOwnerOrRoles,
   protectReportedFromEdit,
   methodNotAllowedHandler,
   postExists,
@@ -52,10 +51,7 @@ router
     requireLoggedIn,
     validateUids(['postId']),
     postExists,
-    restrictToOwnerOrRoles([
-      ROLE_TYPES.MOD.name,
-      ROLE_TYPES.ADMIN.name
-    ])
+    restrictToOwner
   ], errorCatcher(deletePostById))
   .all(methodNotAllowedHandler)
 
