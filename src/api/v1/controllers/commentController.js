@@ -1,5 +1,7 @@
 import { voteById } from '../models/votingModel.js'
 import { create, getAll, updateById, deleteById } from '../models/commentModel.js'
+import { createReport } from '../models/reportModel.js'
+import { REPORT_TYPES } from '../../../config/index.js'
 
 const createComment = async (req, res) => {
   const data = await create({
@@ -54,4 +56,26 @@ const voteCommentById = async (req, res) => {
   res.sendStatus(204)
 }
 
-export { createComment, getComments, editCommentById, deleteCommentById, voteCommentById }
+const reportCommentById = async (req, res) => {
+  const data = await createReport({
+    reportId: req.body.reportId,
+    reportedBy: req.user.id,
+    reportedItemId: req.params.commentId,
+    reportType: REPORT_TYPES.COMMENT,
+    reportRelationshipId: req.body.relationshipId,
+    reportReasonId: req.body.reportReasonId
+  })
+  res.status(201).json({
+    status: 'success',
+    data
+  })
+}
+
+export {
+  createComment,
+  getComments,
+  editCommentById,
+  deleteCommentById,
+  voteCommentById,
+  reportCommentById
+}

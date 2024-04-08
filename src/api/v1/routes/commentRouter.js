@@ -1,7 +1,14 @@
 import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
 import { createCommentDto, editCommentDto } from '../dtos/commentDto.js'
-import { createComment, getComments, editCommentById, deleteCommentById, voteCommentById } from '../controllers/commentController.js'
+import {
+  createComment,
+  getComments,
+  editCommentById,
+  deleteCommentById,
+  voteCommentById,
+  reportCommentById
+} from '../controllers/commentController.js'
 import {
   postExists,
   validateUids,
@@ -17,6 +24,7 @@ import {
 } from '../middleware/index.js'
 import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
+import { createReportDto } from '../dtos/reportDto.js'
 
 const router = Router({ mergeParams: true })
 
@@ -66,6 +74,16 @@ router
     findAndSetComment,
     voteDto
   ], errorCatcher(voteCommentById))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/:commentId/report')
+  .post([
+    requireLoggedIn,
+    validateUids(['postId', 'commentId']),
+    findAndSetComment,
+    createReportDto
+  ], errorCatcher(reportCommentById))
   .all(methodNotAllowedHandler)
 
 export default router
