@@ -11,7 +11,7 @@ import {
   setUserIfLoggedIn,
   isMuted,
   restrictToRoles,
-  canIgnoreReport
+  canCloseReport
 } from '../middleware/index.js'
 import {
   createPost,
@@ -86,7 +86,7 @@ router
     validateUids(['postId']),
     postExists,
     closeReportDto,
-    canIgnoreReport
+    canCloseReport
   ], errorCatcher(ignorePostReportsByReason))
   .all(methodNotAllowedHandler)
 

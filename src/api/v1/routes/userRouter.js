@@ -22,7 +22,7 @@ import {
   canBeMod,
   canBeMuted,
   canDemoteMod,
-  canIgnoreReport
+  canCloseReport
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
 import { ROLE_TYPES } from '../../../config/index.js'
@@ -84,7 +84,7 @@ router
     ]),
     findAndSetUser,
     closeReportDto,
-    canIgnoreReport
+    canCloseReport
   ], errorCatcher(ignoreUserReportsByReason))
   .all(methodNotAllowedHandler)
 

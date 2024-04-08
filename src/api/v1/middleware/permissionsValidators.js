@@ -88,12 +88,12 @@ const isMuted = async (req, res, next) => {
   next()
 }
 
-const canIgnoreReport = (req, res, next) => {
+const canCloseReport = (req, res, next) => {
   if (!isReported(req)) {
-    return next(AppError.badRequest('No hay reportes pendientes para desestimar'))
+    return next(AppError.badRequest('No hay reportes pendientes'))
   }
   if (!hasOpenRelatedReports(req)) {
-    return next(AppError.badRequest('No hay reportes por este motivo para desestimar'))
+    return next(AppError.badRequest('No hay reportes por este motivo'))
   }
   next()
 }
@@ -107,5 +107,5 @@ export {
   canBeMod,
   canDemoteMod,
   canBeMuted,
-  canIgnoreReport
+  canCloseReport
 }

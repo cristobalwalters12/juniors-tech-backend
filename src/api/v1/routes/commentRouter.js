@@ -23,7 +23,7 @@ import {
   requireLoggedIn,
   isMuted,
   restrictToRoles,
-  canIgnoreReport
+  canCloseReport
 } from '../middleware/index.js'
 import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
@@ -96,7 +96,7 @@ router
     validateUids(['postId']),
     findAndSetComment,
     closeReportDto,
-    canIgnoreReport
+    canCloseReport
   ], errorCatcher(ignoreCommentReportsByReason))
   .all(methodNotAllowedHandler)
 
