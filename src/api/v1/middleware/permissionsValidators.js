@@ -8,6 +8,8 @@ const hasRole = (req, roles) => {
 
 const isOwner = (req) => req.user.id === req.resource.ownerId
 
+const hasOpenRelatedReports = (req) => req.resource.reportReasons.includes(req.body.reportReasonId)
+
 const isReported = (req) => req.resource.hasOpenReport
 
 const restrictToRoles = (roles) => (req, res, next) => {
@@ -86,6 +88,16 @@ const isMuted = async (req, res, next) => {
   next()
 }
 
+const canIgnoreReport = (req, res, next) => {
+  if (!isReported(req)) {
+    return next(AppError.badRequest('No hay reportes pendientes para desestimar'))
+  }
+  if (!hasOpenRelatedReports(req)) {
+    return next(AppError.badRequest('No hay reportes por este motivo para desestimar'))
+  }
+  next()
+}
+
 export {
   restrictToRoles,
   restrictToOwnerOrRoles,
@@ -94,5 +106,6 @@ export {
   isMuted,
   canBeMod,
   canDemoteMod,
-  canBeMuted
+  canBeMuted,
+  canIgnoreReport
 }
