@@ -169,4 +169,39 @@ const closeReportsByReasonId = async ({ reportType, reportActionId, reportReason
   }
 }
 
-export { getPostReports, getCommentReports, getUserReports, createReport, closeReportsByReasonId }
+const closeAllReportsByResourceId = async ({ reportType, reportActionId, reportedItemId }) => {
+  const updateReportActions = `UPDATE report R
+                              SET report_action_id = $1,
+                              updated_at = NOW()
+                              FROM reported_item RI
+                              JOIN ${reportType.table} RT
+                                ON RT.id = RI.${reportType.column}
+                              WHERE R.id = RI.report_id
+                                AND RI.${reportType.column} = $2
+                                AND R.updated_at IS NULL
+                              RETURNING
+                                R.id AS "reportId",
+                                R.created_at AS "createdAt";`
+  const { rows: closedReports } = await pool.query(updateReportActions, [reportActionId, reportedItemId])
+
+  const updateStatus = `UPDATE ${reportType.table}
+                        SET has_open_report = FALSE
+                        WHERE id = $1;`
+  await pool.query(updateStatus, [reportedItemId])
+
+  return {
+    reportedItemId,
+    closedReports,
+    openReportReasonsId: [],
+    hasOpenReports: false
+  }
+}
+
+export {
+  getPostReports,
+  getCommentReports,
+  getUserReports,
+  createReport,
+  closeReportsByReasonId,
+  closeAllReportsByResourceId
+}
