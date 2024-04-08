@@ -194,7 +194,7 @@ const existsById = async (postId) => {
                         A.author_id AS "ownerId",
                         A.has_open_report AS "hasOpenReport",
                         U.muted_at IS NOT NULL AS "isOwnerMuted",
-                        TO_CHAR(U.muted_at + INTERVAL '15' DAY, 'dd-mm-yyy') AS "ownerMutedUntil",
+                        TO_CHAR(U.muted_at + INTERVAL '15' DAY, 'dd-mm-yyyy') AS "ownerMutedUntil",
                         COALESCE(ARRAY_AGG(DISTINCT R.report_reason_id) filter (
                           WHERE R.report_reason_id IS NOT NULL
                           AND R.report_action_id IS NULL
