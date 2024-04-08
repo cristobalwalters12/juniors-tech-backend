@@ -70,7 +70,7 @@ const canDemoteMod = (req, res, next) => {
   next()
 }
 
-const canBeMuted = (req, res, next) => {
+const canMuteUser = (req, res, next) => {
   if (req.user.id === req.resource.ownerId) {
     return next(AppError.forbidden('Solo puedes silenciar a otros usuarios'))
   }
@@ -115,6 +115,6 @@ export {
   isMuted,
   canBeMod,
   canDemoteMod,
-  canBeMuted,
+  canMuteUser,
   canCloseReport
 }

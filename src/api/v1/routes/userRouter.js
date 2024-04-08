@@ -20,7 +20,7 @@ import {
   restrictToRoles,
   findAndSetUser,
   canBeMod,
-  canBeMuted,
+  canMuteUser,
   canDemoteMod,
   canCloseReport,
   checkForReportOfType
@@ -66,7 +66,7 @@ router
     requireLoggedIn,
     restrictToRoles([ROLE_TYPES.MOD.name, ROLE_TYPES.ADMIN.name]),
     findAndSetUser,
-    canBeMuted,
+    canMuteUser,
     checkForReportOfType(REPORT_TYPES.USER)
   ], errorCatcher(muteUser))
   .all(methodNotAllowedHandler)
