@@ -109,8 +109,9 @@ const createReport = async ({
                                   SET has_open_report = TRUE
                                   WHERE id = $1;`
 
-  const [{ rows: [report] }] = await Promise.all([
-    pool.query(insertReport, [reportId, reportedBy, reportType.id, reportReasonId]),
+  const { rows: [report] } = await pool.query(insertReport, [reportId, reportedBy, reportType.id, reportReasonId])
+
+  await Promise.all([
     pool.query(insertReportRelationship, [reportRelationshipId, reportId, reportedItemId]),
     pool.query(updateReportedResource, [reportedItemId])
   ])
