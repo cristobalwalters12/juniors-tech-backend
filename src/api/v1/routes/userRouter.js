@@ -9,6 +9,7 @@ import {
   muteUser,
   demoteMod,
   reportUser,
+  ignoreUserReportsByReason,
   desactivateUserController
 } from '../controllers/userController.js'
 import { errorCatcher } from '../../helpers/index.js'
@@ -20,11 +21,12 @@ import {
   findAndSetUser,
   canBeMod,
   canBeMuted,
-  canDemoteMod
+  canDemoteMod,
+  canIgnoreReport
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
 import { ROLE_TYPES } from '../../../config/index.js'
-import { createReportDto } from '../dtos/reportDto.js'
+import { closeReportDto, createReportDto } from '../dtos/reportDto.js'
 
 const router = Router()
 router.post('/sign-up', registerDto, errorCatcher(createUserjwtController)).all(methodNotAllowedHandler)
@@ -74,6 +76,16 @@ router
     findAndSetUser,
     createReportDto
   ], errorCatcher(reportUser))
+  .delete([
+    requireLoggedIn,
+    restrictToRoles([
+      ROLE_TYPES.MOD.name,
+      ROLE_TYPES.ADMIN.name
+    ]),
+    findAndSetUser,
+    closeReportDto,
+    canIgnoreReport
+  ], errorCatcher(ignoreUserReportsByReason))
   .all(methodNotAllowedHandler)
 
 router.put('/:id', jwtValidator, errorCatcher(updateUserController)).all(methodNotAllowedHandler)
