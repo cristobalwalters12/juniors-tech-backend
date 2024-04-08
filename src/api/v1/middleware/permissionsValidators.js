@@ -44,12 +44,19 @@ const canBeMod = (req, res, next) => {
   if (req.user.id === req.resource.ownerId) {
     return next(AppError.unauthorized('No puedes autopromoverte a moderador'))
   }
+
   if (req.resource.roles.includes(ROLE_TYPES.MOD.name)) {
     return next(AppError.badRequest('El usuario ya es moderador'))
   }
+
   if (req.resource.isMuted) {
     return next(AppError.badRequest('Un usuario silenciado no puede ser moderador'))
   }
+
+  if (req.resource.hasOpenReport) {
+    return next(AppError.badRequest('Un usuario reportado no puede ser moderador'))
+  }
+
   next()
 }
 
