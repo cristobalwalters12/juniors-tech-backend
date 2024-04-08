@@ -8,6 +8,7 @@ import {
   promoteUserToMod,
   muteUser,
   demoteMod,
+  reportUser,
   desactivateUserController
 } from '../controllers/userController.js'
 import { errorCatcher } from '../../helpers/index.js'
@@ -23,6 +24,7 @@ import {
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
 import { ROLE_TYPES } from '../../../config/index.js'
+import { createReportDto } from '../dtos/reportDto.js'
 
 const router = Router()
 router.post('/sign-up', registerDto, errorCatcher(createUserjwtController)).all(methodNotAllowedHandler)
@@ -63,6 +65,15 @@ router
     findAndSetUser,
     canBeMuted
   ], errorCatcher(muteUser))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/:username/report')
+  .post([
+    requireLoggedIn,
+    findAndSetUser,
+    createReportDto
+  ], errorCatcher(reportUser))
   .all(methodNotAllowedHandler)
 
 router.put('/:id', jwtValidator, errorCatcher(updateUserController)).all(methodNotAllowedHandler)

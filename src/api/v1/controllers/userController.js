@@ -1,7 +1,8 @@
 import { createUser, getByEmail, getUsers, getUserByUsername, updateUser, validateEmailById, desactivateUser } from '../models/userModel.js'
 import { jwtAdapter } from '../../../config/adapters/jwtAdapter.js'
 import { getAll, promoteToMod, mute, demote } from '../models/moderatorModel.js'
-import { ROLE_TYPES } from '../../../config/index.js'
+import { REPORT_TYPES, ROLE_TYPES } from '../../../config/index.js'
+import { createReport } from '../models/reportModel.js'
 
 const createUserjwtController = async (req, res) => {
   const { email, password, username, birthdate } = req.body
@@ -119,6 +120,22 @@ const muteUser = async (req, res) => {
   await mute(req.resource.ownerId)
   res.sendStatus(204)
 }
+
+const reportUser = async (req, res) => {
+  const data = await createReport({
+    reportId: req.body.reportId,
+    reportedBy: req.user.id,
+    reportedItemId: req.resource.ownerId,
+    reportType: REPORT_TYPES.USER,
+    reportRelationshipId: req.body.relationshipId,
+    reportReasonId: req.body.reportReasonId
+  })
+  res.status(201).json({
+    status: 'success',
+    data
+  })
+}
+
 const desactivateUserController = async (req, res) => {
   try {
     const id = req.params.id
@@ -166,5 +183,6 @@ export {
   promoteUserToMod,
   demoteMod,
   muteUser,
+  reportUser,
   desactivateUserController
 }
