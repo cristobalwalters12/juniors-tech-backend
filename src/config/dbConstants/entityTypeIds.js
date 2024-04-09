@@ -51,4 +51,26 @@ const REPORT_REASONS = {
   OTHER: 'ASU6wJFZJ8'
 }
 
-export { REPORT_TYPES, ASPECT_TYPES, ROLE_TYPES, REPORT_ACTIONS, REPORT_REASONS }
+const CATEGORIES = {
+  proyectos: 'S5L4FfEnjz',
+  cv: 'L1w-xYdnDH',
+  portafolios: 'X9lWwZFUMs',
+  trabajo: 'vq8EkwRM5Q',
+  estudio: 'xOnWXzDLgx',
+  cursos: 'WsMK91X7dK'
+}
+
+const POST_SORT_OPTIONS = {
+  votes: 'vote_count',
+  date: 'created_at'
+}
+
+export {
+  REPORT_TYPES,
+  ASPECT_TYPES,
+  ROLE_TYPES,
+  REPORT_ACTIONS,
+  REPORT_REASONS,
+  POST_SORT_OPTIONS,
+  CATEGORIES
+}
