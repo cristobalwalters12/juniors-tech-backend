@@ -8,7 +8,8 @@ import {
   postExists,
   validateUids,
   requireLoggedIn,
-  setUserIfLoggedIn
+  setUserIfLoggedIn,
+  isMuted
 } from '../middleware/index.js'
 import { createPost, getPostById, getPosts, editPostById, deletePostById, votePostById } from '../controllers/postController.js'
 import { postDto } from '../dtos/postDto.js'
@@ -19,7 +20,7 @@ const router = Router()
 
 router
   .route('/')
-  .post([requireLoggedIn, postDto], errorCatcher(createPost))
+  .post([requireLoggedIn, isMuted, postDto], errorCatcher(createPost))
   .get(setUserIfLoggedIn, getPosts)
   .all(methodNotAllowedHandler)
 
@@ -31,6 +32,7 @@ router
     validateUids(['postId']),
     postExists,
     restrictToOwner,
+    isMuted,
     isReported,
     postDto
   ], errorCatcher(editPostById))

@@ -1,14 +1,3 @@
-const REPORT_TYPES = {
-  POST: 'eXx8aFdM6E',
-  COMMENT: 'FciMP7nq18',
-  USER: 'aSRB2RNW9K'
-}
-
-const ASPECT_TYPES = {
-  POST: 'pOcG-XWN58',
-  COMMENT: 'm6udpXPOt6'
-}
-
 const ROLE_TYPES = {
   USER: {
     id: '2SbUCqylYo',
@@ -24,4 +13,23 @@ const ROLE_TYPES = {
   }
 }
 
-export { REPORT_TYPES, ASPECT_TYPES, ROLE_TYPES }
+const ASPECT_TYPES = {
+  POST: 'pOcG-XWN58',
+  COMMENT: 'm6udpXPOt6'
+}
+
+const REPORT_TYPES = {
+  POST: 'eXx8aFdM6E',
+  COMMENT: 'FciMP7nq18',
+  USER: 'aSRB2RNW9K'
+}
+
+const REPORT_ACTIONS = {
+  DEACTIVATE_ACCOUNT: 'toUoxwUTrg',
+  IGNORE_REPORT: 'J9s14lchjO',
+  DELETE_COMMENT: 'b5lHGSAcTV',
+  DELETE_POST: 'rIDwcR6GbB',
+  MUTE_USER: '4BhmLIjTLQ'
+}
+
+export { REPORT_TYPES, ASPECT_TYPES, ROLE_TYPES, REPORT_ACTIONS }

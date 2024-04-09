@@ -34,7 +34,7 @@ const router = express.Router()
  *               password: "Aa1234567"
  *     responses:
  *       200:
- *         description: Cuenta creada con éxito
+ *         description: Cuenta iniciada con Exito
  *         schema:
  *           type: object
  *           properties:

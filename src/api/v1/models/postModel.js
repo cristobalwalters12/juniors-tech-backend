@@ -190,14 +190,19 @@ const deleteById = async ({ postId }) => {
 
 const existsById = async (postId) => {
   const selectPost = `SELECT
-                        id,
-                        author_id AS "ownerId",
-                        has_open_report AS "hasOpenReport"
-                      FROM aspect
+                        A.id,
+                        A.author_id AS "ownerId",
+                        A.has_open_report AS "hasOpenReport",
+                        U.muted_at IS NOT NULL AS "isOwnerMuted",
+                        TO_CHAR(U.muted_at + INTERVAL '15' DAY, 'dd-mm-yyy') AS "ownerMutedUntil"
+                      FROM aspect A
+                      JOIN "user" U
+                      ON A.author_id = U.id
                       WHERE
-                        id = $1
-                        AND deleted_at IS NULL;`
-  const { rows: [post] } = await pool.query(selectPost, [postId])
+                        A.id = $1
+                        AND A.aspect_type_id = $2
+                        AND A.deleted_at IS NULL;`
+  const { rows: [post] } = await pool.query(selectPost, [postId, ASPECT_TYPES.POST])
   return post
 }
 

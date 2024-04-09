@@ -63,3 +63,9 @@ Abrir la terminal en la carpeta raíz y ejecutar:
 ```
 
 Para ejecutar los tests, usando la base de datos de pruebas.
+
+## API Rest Foro
+
+### Url para Api rest de nuestro foro
+
+- [API Rest](http://localhost:3000/api/v1/docs)
