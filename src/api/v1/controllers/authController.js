@@ -20,9 +20,8 @@ const loginUser = async (req, res) => {
   }
 
   const accessToken = await jwtAdapter.generateAccessToken({ id: userData.id, roles: userData.roles })
-  const { password, totalDaysMuted, ...user } = userData
+  const { password, totalDaysMuted, deleted, ...user } = userData
   user.accessToken = accessToken
-
   return res.status(200).json({
     status: 'success',
     data: user

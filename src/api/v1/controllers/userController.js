@@ -11,7 +11,7 @@ const createUserjwtController = async (req, res) => {
     res.status(400).json({ message: 'User already exists' })
   } else {
     const newUser = await createUser({ email, password, username, birthdate })
-    const token = await jwtAdapter.generateAccessToken({ id: newUser.id, role: newUser.role })
+    const token = await jwtAdapter.generateAccessToken({ id: newUser.id, roles: [newUser.role] })
     res.status(201).json({ message: 'User created', user: newUser, token })
   }
 }
