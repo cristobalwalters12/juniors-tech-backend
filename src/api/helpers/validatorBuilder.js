@@ -31,10 +31,6 @@ const pathVariablesValidatorBuilder =
 
 const queryParamsValidatorBuilder =
   (validate, transform) => async (req, res, next) => {
-    if (isObjectEmpty(req.query)) {
-      next()
-      return
-    }
     try {
       await validate(req)
       if (transform) req.query = await transform(req)
@@ -47,14 +43,6 @@ const queryParamsValidatorBuilder =
       }
     }
   }
-
-/* eslint no-unreachable-loop: "off" */
-const isObjectEmpty = (obj) => {
-  for (const key in obj) {
-    return false
-  }
-  return true
-}
 
 export {
   reqBodyValidatorBuilder,
