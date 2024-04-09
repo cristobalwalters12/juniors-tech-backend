@@ -19,9 +19,21 @@ const ASPECT_TYPES = {
 }
 
 const REPORT_TYPES = {
-  POST: 'eXx8aFdM6E',
-  COMMENT: 'FciMP7nq18',
-  USER: 'aSRB2RNW9K'
+  POST: {
+    id: 'eXx8aFdM6E',
+    table: 'aspect',
+    column: 'aspect_id'
+  },
+  COMMENT: {
+    id: 'FciMP7nq18',
+    table: 'aspect',
+    column: 'aspect_id'
+  },
+  USER: {
+    id: 'aSRB2RNW9K',
+    table: 'user',
+    column: 'user_id'
+  }
 }
 
 const REPORT_ACTIONS = {
@@ -32,4 +44,33 @@ const REPORT_ACTIONS = {
   MUTE_USER: '4BhmLIjTLQ'
 }
 
-export { REPORT_TYPES, ASPECT_TYPES, ROLE_TYPES, REPORT_ACTIONS }
+const REPORT_REASONS = {
+  SPAM: 'FWLo2VXNHE',
+  INAPPROPIATE_CONTENT: 'a90dtRdfEP',
+  HARASSMENT: 'QSz3vzQtz2',
+  OTHER: 'ASU6wJFZJ8'
+}
+
+const CATEGORIES = {
+  proyectos: 'S5L4FfEnjz',
+  cv: 'L1w-xYdnDH',
+  portafolios: 'X9lWwZFUMs',
+  trabajo: 'vq8EkwRM5Q',
+  estudio: 'xOnWXzDLgx',
+  cursos: 'WsMK91X7dK'
+}
+
+const POST_SORT_OPTIONS = {
+  votes: 'vote_count',
+  date: 'created_at'
+}
+
+export {
+  REPORT_TYPES,
+  ASPECT_TYPES,
+  ROLE_TYPES,
+  REPORT_ACTIONS,
+  REPORT_REASONS,
+  POST_SORT_OPTIONS,
+  CATEGORIES
+}
