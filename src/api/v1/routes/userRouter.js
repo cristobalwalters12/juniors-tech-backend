@@ -6,7 +6,6 @@ import {
   updateUserController,
   getMods,
   promoteUserToMod,
-  muteUser,
   demoteMod,
   reportUser,
   desactivateUserController
@@ -19,13 +18,11 @@ import {
   restrictToRoles,
   findAndSetUser,
   canBeMod,
-  canMuteUser,
-  canDemoteMod,
-  checkForReportOfType
+  canDemoteMod
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
-import { REPORT_TYPES, ROLE_TYPES } from '../../../config/index.js'
-import { closeReportDto, createReportDto } from '../dtos/reportDto.js'
+import { ROLE_TYPES } from '../../../config/index.js'
+import { createReportDto } from '../dtos/reportDto.js'
 
 const router = Router()
 router.post('/sign-up', registerDto, errorCatcher(createUserjwtController)).all(methodNotAllowedHandler)
@@ -56,21 +53,6 @@ router
     findAndSetUser,
     canDemoteMod
   ], errorCatcher(demoteMod))
-  .all(methodNotAllowedHandler)
-
-router
-  .route('/:username/mute')
-  .post([
-    requireLoggedIn,
-    restrictToRoles([
-      ROLE_TYPES.MOD.name,
-      ROLE_TYPES.ADMIN.name
-    ]),
-    findAndSetUser,
-    canMuteUser,
-    checkForReportOfType(REPORT_TYPES.USER),
-    closeReportDto
-  ], errorCatcher(muteUser))
   .all(methodNotAllowedHandler)
 
 router

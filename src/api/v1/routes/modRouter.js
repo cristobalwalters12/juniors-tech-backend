@@ -1,8 +1,10 @@
 import { Router } from 'express'
 import {
+  canMuteUser,
   checkForReportOfType,
   commentExists,
   findAndSetReport,
+  findAndSetUser,
   methodNotAllowedHandler,
   postExists,
   requireLoggedIn,
@@ -15,6 +17,7 @@ import { deletePostById } from '../controllers/postController.js'
 import { closeReportDto } from '../dtos/reportDto.js'
 import { ignoreReport } from '../controllers/reportController.js'
 import { deleteCommentById } from '../controllers/commentController.js'
+import { muteUser } from '../controllers/userController.js'
 
 const router = Router()
 
@@ -46,6 +49,21 @@ router
     closeReportDto,
     checkForReportOfType(REPORT_TYPES.COMMENT)
   ], errorCatcher(deleteCommentById))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/users/:username/mute')
+  .post([
+    requireLoggedIn,
+    restrictToRoles([
+      ROLE_TYPES.MOD.name,
+      ROLE_TYPES.ADMIN.name
+    ]),
+    findAndSetUser,
+    canMuteUser,
+    checkForReportOfType(REPORT_TYPES.USER),
+    closeReportDto
+  ], errorCatcher(muteUser))
   .all(methodNotAllowedHandler)
 
 router
