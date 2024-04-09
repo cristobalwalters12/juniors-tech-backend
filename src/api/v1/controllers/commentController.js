@@ -42,12 +42,23 @@ const editCommentById = async (req, res) => {
 }
 
 const deleteCommentById = async (req, res) => {
-  await deleteById(req.params.commentId)
+  const commentId = req.params.commentId
+
+  if (req?.report?.exists === false) {
+    await createReport({
+      ...req.report,
+      reportedItemId: commentId
+    })
+  }
+
+  await deleteById(commentId)
+
   await closeAllReportsByResourceId({
     reportType: REPORT_TYPES.COMMENT,
     reportActionId: REPORT_ACTIONS.DELETE_COMMENT,
-    reportedItemId: req.params.commentId
+    reportedItemId: commentId
   })
+
   res.sendStatus(204)
 }
 

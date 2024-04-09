@@ -17,12 +17,10 @@ import {
   restrictToOwner,
   canReply,
   findAndSetComment,
-  restrictToOwnerOrRoles,
   setUserIfLoggedIn,
   requireLoggedIn,
   isMuted
 } from '../middleware/index.js'
-import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
 import { createReportDto } from '../dtos/reportDto.js'
 
@@ -57,12 +55,9 @@ router
   ], errorCatcher(editCommentById))
   .delete([
     validateUids(['postId', 'commentId']),
-    findAndSetComment,
     requireLoggedIn,
-    restrictToOwnerOrRoles([
-      ROLE_TYPES.MOD.name,
-      ROLE_TYPES.ADMIN.name
-    ])
+    findAndSetComment,
+    restrictToOwner
   ], errorCatcher(deleteCommentById))
   .all(methodNotAllowedHandler)
 

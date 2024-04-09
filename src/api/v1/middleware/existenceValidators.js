@@ -36,6 +36,16 @@ const findAndSetComment = async (req, res, next) => {
   next()
 }
 
+const commentExists = async (req, res, next) => {
+  const comment = await commentExistsById(req.params.commentId)
+  if (comment === undefined) {
+    return next(AppError.notFound('El comentario no existe'))
+  }
+
+  req.resource = comment
+  next()
+}
+
 const findAndSetUser = async (req, res, next) => {
   const user = await getUserAuthDataIfExists(req.params.username)
   if (user === undefined) {
@@ -94,4 +104,4 @@ const checkForReportOfType = (reportType) => async (req, res, next) => {
   next()
 }
 
-export { postExists, canReply, findAndSetComment, findAndSetUser, findAndSetReport, checkForReportOfType }
+export { postExists, canReply, findAndSetComment, findAndSetUser, findAndSetReport, checkForReportOfType, commentExists }

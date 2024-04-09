@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import {
   checkForReportOfType,
+  commentExists,
   findAndSetReport,
   methodNotAllowedHandler,
   postExists,
@@ -13,6 +14,7 @@ import { REPORT_TYPES, ROLE_TYPES } from '../../../config/index.js'
 import { deletePostById } from '../controllers/postController.js'
 import { closeReportDto } from '../dtos/reportDto.js'
 import { ignoreReport } from '../controllers/reportController.js'
+import { deleteCommentById } from '../controllers/commentController.js'
 
 const router = Router()
 
@@ -29,6 +31,21 @@ router
     closeReportDto,
     checkForReportOfType(REPORT_TYPES.POST)
   ], errorCatcher(deletePostById))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/comments/:commentId')
+  .delete([
+    requireLoggedIn,
+    restrictToRoles([
+      ROLE_TYPES.MOD.name,
+      ROLE_TYPES.ADMIN.name
+    ]),
+    validateUids(['commentId']),
+    commentExists,
+    closeReportDto,
+    checkForReportOfType(REPORT_TYPES.COMMENT)
+  ], errorCatcher(deleteCommentById))
   .all(methodNotAllowedHandler)
 
 router

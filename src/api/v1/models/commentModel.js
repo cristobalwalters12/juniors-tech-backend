@@ -151,11 +151,11 @@ const deleteById = async (commentId) => {
 }
 
 const existsById = async (commentId) => {
-  const selectParentComment = `SELECT EXISTS(
+  const selectExists = `SELECT EXISTS(
                                 SELECT 1 FROM aspect
                                 WHERE id = $1
                                 AND deleted_at IS NULL);`
-  const { rows: [comment] } = await pool.query(selectParentComment, [commentId])
+  const { rows: [comment] } = await pool.query(selectExists, [commentId])
 
   return comment.exists
 }
