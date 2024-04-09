@@ -19,9 +19,21 @@ const ASPECT_TYPES = {
 }
 
 const REPORT_TYPES = {
-  POST: 'eXx8aFdM6E',
-  COMMENT: 'FciMP7nq18',
-  USER: 'aSRB2RNW9K'
+  POST: {
+    id: 'eXx8aFdM6E',
+    table: 'aspect',
+    column: 'aspect_id'
+  },
+  COMMENT: {
+    id: 'FciMP7nq18',
+    table: 'aspect',
+    column: 'aspect_id'
+  },
+  USER: {
+    id: 'aSRB2RNW9K',
+    table: 'user',
+    column: 'user_id'
+  }
 }
 
 const REPORT_ACTIONS = {
@@ -32,4 +44,11 @@ const REPORT_ACTIONS = {
   MUTE_USER: '4BhmLIjTLQ'
 }
 
-export { REPORT_TYPES, ASPECT_TYPES, ROLE_TYPES, REPORT_ACTIONS }
+const REPORT_REASONS = {
+  SPAM: 'FWLo2VXNHE',
+  INAPPROPIATE_CONTENT: 'a90dtRdfEP',
+  HARASSMENT: 'QSz3vzQtz2',
+  OTHER: 'ASU6wJFZJ8'
+}
+
+export { REPORT_TYPES, ASPECT_TYPES, ROLE_TYPES, REPORT_ACTIONS, REPORT_REASONS }

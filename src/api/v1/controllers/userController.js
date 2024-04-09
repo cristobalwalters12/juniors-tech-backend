@@ -1,7 +1,8 @@
 import { createUser, getByEmail, getUsers, getUserByUsername, updateUser, validateEmailById, desactivateUser } from '../models/userModel.js'
 import { jwtAdapter } from '../../../config/adapters/jwtAdapter.js'
 import { getAll, promoteToMod, mute, demote } from '../models/moderatorModel.js'
-import { ROLE_TYPES } from '../../../config/index.js'
+import { REPORT_ACTIONS, REPORT_TYPES, ROLE_TYPES } from '../../../config/index.js'
+import { closeReasonRelatedReports, createReport } from '../models/reportModel.js'
 
 const createUserjwtController = async (req, res) => {
   const { email, password, username, birthdate } = req.body
@@ -10,7 +11,7 @@ const createUserjwtController = async (req, res) => {
     res.status(400).json({ message: 'User already exists' })
   } else {
     const newUser = await createUser({ email, password, username, birthdate })
-    const token = await jwtAdapter.generateAccessToken({ id: newUser.id, role: newUser.role })
+    const token = await jwtAdapter.generateAccessToken({ id: newUser.id, roles: [newUser.role] })
     res.status(201).json({ message: 'User created', user: newUser, token })
   }
 }
@@ -116,9 +117,39 @@ const demoteMod = async (req, res) => {
 }
 
 const muteUser = async (req, res) => {
-  await mute(req.resource.ownerId)
-  res.sendStatus(204)
+  if (!req.report.exists) {
+    await createReport({
+      reportType: REPORT_TYPES.USER,
+      ...req.report
+    })
+  }
+  await mute(req.report.reportedItemId)
+  const data = await closeReasonRelatedReports({
+    reportType: REPORT_TYPES.USER,
+    reportActionId: REPORT_ACTIONS.MUTE_USER,
+    ...req.report
+  })
+  res.status(200).json({
+    status: 'success',
+    data
+  })
 }
+
+const reportUser = async (req, res) => {
+  const data = await createReport({
+    reportId: req.body.reportId,
+    reportedBy: req.user.id,
+    reportedItemId: req.resource.ownerId,
+    reportType: REPORT_TYPES.USER,
+    reportRelationshipId: req.body.relationshipId,
+    reportReasonId: req.body.reportReasonId
+  })
+  res.status(201).json({
+    status: 'success',
+    data
+  })
+}
+
 const desactivateUserController = async (req, res) => {
   try {
     const id = req.params.id
@@ -167,5 +198,6 @@ export {
   promoteUserToMod,
   demoteMod,
   muteUser,
+  reportUser,
   desactivateUserController
 }

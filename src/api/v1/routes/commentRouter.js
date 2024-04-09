@@ -1,22 +1,28 @@
 import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
 import { createCommentDto, editCommentDto } from '../dtos/commentDto.js'
-import { createComment, getComments, editCommentById, deleteCommentById, voteCommentById } from '../controllers/commentController.js'
+import {
+  createComment,
+  getComments,
+  editCommentById,
+  deleteCommentById,
+  voteCommentById,
+  reportCommentById
+} from '../controllers/commentController.js'
 import {
   postExists,
   validateUids,
   methodNotAllowedHandler,
-  isReported,
+  protectReportedFromEdit,
   restrictToOwner,
   canReply,
   findAndSetComment,
-  restrictToOwnerOrRoles,
   setUserIfLoggedIn,
   requireLoggedIn,
   isMuted
 } from '../middleware/index.js'
-import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
+import { createReportDto } from '../dtos/reportDto.js'
 
 const router = Router({ mergeParams: true })
 
@@ -43,18 +49,15 @@ router
     requireLoggedIn,
     findAndSetComment,
     restrictToOwner,
-    isReported,
+    protectReportedFromEdit,
     isMuted,
     editCommentDto
   ], errorCatcher(editCommentById))
   .delete([
     validateUids(['postId', 'commentId']),
-    findAndSetComment,
     requireLoggedIn,
-    restrictToOwnerOrRoles([
-      ROLE_TYPES.MOD.name,
-      ROLE_TYPES.ADMIN.name
-    ])
+    findAndSetComment,
+    restrictToOwner
   ], errorCatcher(deleteCommentById))
   .all(methodNotAllowedHandler)
 
@@ -66,6 +69,16 @@ router
     findAndSetComment,
     voteDto
   ], errorCatcher(voteCommentById))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/:commentId/report')
+  .post([
+    requireLoggedIn,
+    validateUids(['postId', 'commentId']),
+    findAndSetComment,
+    createReportDto
+  ], errorCatcher(reportCommentById))
   .all(methodNotAllowedHandler)
 
 export default router

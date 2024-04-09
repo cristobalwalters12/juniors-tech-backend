@@ -1,4 +1,6 @@
+import { REPORT_ACTIONS, REPORT_TYPES } from '../../../config/index.js'
 import { create, getById, getAll, updateById, deleteById } from '../models/postModel.js'
+import { createReport, closeReasonRelatedReports, closeAllReportsByResourceId } from '../models/reportModel.js'
 import { voteById } from '../models/votingModel.js'
 
 const createPost = async (req, res) => {
@@ -38,7 +40,22 @@ const editPostById = async (req, res) => {
 }
 
 const deletePostById = async (req, res) => {
-  await deleteById({ postId: req.params.postId })
+  const postId = req.params.postId
+
+  if (req?.report?.exists === false) {
+    await createReport({
+      ...req.report,
+      reportedItemId: postId
+    })
+  }
+
+  await deleteById(postId)
+  await closeAllReportsByResourceId({
+    reportType: REPORT_TYPES.POST,
+    reportActionId: REPORT_ACTIONS.DELETE_POST,
+    reportedItemId: postId
+  })
+
   res.sendStatus(204)
 }
 
@@ -52,4 +69,41 @@ const votePostById = async (req, res) => {
   res.sendStatus(204)
 }
 
-export { createPost, getPostById, getPosts, editPostById, deletePostById, votePostById }
+const reportPostById = async (req, res) => {
+  const data = await createReport({
+    reportId: req.body.reportId,
+    reportedBy: req.user.id,
+    reportedItemId: req.params.postId,
+    reportType: REPORT_TYPES.POST,
+    reportRelationshipId: req.body.relationshipId,
+    reportReasonId: req.body.reportReasonId
+  })
+  res.status(201).json({
+    status: 'success',
+    data
+  })
+}
+
+const ignorePostReportsByReason = async (req, res) => {
+  const data = await closeReasonRelatedReports({
+    reportType: REPORT_TYPES.POST,
+    reportActionId: REPORT_ACTIONS.IGNORE_REPORT,
+    reportReasonId: req.body.reportReasonId,
+    reportedItemId: req.params.postId
+  })
+  res.status(200).json({
+    status: 'success',
+    data
+  })
+}
+
+export {
+  createPost,
+  getPostById,
+  getPosts,
+  editPostById,
+  deletePostById,
+  votePostById,
+  reportPostById,
+  ignorePostReportsByReason
+}
