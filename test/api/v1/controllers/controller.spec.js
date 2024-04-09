@@ -1,27 +1,33 @@
-/* // fuente: https://github.com/FabianPinoP/swagger-tutorial
 import request from 'supertest'
-import { generateToken } from '../../../utils/login.js'
-import app from '../../../../src/api/v1/app.js'
+import app from '../../../../src/api/v1/app'
 
-describe('travels controller', () => {
-  describe('GET /api/v1/travels with valid params', () => {
-    const token = generateToken()
-    it('should return all travels', async () => {
-      const response = await request(app)
-        .get('/api/v1/travels')
-        .set('Authorization', `Bearer ${token}`)
-      expect(response.statusCode).toBe(200)
-    })
+describe('Testing routes', () => {
+  test('GET /categories', async () => {
+    const response = await request(app).get('/api/v1/categories')
+    expect(response.status).toBe(200)
   })
-})
- */
 
-const sumar = (a, b) => a + b
-describe('Testing unitario con Jest', () => {
-  it('Comprobando el resultado de una sumatoria', () => {
-    const n1 = 4
-    const n2 = 5
-    const resultado = sumar(n1, n2)
-    expect(resultado).toBe(9)
+  test('GET /posts', async () => {
+    const response = await request(app).get('/api/v1/posts/')
+    expect(response.status).toBe(200)
+  })
+
+  test('DELETE /posts/:id devuelve status 400 cuando se intenta eliminar una publicación con id invalido', async () => {
+    const postId = '5'
+    const response = await request(app)
+      .delete(`/api/v1/posts/${postId}`)
+    expect(response.status).toBe(400)
+  })
+
+  test('DELETE /posts/:id devuelve status 404 cuando se intenta eliminar una publicación que no existe', async () => {
+    const postId = 'Keevwx9Hb0'
+    const response = await request(app)
+      .delete(`/api/v1/posts/${postId}`)
+    expect(response.status).toBe(404)
+  })
+
+  test('GET /users', async () => {
+    const response = await request(app).get('/api/v1/users')
+    expect(response.status).toBe(200)
   })
 })

@@ -9,6 +9,7 @@ process.on('uncaughtException', (error) => {
 
 const server = app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`)
+  console.log(`Api documentation on http://localhost:${PORT}/api/v1/docs`)
 })
 
 process.on('unhandledRejection', (error) => {

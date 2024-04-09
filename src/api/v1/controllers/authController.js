@@ -1,57 +1,32 @@
+import { byEmailLogin } from '../models/userModel.js'
+import { jwtAdapter, bcryptAdapter } from '../../../config/index.js'
 import { AppError } from '../../helpers/AppError.js'
-import { getByEmail } from '../models/usuarioModel.js'
-import { bcryptAdapter, jwtAdapter } from '../../../config/index.js'
 
 const loginUser = async (req, res) => {
-  const { email, password } = req.body
+  const { email, password: plainPassword } = req.body
+  const userData = await byEmailLogin(email)
 
-  const userInDb = await getByEmail(email)
-  if (!userInDb) {
-    throw AppError.unauthorized('Invalid email or password')
+  if (userData === undefined) {
+    throw AppError.unauthorized('Correo o contraseña inválidos')
   }
 
-  const passwordValid = await bcryptAdapter.compare(
-    password,
-    userInDb.password
-  )
-
-  if (!passwordValid) {
-    throw AppError.unauthorized('Invalid email or password')
+  if (userData.deleted) {
+    throw AppError.unauthorized('Esta cuenta está desactivada')
   }
 
-  const { token, expirationDate } = await jwtAdapter.generateRefreshToken({
-    email
-  })
-  res.cookie('token', token, {
-    expires: expirationDate,
-    httpOnly: true,
-    secure: true,
-    sameSite: 'None'
-  })
+  const match = await bcryptAdapter.compare(plainPassword, userData.password)
+  if (!match) {
+    throw AppError.unauthorized('Correo o contraseña inválidos')
+  }
 
-  const accessToken = await jwtAdapter.generateAccessToken({ email })
-  return res.status(200).json({
-    status: 'success',
-    data: { accessToken }
-  })
-}
-
-const logoutUser = async (req, res) => {
-  res.clearCookie('token')
-  res.status(204).send()
-}
-
-const refreshToken = async (req, res) => {
-  const refreshToken = req.cookies.token
-  if (!refreshToken) throw AppError.unauthorized('Token not found')
-
-  const { email } = await jwtAdapter.decodeRefreshToken(refreshToken)
-  const accessToken = await jwtAdapter.generateAccessToken({ email })
+  const accessToken = await jwtAdapter.generateAccessToken({ id: userData.id, roles: userData.roles })
+  const { password, totalDaysMuted, ...user } = userData
+  user.accessToken = accessToken
 
   return res.status(200).json({
     status: 'success',
-    data: { accessToken }
+    data: user
   })
 }
 
-export { loginUser, logoutUser, refreshToken }
+export { loginUser }
