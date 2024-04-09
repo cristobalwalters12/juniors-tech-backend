@@ -6,7 +6,8 @@ import {
   updateUserController,
   getMods,
   reportUser,
-  desactivateUserController
+  desactivateUserController,
+  desactivateMyAccountController
 } from '../controllers/userController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
@@ -40,4 +41,5 @@ router
 
 router.put('/:id', jwtValidator, errorCatcher(updateUserController)).all(methodNotAllowedHandler)
 router.put('/:id/desactivate', jwtValidator, errorCatcher(desactivateUserController)).all(methodNotAllowedHandler)
+router.put('/desactivateAccount', jwtValidator, errorCatcher(desactivateMyAccountController)).all(methodNotAllowedHandler)
 export default router
