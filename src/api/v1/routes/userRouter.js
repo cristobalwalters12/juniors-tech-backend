@@ -5,8 +5,6 @@ import {
   getUserByUsernameController,
   updateUserController,
   getMods,
-  promoteUserToMod,
-  demoteMod,
   reportUser,
   desactivateUserController
 } from '../controllers/userController.js'
@@ -16,9 +14,7 @@ import {
   jwtValidator,
   requireLoggedIn,
   restrictToRoles,
-  findAndSetUser,
-  canBeMod,
-  canDemoteMod
+  findAndSetUser
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
 import { ROLE_TYPES } from '../../../config/index.js'
@@ -38,22 +34,6 @@ router.get('/mods', [
   .all(methodNotAllowedHandler)
 
 router.get('/:username', errorCatcher(getUserByUsernameController)).all(methodNotAllowedHandler)
-
-router
-  .route('/:username/mod')
-  .post([
-    requireLoggedIn,
-    restrictToRoles([ROLE_TYPES.ADMIN.name]),
-    findAndSetUser,
-    canBeMod
-  ], errorCatcher(promoteUserToMod))
-  .delete([
-    requireLoggedIn,
-    restrictToRoles([ROLE_TYPES.ADMIN.name]),
-    findAndSetUser,
-    canDemoteMod
-  ], errorCatcher(demoteMod))
-  .all(methodNotAllowedHandler)
 
 router
   .route('/:username/report')
