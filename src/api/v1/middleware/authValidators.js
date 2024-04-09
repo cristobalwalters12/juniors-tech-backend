@@ -9,7 +9,7 @@ const setUserIfLoggedIn = async (req, res, next) => {
     req.user = { id, roles: [role] }
     return next()
   } catch (error) {
-    return next(error)
+    return next()
   }
 }
 
