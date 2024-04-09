@@ -10,7 +10,7 @@ const bodySchema = Joi.string().trim().min(4).messages({
 }).required()
 
 const createCommentSchema = Joi.object({
-  parentId: uidSchema.label('El parentId'),
+  parentId: uidSchema.label('El parentId').required(),
   body: bodySchema
 }).options({ abortEarly: false })
 

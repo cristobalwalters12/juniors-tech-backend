@@ -2,8 +2,7 @@ import { Router } from 'express'
 import { errorCatcher } from '../../helpers/index.js'
 import {
   restrictToOwner,
-  restrictToOwnerOrRoles,
-  isReported,
+  protectReportedFromEdit,
   methodNotAllowedHandler,
   postExists,
   validateUids,
@@ -11,10 +10,18 @@ import {
   setUserIfLoggedIn,
   isMuted
 } from '../middleware/index.js'
-import { createPost, getPostById, getPosts, editPostById, deletePostById, votePostById } from '../controllers/postController.js'
+import {
+  createPost,
+  getPostById,
+  getPosts,
+  editPostById,
+  deletePostById,
+  votePostById,
+  reportPostById
+} from '../controllers/postController.js'
 import { postDto } from '../dtos/postDto.js'
-import { ROLE_TYPES } from '../../../config/index.js'
 import { voteDto } from '../dtos/voteDto.js'
+import { createReportDto } from '../dtos/reportDto.js'
 
 const router = Router()
 
@@ -33,17 +40,14 @@ router
     postExists,
     restrictToOwner,
     isMuted,
-    isReported,
+    protectReportedFromEdit,
     postDto
   ], errorCatcher(editPostById))
   .delete([
     requireLoggedIn,
     validateUids(['postId']),
     postExists,
-    restrictToOwnerOrRoles([
-      ROLE_TYPES.MOD.name,
-      ROLE_TYPES.ADMIN.name
-    ])
+    restrictToOwner
   ], errorCatcher(deletePostById))
   .all(methodNotAllowedHandler)
 
@@ -55,6 +59,16 @@ router
     postExists,
     voteDto
   ], errorCatcher(votePostById))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/:postId/report')
+  .post([
+    requireLoggedIn,
+    validateUids(['postId']),
+    postExists,
+    createReportDto
+  ], errorCatcher(reportPostById))
   .all(methodNotAllowedHandler)
 
 export default router
