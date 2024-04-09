@@ -4,8 +4,8 @@ import { AppError } from '../../api/helpers/index.js'
 import { ACCESS_TOKEN_SECRET } from '../index.js'
 
 const JWT_ERRORS = {
-  TokenExpiredError: 'Token expired',
-  JsonWebTokenError: 'Invalid token or signature'
+  TokenExpiredError: 'El token expiró',
+  JsonWebTokenError: 'Firma o token inválido'
 }
 
 const jwtAdapter = {
