@@ -11,7 +11,8 @@ import {
   postExists,
   requireLoggedIn,
   restrictToRoles,
-  validateUids
+  validateUids,
+  restrictToOwnerOrRoles
 } from '../middleware/index.js'
 import { errorCatcher } from '../../helpers/index.js'
 import { REPORT_TYPES, ROLE_TYPES } from '../../../config/index.js'
@@ -83,8 +84,8 @@ router
   ], errorCatcher(promoteUserToMod))
   .delete([
     requireLoggedIn,
-    restrictToRoles([ROLE_TYPES.ADMIN.name]),
     findAndSetUser,
+    restrictToOwnerOrRoles([ROLE_TYPES.ADMIN.name]),
     canDemoteMod
   ], errorCatcher(demoteMod))
   .all(methodNotAllowedHandler)
