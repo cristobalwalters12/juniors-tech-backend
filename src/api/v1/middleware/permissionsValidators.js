@@ -40,7 +40,7 @@ const protectReportedFromEdit = (req, res, next) => {
   next()
 }
 
-const canBeMod = (req, res, next) => {
+const canPromoteToMod = (req, res, next) => {
   if (req.user.id === req.resource.ownerId) {
     return next(AppError.forbidden('No puedes autopromoverte a moderador'))
   }
@@ -113,7 +113,7 @@ export {
   restrictToOwner,
   protectReportedFromEdit,
   isMuted,
-  canBeMod,
+  canPromoteToMod,
   canDemoteMod,
   canMuteUser,
   canCloseReport

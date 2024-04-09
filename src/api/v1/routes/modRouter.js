@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import {
-  canBeMod,
+  canPromoteToMod,
   canDemoteMod,
   canMuteUser,
   checkForReportOfType,
@@ -74,7 +74,7 @@ router
     requireLoggedIn,
     restrictToRoles([ROLE_TYPES.ADMIN.name]),
     findAndSetUser,
-    canBeMod
+    canPromoteToMod
   ], errorCatcher(promoteUserToMod))
   .delete([
     requireLoggedIn,
