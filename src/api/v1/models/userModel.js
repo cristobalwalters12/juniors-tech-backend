@@ -290,14 +290,26 @@ const updateUser = async (id, fields) => {
 
 const getUserAuthDataIfExists = async (username) => {
   const selectUser = `SELECT
+                        U.id,
                         U.id AS "ownerId",
+                        U.has_open_report AS "hasOpenReport",
                         ARRAY_AGG(DISTINCT R.name) AS roles,
-                        U.muted_at IS NOT NULL AS "isMuted"
+                        U.muted_at IS NOT NULL AS "isOwnerMuted",
+                        TO_CHAR(U.muted_at + INTERVAL '15' DAY, 'dd-mm-yyyy') AS "ownerMutedUntil",
+                        COALESCE(ARRAY_AGG(DISTINCT RE.report_reason_id)
+                          FILTER (WHERE RE.report_reason_id IS NOT NULL
+                            AND RE.report_action_id IS NULL
+                            AND RE.updated_at IS NULL), '{}'
+                          ) AS "reportReasons"
                       FROM "user" U
                       JOIN user_role UR
-                      ON U.id = UR.user_id
+                        ON U.id = UR.user_id
                       JOIN role R
-                      ON UR.role_id = R.id
+                        ON UR.role_id = R.id
+                      LEFT JOIN reported_item RI
+                        ON U.id = RI.user_id
+                      LEFT JOIN report RE
+                        ON RI.report_id = RE.id
                       WHERE U.username = $1
                         AND U.deleted_at IS NULL
                       GROUP BY U.id;`

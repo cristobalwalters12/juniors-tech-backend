@@ -1,6 +1,15 @@
 INSERT INTO "user"
-(id, username, avatar_url, email, password, birthdate)
+(id, email, username, password, avatar_url, birthdate, updated_at, deleted_at, muted_at, has_open_report)
 VALUES
-('KrMUeta4ji', 'Eliseo', 'https://docs.material-tailwind.com/img/face-2.jpg', 'eliseus@gmail.com', '12345678', '1990-08-25'),
-('h3dk3dO7A_', 'Jayne_Kuhic', 'https://docs.material-tailwind.com/img/face-3.jpg', 'janedoe@gmail.com', '12345678', '1993-05-19'),
-('sYfjpcR8ge', 'Nikita', 'https://docs.material-tailwind.com/img/face-4.jpg', 'nikita123@gmail.com', '12345678', '1985-12-04');
+('RuxfXYaO5Y', 'admin1234@correo.com', 'admin1234', '$2b$10$NckmokVn.WK/wSA.9SFfeuAXHwLNq4M6r7zoManfwcPyCtTqZgwO2', 'https://docs.material-tailwind.com/img/face-2.jpg', '1990-10-05');
+('q8uwneJuCu', 'mod1234@correo.com', 'mod1234', '$2b$10$lSFL59i2on7ECzlSLqpJ8ebMsvZchFs00XRWfSZP3r5R9xtmI5.RK', 'https://docs.material-tailwind.com/img/face-3.jpg', '1990-10-05');
+('r7Q-Fnug43', 'user1234@correo.com', 'user1234', '$2b$10$KYIv00g2R0F0nRBtGTO09.Yv3lhMVNdhui7W/JMqYGy7CNC7VXJ/K', 'https://docs.material-tailwind.com/img/face-4.jpg', '1990-10-05');
+
+INSERT INTO "user_role"
+(user_id, role_id)
+VALUES
+('RuxfXYaO5Y', '2SbUCqylYo');
+('q8uwneJuCu', '2SbUCqylYo');
+('r7Q-Fnug43', '2SbUCqylYo');
+('RuxfXYaO5Y', 'iBM3mRqi3F'),
+('q8uwneJuCu', '8h5NIrFj4K');
