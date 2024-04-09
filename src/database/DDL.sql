@@ -67,7 +67,7 @@ CREATE TABLE "user" (
   "updated_at" TIMESTAMP,
   "deleted_at" TIMESTAMP,
   "muted_at" TIMESTAMP,
-  "has_open_report" BOOLEAN DEFAULT FALSE NOT NULL
+  "has_open_report" BOOLEAN DEFAULT FALSE NOT NULL,
 
   CONSTRAINT existent_employment_status FOREIGN KEY (employment_status_id) REFERENCES employment_status (id),
   CONSTRAINT existent_it_field FOREIGN KEY (it_field_id) REFERENCES it_field (id),
@@ -82,28 +82,43 @@ CREATE TABLE "user" (
 
 CREATE TABLE "user_role" (
   "user_id" CHAR(10) NOT NULL,
-  "role_id" CHAR(10) NOT NULL
+  "role_id" CHAR(10) NOT NULL,
+
+  CONSTRAINT user_role_existent_user FOREIGN KEY (user_id) REFERENCES "user" (id),
+  CONSTRAINT user_role_existent_role FOREIGN KEY (role_id) REFERENCES "role" (id)
 );
 
 CREATE TABLE "user_education" (
   "user_id" CHAR(10) NOT NULL,
-  "education_id" CHAR(10) NOT NULL
+  "education_id" CHAR(10) NOT NULL,
+
+  CONSTRAINT user_education_existent_user FOREIGN KEY (user_id) REFERENCES "user" (id),
+  CONSTRAINT user_education_existent_education FOREIGN KEY (education_id) REFERENCES "education" (id)
 );
 
 CREATE TABLE "user_social_network" (
   "user_id" CHAR(10) NOT NULL,
   "social_network_id" CHAR(10) NOT NULL,
-  "url" VARCHAR UNIQUE NOT NULL
+  "url" VARCHAR UNIQUE NOT NULL,
+
+  CONSTRAINT user_social_network_existent_user FOREIGN KEY (user_id) REFERENCES "user" (id),
+  CONSTRAINT user_social_network_existent_social_network FOREIGN KEY (social_network_id) REFERENCES "social_network" (id)
 );
 
 CREATE TABLE "user_language" (
   "user_id" CHAR(10) NOT NULL,
-  "language_id" CHAR(10) NOT NULL
+  "language_id" CHAR(10) NOT NULL,
+
+  CONSTRAINT user_language_existent_user FOREIGN KEY (user_id) REFERENCES "user" (id),
+  CONSTRAINT user_language_existent_language FOREIGN KEY (language_id) REFERENCES "language" (id)
 );
 
 CREATE TABLE "user_technology" (
   "user_id" CHAR(10) NOT NULL,
-  "technology_id" CHAR(10) NOT NULL
+  "technology_id" CHAR(10) NOT NULL,
+
+  CONSTRAINT user_technology_existent_user FOREIGN KEY (user_id) REFERENCES "user" (id),
+  CONSTRAINT user_technology_existent_technology FOREIGN KEY (technology_id) REFERENCES "technology" (id)
 );
 
 CREATE TABLE "category" (
