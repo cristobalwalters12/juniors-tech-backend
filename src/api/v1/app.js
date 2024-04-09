@@ -9,7 +9,6 @@ import categoryRouter from '../v1/routes/categoryRouter.js'
 import searchRouter from './routes/searchRouter.js'
 import postRouter from '../v1/routes/postRouter.js'
 import commentRouter from '../v1/routes/commentRouter.js'
-import reportRouter from '../v1/routes/reportRouter.js'
 import modRouter from '../v1/routes/modRouter.js'
 import { errorHandler, notFoundHandler } from './middleware/index.js'
 
@@ -26,7 +25,6 @@ app.use('/api/v1/categories', categoryRouter)
 app.use('/api/v1/search', searchRouter)
 app.use('/api/v1/posts', postRouter)
 app.use('/api/v1/posts/:postId/comments', commentRouter)
-app.use('/api/v1/reports', reportRouter)
 app.use('/api/v1/mod', modRouter)
 
 app.use('*', notFoundHandler)

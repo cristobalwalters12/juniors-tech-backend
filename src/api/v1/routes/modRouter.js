@@ -17,7 +17,12 @@ import { errorCatcher } from '../../helpers/index.js'
 import { REPORT_TYPES, ROLE_TYPES } from '../../../config/index.js'
 import { deletePostById } from '../controllers/postController.js'
 import { closeReportDto } from '../dtos/reportDto.js'
-import { ignoreReport } from '../controllers/reportController.js'
+import {
+  getCommentTypeReports,
+  getPostTypeReports,
+  getUserTypeReports,
+  ignoreReport
+} from '../controllers/reportController.js'
 import { deleteCommentById } from '../controllers/commentController.js'
 import { demoteMod, muteUser, promoteUserToMod } from '../controllers/userController.js'
 
@@ -82,6 +87,36 @@ router
     findAndSetUser,
     canDemoteMod
   ], errorCatcher(demoteMod))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/reports/posts')
+  .get([
+    requireLoggedIn,
+    restrictToRoles([
+      ROLE_TYPES.MOD.name,
+      ROLE_TYPES.ADMIN.name
+    ])], errorCatcher(getPostTypeReports))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/reports/comments')
+  .get([
+    requireLoggedIn,
+    restrictToRoles([
+      ROLE_TYPES.MOD.name,
+      ROLE_TYPES.ADMIN.name
+    ])], errorCatcher(getCommentTypeReports))
+  .all(methodNotAllowedHandler)
+
+router
+  .route('/reports/users')
+  .get([
+    requireLoggedIn,
+    restrictToRoles([
+      ROLE_TYPES.MOD.name,
+      ROLE_TYPES.ADMIN.name
+    ])], errorCatcher(getUserTypeReports))
   .all(methodNotAllowedHandler)
 
 router
