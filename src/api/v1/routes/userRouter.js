@@ -13,11 +13,9 @@ import {
   methodNotAllowedHandler,
   jwtValidator,
   requireLoggedIn,
-  restrictToRoles,
   findAndSetUser
 } from '../middleware/index.js'
 import { registerDto } from '../dtos/registerDto.js'
-import { ROLE_TYPES } from '../../../config/index.js'
 import { createReportDto } from '../dtos/reportDto.js'
 
 const router = Router()
@@ -25,11 +23,7 @@ router.post('/sign-up', registerDto, errorCatcher(createUserjwtController)).all(
 router.get('/', errorCatcher(getUsersController)).all(methodNotAllowedHandler)
 
 router.get('/mods', [
-  requireLoggedIn,
-  restrictToRoles([
-    ROLE_TYPES.MOD.name,
-    ROLE_TYPES.ADMIN.name
-  ])
+  requireLoggedIn
 ], errorCatcher(getMods))
   .all(methodNotAllowedHandler)
 
