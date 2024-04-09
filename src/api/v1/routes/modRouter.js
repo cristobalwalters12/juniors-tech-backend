@@ -63,8 +63,8 @@ router
     ]),
     findAndSetUser,
     canMuteUser,
-    checkForReportOfType(REPORT_TYPES.USER),
-    closeReportDto
+    closeReportDto,
+    checkForReportOfType(REPORT_TYPES.USER)
   ], errorCatcher(muteUser))
   .all(methodNotAllowedHandler)
 
