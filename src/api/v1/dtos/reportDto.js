@@ -33,6 +33,6 @@ const transform = async ({ body, method }) => {
 }
 
 const createReportDto = reqBodyValidatorBuilder(validateCreateReport, transform)
-const closeReportDto = reqBodyValidatorBuilder(validateIgnoreReport, transform)
+const closeReportDto = reqBodyValidatorBuilder(validateIgnoreReport)
 
 export { createReportDto, closeReportDto, reportReasonSchema }
