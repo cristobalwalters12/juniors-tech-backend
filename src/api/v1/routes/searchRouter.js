@@ -1,11 +1,19 @@
 import { Router } from 'express'
-import { searchController } from '../controllers/searchController.js'
+import { searchController, searchPosts } from '../controllers/searchController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
-  methodNotAllowedHandler
+  methodNotAllowedHandler,
+  setUserIfLoggedIn
 } from '../middleware/index.js'
+import { postSearchDto } from '../dtos/searchDto.js'
 
 const router = Router()
 router.get('/', errorCatcher(searchController)).all(methodNotAllowedHandler)
+
+router.get('/posts',
+  postSearchDto,
+  setUserIfLoggedIn,
+  errorCatcher(searchPosts)
+).all(methodNotAllowedHandler)
 
 export default router

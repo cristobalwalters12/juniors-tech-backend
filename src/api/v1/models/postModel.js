@@ -216,4 +216,49 @@ const existsById = async (postId) => {
   return post
 }
 
-export { create, getById, getAll, updateById, deleteById, existsById }
+const getPostsByQuery = async ({ title, sort, order, category, page, limit, currUserId }) => {
+  const selectPosts = `WITH counted_posts AS (
+                          SELECT
+                            *,
+                            P.id AS counted_post_id,
+                            COUNT(P.id) OVER() as total
+                          FROM aspect P
+                          LEFT JOIN vote V
+                            ON P.id = V.aspect_id AND V.user_id = $1
+                          WHERE P.title ILIKE $2
+                            AND (P.category_id = $3 OR P.category_id IS NOT NULL)
+                            AND P.deleted_at IS NULL
+                        )
+                        SELECT
+                          CP.counted_post_id AS id,
+                          CP.title,
+                          CP.category_id AS "categoryId",
+                          CP.slug,
+                          CP.author_id AS "authorId",
+                          COALESCE(CP.vote_direction, 0) AS "voteDirection",
+                          CP.vote_count AS "voteCount",
+                          CP.comment_count AS "commentCount",
+                          CP.has_open_report AS "hasOpenReport",
+                          CP.created_at AS "createdAt",
+                          CP.updated_at AS "updatedAt",
+                          CP.total::int
+                          FROM counted_posts CP
+                        ORDER BY ${sort} ${order}
+                        LIMIT ${limit}
+                        OFFSET ${(page - 1) * limit};`
+  const { rows: searchResults } = await pool.query(selectPosts, [currUserId, title, category])
+  const { total } = searchResults[0]
+  const posts = searchResults.map(row => {
+    const { total, ...post } = row
+    return post
+  })
+
+  return {
+    total,
+    page,
+    limit,
+    posts
+  }
+}
+
+export { create, getById, getAll, updateById, deleteById, existsById, getPostsByQuery }
