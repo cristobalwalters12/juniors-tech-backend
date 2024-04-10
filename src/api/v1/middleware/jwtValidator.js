@@ -11,7 +11,6 @@ const jwtValidator = async (req, res, next) => {
     const { id, roles } = await jwtAdapter.decodeAccessToken(token)
     req._id = id
     req._role = roles[0]
-    console.log('este es el rol', req._role)
     return next()
   } catch (error) {
     next(error)
