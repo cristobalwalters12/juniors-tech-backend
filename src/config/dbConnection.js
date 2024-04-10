@@ -1,9 +1,13 @@
 import 'dotenv/config'
 import pg from 'pg'
 
-import { DATABASE_URL } from '../config/envs.js'
+import { DB_HOST, DB_NAME, DB_PORT, DB_USER, DB_PASSWORD } from '../config/envs.js'
 const pool = new pg.Pool({
-  connectionString: DATABASE_URL,
+  user: DB_USER,
+  host: DB_HOST,
+  database: DB_NAME,
+  password: DB_PASSWORD,
+  port: DB_PORT,
   allowExitOnIdle: true
 })
 
