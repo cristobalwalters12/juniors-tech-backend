@@ -20,6 +20,7 @@ const options = {
     'src/config/routes/usersDocs.js',
     'src/config/routes/postsDocs.js',
     'src/config/routes/commentsDocs.js',
+    'src/config/routes/modDocs.js',
     'src/config/routes/voteDocs.js',
     'src/config/routes/searchDocs.js'
   ]
