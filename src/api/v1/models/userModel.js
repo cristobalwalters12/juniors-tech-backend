@@ -24,7 +24,7 @@ const createUser = async ({ email, password, username, birthdate }) => {
     email: user.email,
     username: user.username,
     birthdate: user.birthdate,
-    role: user.role
+    role: [user.role]
   }
 }
 
