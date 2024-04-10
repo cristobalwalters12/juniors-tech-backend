@@ -80,59 +80,67 @@ const getById = async ({ postId, currUserId }) => {
   return visiblePostData
 }
 
-const getAll = async ({ currUserId }) => {
-  const selectPosts = `SELECT
-                        A.id,
-                        A.title,
-                        A.body,
-                        A.category_id AS "categoryId",
-                        A.slug,
-                        A.author_id AS "authorId",
-                        U.username AS "authorUsername",
-                        U.avatar_url AS "avatarUrl",
-                        A.vote_count AS "voteCount",
-                        A.comment_count AS "commentCount",
-                        A.created_at AS "createdAt",
-                        A.updated_at AS "updatedAt",
-                        A.has_open_report AS "hasOpenReport",
-                        U.deleted_at AS "userDeletedAt"
-                      FROM aspect A
-                      LEFT JOIN "user" U
-                      ON A.author_id = U.id
-                      WHERE A.deleted_at IS NULL;`
-
-  const { rows: rawPostsData } = await pool.query(selectPosts)
-
-  const postVotes = {}
-
-  if (currUserId !== undefined) {
-    const selectPostVotes = `SELECT
-                              V.vote_direction AS "voteDirection",
-                              V.aspect_id AS "aspectId"
-                            FROM aspect A
-                            JOIN vote V
-                            ON A.id = V.aspect_id
-                            WHERE A.aspect_type_id = $1
-                            AND V.user_id = $2;`
-    const { rows: rawPostsVotes } = await pool.query(selectPostVotes, [ASPECT_TYPES.POST, currUserId])
-
-    rawPostsVotes.forEach(({ voteDirection, aspectId }) => {
-      postVotes[aspectId] = voteDirection
-    })
+const getAll = async ({ sort, order, category, page, limit, currUserId }) => {
+  const selectPosts = `WITH counted_posts AS (
+                          SELECT
+                            P.id,
+                            P.title,
+                            P.body,
+                            P.category_id AS "categoryId",
+                            P.slug,
+                            P.author_id AS "authorId",
+                            A.username AS "authorUsername",
+                            A.avatar_url AS "avatarUrl",
+                            P.vote_count AS post_vote_count,
+                            P.comment_count AS "commentCount",
+                            P.created_at AS post_created_at,
+                            P.updated_at AS "updatedAt",
+                            COALESCE(V.vote_direction, 0) AS "voteDirection",
+                            P.has_open_report AS "hasOpenReport",
+                            COUNT(P.id) OVER() as total
+                          FROM aspect P
+                          JOIN "user" A
+                            ON P.author_id = A.id
+                          LEFT JOIN vote V
+                            ON P.id = V.aspect_id AND V.user_id = $1
+                          LEFT JOIN "user" U
+                            ON U.id = V.user_id
+                          -- WHERE (P.category_id IS NOT NULL OR $2 IS NULL)
+                          WHERE (P.category_id = $2 OR $2 IS NULL OR $2 = '')
+                            AND P.deleted_at IS NULL
+                            AND P.deleted_at IS NULL
+                          )
+                        SELECT
+                          *,
+                          CP.post_vote_count AS "voteCount",
+                          CP.post_created_at AS "createdAt",
+                          CP.total::int
+                        FROM counted_posts CP
+                        ORDER BY post_${sort} ${order}
+                        LIMIT ${limit}
+                        OFFSET ${(page - 1) * limit};`
+  const { rows } = await pool.query(selectPosts, [currUserId, category])
+  if (rows.length === 0) {
+    return {
+      total: 0,
+      page: 1,
+      limit,
+      posts: []
+    }
   }
 
-  const visiblePostsData = rawPostsData.map(rawPost => {
-    if (rawPost.userDeletedAt) {
-      rawPost.authorId = null
-      rawPost.username = null
-      rawPost.avatarUrl = null
-    }
-    rawPost.voteDirection = postVotes[rawPost.id] || 0
-    const { userDeletedAt, ...visiblePostData } = rawPost
-    return visiblePostData
+  const { total } = rows[0]
+  const posts = rows.map(row => {
+    const { total, post_vote_count: _pVC, post_created_at: _pCA, ...post } = row
+    return post
   })
 
-  return visiblePostsData
+  return {
+    total,
+    page,
+    limit,
+    posts
+  }
 }
 
 const updateById = async ({ postId, title, body, categoryId, slug, currUserId }) => {
@@ -216,4 +224,50 @@ const existsById = async (postId) => {
   return post
 }
 
-export { create, getById, getAll, updateById, deleteById, existsById }
+const getPostsByQuery = async ({ title, sort, order, category, page, limit, currUserId }) => {
+  console.log({ category })
+  const selectPosts = `WITH counted_posts AS (
+                          SELECT
+                            *,
+                            P.id AS counted_post_id,
+                            COUNT(P.id) OVER() as total
+                          FROM aspect P
+                          LEFT JOIN vote V
+                            ON P.id = V.aspect_id AND V.user_id = $1
+                          WHERE P.title ILIKE $2
+                            AND (P.category_id = $3 OR P.category_id IS NULL OR P.category_id = '')
+                            AND P.deleted_at IS NULL
+                        )
+                        SELECT
+                          CP.counted_post_id AS id,
+                          CP.title,
+                          CP.category_id AS "categoryId",
+                          CP.slug,
+                          CP.author_id AS "authorId",
+                          COALESCE(CP.vote_direction, 0) AS "voteDirection",
+                          CP.vote_count AS "voteCount",
+                          CP.comment_count AS "commentCount",
+                          CP.has_open_report AS "hasOpenReport",
+                          CP.created_at AS "createdAt",
+                          CP.updated_at AS "updatedAt",
+                          CP.total::int
+                          FROM counted_posts CP
+                        ORDER BY ${sort} ${order}
+                        LIMIT ${limit}
+                        OFFSET ${(page - 1) * limit};`
+  const { rows: searchResults } = await pool.query(selectPosts, [currUserId, title, category])
+  const { total } = searchResults[0]
+  const posts = searchResults.map(row => {
+    const { total, ...post } = row
+    return post
+  })
+
+  return {
+    total,
+    page,
+    limit,
+    posts
+  }
+}
+
+export { create, getById, getAll, updateById, deleteById, existsById, getPostsByQuery }
