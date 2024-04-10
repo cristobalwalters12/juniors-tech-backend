@@ -8,6 +8,7 @@ const router = express.Router()
  * tags:
  *   name: Publicaciones
  *   description: manejo de publicaciones
+ */
 
 /**
  * @swagger

@@ -1,5 +1,5 @@
 import express from 'express'
-import { createComment, getComments, editCommentById, voteCommentById } from '../../api/v1/controllers/commentController'
+import { createComment, getComments, editCommentById } from '../../api/v1/controllers/commentController'
 
 const router = express.Router()
 
@@ -17,63 +17,9 @@ const router = express.Router()
  *     CommentResponse:
  *       type: object
  *       properties:
- *         id:
- *           type: string
- *           description: ID del comentario
- *         postId:
- *           type: string
- *           description: ID de la publicación a la que pertenece el comentario
- *         parentId:
- *           type: string
- *           description: ID del comentario padre (si es una respuesta a otro comentario)
  *         body:
  *           type: string
  *           description: Contenido del comentario
- *         authorId:
- *           type: string
- *           description: ID del autor del comentario
- *         authorUsername:
- *           type: string
- *           description: Nombre de usuario del autor del comentario
- *         avatarUrl:
- *           type: string
- *           description: URL del avatar del autor del comentario
- *         voteCount:
- *           type: number
- *           description: Número de votos del comentario
- *         commentCount:
- *           type: number
- *           description: Número de respuestas al comentario
- *         createdAt:
- *           type: string
- *           description: Fecha de creación del comentario
- *         updatedAt:
- *           type: string
- *           description: Fecha de última actualización del comentario
- *         deletedAt:
- *           type: string
- *           description: Fecha de eliminación del comentario (si está eliminado)
- *         hasOpenReport:
- *           type: boolean
- *           description: Indica si el comentario tiene un reporte abierto
- *
- *     CommentCreationSuccessResponse:
- *       description: Comentario creado exitosamente
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CommentResponse'
- *
- *     CommentErrorResponse:
- *       description: Error al crear el comentario
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               message:
- *                 type: string
- *                 description: Mensaje de error
  */
 
 /**
@@ -110,7 +56,7 @@ const router = express.Router()
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/CommentCreationSuccessResponse'
+ *               $ref: '#/components/schemas/CommentResponse'
  *       '400':
  *         description: Error en la solicitud, revise los parámetros
  *       '401':
@@ -147,12 +93,11 @@ const router = express.Router()
  *           schema:
  *             type: object
  *             properties:
- *               parentId:
- *                 type: string
- *                 description: ID del comentario padre
  *               body:
  *                 type: string
  *                 description: Cuerpo del comentario
+ *           required:
+ *             - body
  *     responses:
  *       '200':
  *         description: Comentario actualizado exitosamente
@@ -179,6 +124,12 @@ const router = express.Router()
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: Id de la publicacion.
+ *         schema:
+ *           type: string
  *       - in: path
  *         name: commentId
  *         required: true
@@ -239,94 +190,7 @@ const router = express.Router()
  *                   description: Mensaje de error interno del servidor.
  */
 
-/**
- * @swagger
- * /comments/{commentId}/vote:
- *   post:
- *     summary: Votar por un comentario
- *     tags: [Comentarios]
- *     parameters:
- *       - in: path
- *         name: commentId
- *         required: true
- *         description: ID del comentario para votar.
- *         schema:
- *           type: string
- *       - in: header
- *         name: Authorization
- *         description: Token de autorización JWT.
- *         required: true
- *         schema:
- *           type: string
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               voteId:
- *                 type: string
- *               description: ID del voto.
- *               voteDirection:
- *                 type: integer
- *                 description: Dirección del voto (-1 para negativo, 1 para positivo).
- *     responses:
- *       '204':
- *         description: El voto se registró con éxito para el comentario.
- *       '400':
- *         description: Error en la solicitud.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: integer
- *                   description: Código de error.
- *                 message:
- *                   type: string
- *                   description: Mensaje de error.
- *       '401':
- *         description: No autorizado, el usuario no tiene permisos.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: integer
- *                   description: Código de error.
- *                 message:
- *                   type: string
- *                   description: Mensaje de error.
- *       '404':
- *         description: El comentario no existe o no se encontró.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: integer
- *                   description: Código de error.
- *                 message:
- *                   type: string
- *                   description: Mensaje de error.
- *       '500':
- *         description: Error interno del servidor.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Mensaje de error interno del servidor.
- */
-
 router.post('/posts/:postId/comments', createComment)
-router.post('/posts/:postId/comments', getComments)
+router.get('/posts/:postId/comments', getComments)
 router.post('/posts/:postId/comments', editCommentById)
 router.delete('/posts/:postId/comments/:commentId', editCommentById)
-router.delete('/posts/:postId/comments/:commentId/vote', voteCommentById)
