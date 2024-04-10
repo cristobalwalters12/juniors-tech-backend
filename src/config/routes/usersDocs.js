@@ -1,5 +1,5 @@
 import express from 'express'
-import { getUsersController, createUserjwtController, getUserByUsernameController, updateUserController, desactivateUserController, getMods, promoteUserToMod, muteUser } from '../../api/v1/controllers/userController'
+import { getUsersController, createUserjwtController, getUserByUsernameController, updateUserController, desactivateUserController, getMods, promoteUserToMod, muteUser, demoteMod } from '../../api/v1/controllers/userController'
 
 const router = express.Router()
 
@@ -30,6 +30,7 @@ const router = express.Router()
  *         - openToWork
  *         - languages
  *         - technologies
+ *         - role_id
  *       properties:
  *         id:
  *           type: string
@@ -58,6 +59,9 @@ const router = express.Router()
  *         technologies:
  *           type: string
  *           description: tecnologias del usuario
+ *         role_id:
+ *           type: string
+ *           description: tecnologias del usuario
  *       example:
  *         username: Jayne_Kuhic
  *         avatar: https://docs.material-tailwind.com/img/face-3.jpg
@@ -67,6 +71,7 @@ const router = express.Router()
  *         openToWork: True
  *         languages: GmF16qvoh5
  *         technologies: _84RNpgyTx
+ *         role_id: user
  */
 
 /**
@@ -112,54 +117,10 @@ const router = express.Router()
  *         username:
  *           type: string
  *           description: Nombre de usuario del usuario.
- *         score:
- *           type: number
- *           description: Puntuación del usuario.
- *         postCount:
- *           type: number
- *           description: Cantidad de publicaciones del usuario.
- *         commentCount:
- *           type: number
- *           description: Cantidad de comentarios del usuario.
- *         openToWork:
- *           type: boolean
- *           description: Indica si el usuario está abierto a oportunidades laborales.
- *         about:
- *           type: string
- *           description: Descripción o información sobre el usuario.
- *         employmentStatusId:
- *           type: string
- *           description: ID del estado laboral del usuario.
- *         pronoun:
- *           type: string
- *           description: Pronombre del usuario.
- *         avatarUrl:
- *           type: string
- *           description: URL del avatar del usuario.
- *         countryId:
- *           type: string
- *           description: ID del país del usuario.
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: Fecha de creación del usuario.
  *         mutedAt:
  *           type: string
  *           format: date-time
  *           description: Fecha en la que el usuario fue silenciado.
- *         languages:
- *           type: array
- *           items:
- *             type: string
- *           description: Lista de IDs de los idiomas que habla el usuario.
- *         itFieldId:
- *           type: string
- *           description: ID del campo de TI en el que trabaja el usuario.
- *         technologies:
- *           type: array
- *           items:
- *             type: string
- *           description: Lista de IDs de las tecnologías que utiliza el usuario.
  *         education:
  *           type: array
  *           items:
@@ -175,34 +136,6 @@ const router = express.Router()
  *           items:
  *             type: string
  *           description: Lista de IDs de los roles del usuario.
- *       example:
- *         id: abc123
- *         username: usuario123
- *         score: 100
- *         postCount: 10
- *         commentCount: 20
- *         openToWork: true
- *         about: Lorem ipsum dolor sit amet...
- *         employmentStatusId: emp123
- *         pronoun: they/them
- *         avatarUrl: http://example.com/avatar.png
- *         countryId: country123
- *         createdAt: '2024-04-06T12:00:00Z'
- *         mutedAt: '2024-04-05T12:00:00Z'
- *         languages:
- *           - GmF16qvoh5
- *           - zMnto3e8tN
- *         itFieldId: MDfP4QzwC8
- *         technologies:
- *           - _84RNpgyTx
- *           - _mnxA7nz8c
- *         education:
- *           - UWLfRUVGkb
- *           - HfozUT_PsC
- *         social_networks:
- *           - 7jstZPmPng
- *           - ep54y-_428
- *         roles: 2SbUCqylYo
  *     404:
  *       description: El usuario no existe
  */
@@ -234,21 +167,8 @@ const router = express.Router()
  *               username: jonathan
  *               birthdate: 1991-07-07
  *     responses:
- *       200:
+ *       '201':
  *         description: Cuenta creada con éxito
- *         schema:
- *           type: object
- *           properties:
- *             id:
- *               type: string
- *             username:
- *               type: string
- *             avatar:
- *               type: string
- *             roles:
- *               type: string
- *             token:
- *               type: string
  */
 
 /**
@@ -467,6 +387,8 @@ const router = express.Router()
  *   get:
  *     summary: Obtener todos los moderadores
  *     tags: [usuarios]
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       '200':
  *         description: Lista de moderadores obtenida con éxito
@@ -495,8 +417,8 @@ const router = express.Router()
 
 /**
  * @swagger
- * /users/{username}/promote:
- *   put:
+ * /mod/users/{username}/mod:
+ *   post:
  *     summary: Promover usuario a moderador
  *     tags: [usuarios]
  *     security:
@@ -555,10 +477,12 @@ const router = express.Router()
 
 /**
  * @swagger
- * /users/{username}/demote:
- *   post:
+ * /mod/users/{username}/mod:
+ *   delete:
  *     summary: Quitar rol de moderador a un usuario
  *     tags: [usuarios]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: username
@@ -583,22 +507,22 @@ const router = express.Router()
 
 /**
  * @swagger
- * /users/mute:
+ * /mod/users/{username}/mute:
  *   post:
  *     summary: Silenciar a un usuario
  *     tags: [usuarios]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
- *       - in: query
- *         name: userId
+ *       - in: path
+ *         name: username
  *         required: true
- *         description: ID del usuario que se va a silenciar.
+ *         description: Username del usuario que se va a silenciar.
  *         schema:
  *           type: string
  *     responses:
  *       '204':
  *         description: El usuario ha sido silenciado con éxito.
- *       '400':
- *         description: Error en la solicitud.
  *         content:
  *           application/json:
  *             schema:
@@ -610,6 +534,8 @@ const router = express.Router()
  *                 message:
  *                   type: string
  *                   description: Mensaje de error.
+ *       '400':
+ *         description: Error en la solicitud.
  *       '403':
  *         description: No tiene permisos para realizar esta acción.
  *         content:
@@ -654,5 +580,6 @@ router.put('/users/:id', updateUserController)
 router.post('/users', createUserjwtController)
 router.put('/users/:id/desactivate', desactivateUserController)
 router.get('/users/mods', getMods)
-router.post('/users/:username/mods', promoteUserToMod)
-router.post('/users/:username/mute', muteUser)
+router.post('/mod/users/:username/mod', promoteUserToMod)
+router.post('/mod/users/:username/mute', muteUser)
+router.delete('/mod/users/:username/mod', demoteMod)

@@ -154,6 +154,7 @@ const desactivateUserController = async (req, res) => {
   try {
     const id = req.params.id
     if (req._role !== ROLE_TYPES.ADMIN.name) {
+      console.log(req._role)
       res.status(403).json({
         error: 403,
         message: 'No tienes permisos para realizar esta acción'
