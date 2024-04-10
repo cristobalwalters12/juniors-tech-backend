@@ -1,4 +1,5 @@
 import { REPORT_ACTIONS, REPORT_TYPES } from '../../../config/index.js'
+import { getPagination } from '../../helpers/getPagination.js'
 import { create, getById, getAll, updateById, deleteById } from '../models/postModel.js'
 import { createReport, closeReasonRelatedReports, closeAllReportsByResourceId } from '../models/reportModel.js'
 import { voteById } from '../models/votingModel.js'
@@ -20,10 +21,14 @@ const getPostById = async (req, res) => {
 }
 
 const getPosts = async (req, res) => {
-  const data = await getAll({ currUserId: req?.user?.id })
+  const { posts, ...result } = await getAll({ currUserId: req?.user?.id, ...req.query })
+  const pagination = getPagination(result)
   res.status(200).json({
     status: 'success',
-    data
+    data: {
+      posts,
+      ...pagination
+    }
   })
 }
 

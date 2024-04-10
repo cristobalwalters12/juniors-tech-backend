@@ -54,20 +54,45 @@ const postSearchSchema = Joi.object({
   'object.unknown': "Las únicas queries permitidas son: 'title', 'sort', 'order', 'category', 'page' y 'limit'"
 })
 
+const postPaginationSchema = Joi.object({
+  sort: postSortSchema.optional(),
+  order: Joi.when('sort', {
+    is: Joi.exist(),
+    then: orderSchema.optional(),
+    otherwise: Joi.forbidden().messages({
+      'any.unknown': "Solo se puede proporcionar un valor de 'order' junto con uno de 'sort'"
+    })
+  }).messages({
+    'string.empty': "El valor de 'order' no puede estar vacío"
+  }),
+  category: postFilterSchema,
+  page: pageSchema,
+  limit: limitSchema
+}).options({ abortEarly: false }).messages({
+  'object.unknown': "Las únicas queries permitidas son: 'title', 'sort', 'order', 'category', 'page' y 'limit'"
+})
+
 // DTO functions
 const validatePostSearch = async ({ query }) => await postSearchSchema.validateAsync(query)
+const validatePostPagination = async ({ query }) => await postPaginationSchema.validateAsync(query)
 
-const transformPostSearch = async ({ query }) => {
-  const { sort, page, limit } = query
-  query.title = `%${query.title}%`
+const transformPostPagination = ({ query }) => {
+  const { sort, page, limit, category } = query
   query.sort = sort ? POST_SORT_OPTIONS[sort] : POST_SORT_OPTIONS.votes
   query.order = sort ? query.order : 'desc'
   query.page = page ? +page : 1
   query.limit = limit ? +limit : 20
+  query.category = CATEGORIES[category]
   return query
 }
 
-// DTO
-const postSearchDto = queryParamsValidatorBuilder(validatePostSearch, transformPostSearch)
+const transformPostSearch = ({ query }) => {
+  query.title = `%${query.title}%`
+  return transformPostPagination(query)
+}
 
-export { postSearchDto }
+// DTOs
+const postSearchDto = queryParamsValidatorBuilder(validatePostSearch, transformPostSearch)
+const postPaginationDto = queryParamsValidatorBuilder(validatePostPagination, transformPostPagination)
+
+export { postSearchDto, postPaginationDto }
