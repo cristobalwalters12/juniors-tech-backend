@@ -1,10 +1,10 @@
-import { ALLOWED_ORIGIN, PORT } from './envs.js'
+import { ALLOWED_ORIGIN, PORT, CORS_ALLOW_ALL } from './envs.js'
 
 const whiteList = [ALLOWED_ORIGIN, `http://localhost:${PORT}`]
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || whiteList.includes(origin)) {
+    if (CORS_ALLOW_ALL || !origin || whiteList.includes(origin)) {
       return callback(null, origin)
     }
     // eslint-disable-next-line n/no-callback-literal
