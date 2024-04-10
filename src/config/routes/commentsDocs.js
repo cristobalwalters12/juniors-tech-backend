@@ -17,63 +17,9 @@ const router = express.Router()
  *     CommentResponse:
  *       type: object
  *       properties:
- *         id:
- *           type: string
- *           description: ID del comentario
- *         postId:
- *           type: string
- *           description: ID de la publicación a la que pertenece el comentario
- *         parentId:
- *           type: string
- *           description: ID del comentario padre (si es una respuesta a otro comentario)
  *         body:
  *           type: string
  *           description: Contenido del comentario
- *         authorId:
- *           type: string
- *           description: ID del autor del comentario
- *         authorUsername:
- *           type: string
- *           description: Nombre de usuario del autor del comentario
- *         avatarUrl:
- *           type: string
- *           description: URL del avatar del autor del comentario
- *         voteCount:
- *           type: number
- *           description: Número de votos del comentario
- *         commentCount:
- *           type: number
- *           description: Número de respuestas al comentario
- *         createdAt:
- *           type: string
- *           description: Fecha de creación del comentario
- *         updatedAt:
- *           type: string
- *           description: Fecha de última actualización del comentario
- *         deletedAt:
- *           type: string
- *           description: Fecha de eliminación del comentario (si está eliminado)
- *         hasOpenReport:
- *           type: boolean
- *           description: Indica si el comentario tiene un reporte abierto
- *
- *     CommentCreationSuccessResponse:
- *       description: Comentario creado exitosamente
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CommentResponse'
- *
- *     CommentErrorResponse:
- *       description: Error al crear el comentario
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               message:
- *                 type: string
- *                 description: Mensaje de error
  */
 
 /**
@@ -110,7 +56,7 @@ const router = express.Router()
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/CommentCreationSuccessResponse'
+ *               $ref: '#/components/schemas/CommentResponse'
  *       '400':
  *         description: Error en la solicitud, revise los parámetros
  *       '401':
@@ -147,12 +93,11 @@ const router = express.Router()
  *           schema:
  *             type: object
  *             properties:
- *               parentId:
- *                 type: string
- *                 description: ID del comentario padre
  *               body:
  *                 type: string
  *                 description: Cuerpo del comentario
+ *           required:
+ *             - body
  *     responses:
  *       '200':
  *         description: Comentario actualizado exitosamente
@@ -179,6 +124,12 @@ const router = express.Router()
  *     security:
  *       - bearerAuth: []
  *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: Id de la publicacion.
+ *         schema:
+ *           type: string
  *       - in: path
  *         name: commentId
  *         required: true
@@ -241,21 +192,23 @@ const router = express.Router()
 
 /**
  * @swagger
- * /comments/{commentId}/vote:
+ * /posts/{postId}/comments/{commentId}/vote:
  *   post:
  *     summary: Votar por un comentario
  *     tags: [Comentarios]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
+ *       - in: path
+ *         name: postId
+ *         required: true
+ *         description: ID de la publicación.
+ *         schema:
+ *           type: string
  *       - in: path
  *         name: commentId
  *         required: true
  *         description: ID del comentario para votar.
- *         schema:
- *           type: string
- *       - in: header
- *         name: Authorization
- *         description: Token de autorización JWT.
- *         required: true
  *         schema:
  *           type: string
  *     requestBody:
@@ -265,9 +218,6 @@ const router = express.Router()
  *           schema:
  *             type: object
  *             properties:
- *               voteId:
- *                 type: string
- *               description: ID del voto.
  *               voteDirection:
  *                 type: integer
  *                 description: Dirección del voto (-1 para negativo, 1 para positivo).
@@ -326,7 +276,7 @@ const router = express.Router()
  */
 
 router.post('/posts/:postId/comments', createComment)
-router.post('/posts/:postId/comments', getComments)
+router.get('/posts/:postId/comments', getComments)
 router.post('/posts/:postId/comments', editCommentById)
 router.delete('/posts/:postId/comments/:commentId', editCommentById)
-router.delete('/posts/:postId/comments/:commentId/vote', voteCommentById)
+router.post('/posts/:postId/comments/:commentId/vote', voteCommentById)
