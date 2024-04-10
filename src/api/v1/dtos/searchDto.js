@@ -88,7 +88,7 @@ const transformPostPagination = ({ query }) => {
 
 const transformPostSearch = ({ query }) => {
   query.title = `%${query.title}%`
-  return transformPostPagination(query)
+  return transformPostPagination({ query })
 }
 
 // DTOs

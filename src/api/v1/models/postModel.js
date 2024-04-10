@@ -225,6 +225,7 @@ const existsById = async (postId) => {
 }
 
 const getPostsByQuery = async ({ title, sort, order, category, page, limit, currUserId }) => {
+  console.log({ category })
   const selectPosts = `WITH counted_posts AS (
                           SELECT
                             *,
@@ -234,7 +235,7 @@ const getPostsByQuery = async ({ title, sort, order, category, page, limit, curr
                           LEFT JOIN vote V
                             ON P.id = V.aspect_id AND V.user_id = $1
                           WHERE P.title ILIKE $2
-                            AND (P.category_id = $3 OR P.category_id IS NOT NULL)
+                            AND (P.category_id = $3 OR P.category_id IS NULL OR P.category_id = '')
                             AND P.deleted_at IS NULL
                         )
                         SELECT
