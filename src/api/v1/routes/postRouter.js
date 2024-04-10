@@ -22,13 +22,14 @@ import {
 import { postDto } from '../dtos/postDto.js'
 import { voteDto } from '../dtos/voteDto.js'
 import { createReportDto } from '../dtos/reportDto.js'
+import { postPaginationDto } from '../dtos/searchDto.js'
 
 const router = Router()
 
 router
   .route('/')
   .post([requireLoggedIn, isMuted, postDto], errorCatcher(createPost))
-  .get(setUserIfLoggedIn, getPosts)
+  .get(setUserIfLoggedIn, postPaginationDto, getPosts)
   .all(methodNotAllowedHandler)
 
 router
