@@ -116,17 +116,23 @@ const getUserByUsername = async (username) => {
     u.comment_count as "commentCount",
     u.open_to_work as "openToWork",
     u.about,
-    u.employment_status_id as "employmentStatusId",
+    es."name" as "employmentStatus",
+  es.id as "employmenStatusId",
     p.name AS pronoun, 
     u.avatar_url as "avatarUrl",
     u.created_at as "createdAt",
     u.muted_at as "mutedAt",
     u.deleted_at as "deletedAt",
-    c.id AS "countryId", 
-    ARRAY_AGG(DISTINCT ul.language_id) AS languages, 
-    itf.id AS "itField", 
-    ARRAY_AGG(DISTINCT ut.technology_id) AS technologies, 
-    ARRAY_AGG(DISTINCT ue.education_id) AS education, 
+    c."name" AS "country", 
+    c."id" as "countryId",
+    itf."name" AS "itField",
+    itf.id as "itFieldId",
+    ARRAY_AGG(DISTINCT len."name") AS languages,
+    ARRAY_AGG(DISTINCT ul.language_id) AS languagesId, 
+    ARRAY_AGG(DISTINCT t."name") AS technologies, 
+    ARRAY_AGG(DISTINCT ut.technology_id) AS technologiesId, 
+    ARRAY_AGG(DISTINCT e."name") AS education,
+    ARRAY_AGG(DISTINCT ue.education_id) AS educationId,
     ARRAY_AGG(DISTINCT usn.url) AS social_networks, 
     ARRAY_AGG(DISTINCT ur.role_id) AS roles
     FROM 
@@ -135,14 +141,22 @@ const getUserByUsername = async (username) => {
       "pronoun" p ON u.pronoun_id = p.id 
     LEFT JOIN 
       "country" c ON u.country_id = c.id 
+    LEFT JOIN
+      "employment_status" es on u.employment_status_id = es.id
     LEFT JOIN 
       "user_language" ul ON u.id = ul.user_id 
+    LEFT JOIN
+      "language" len on ul.language_id = len.id
     LEFT JOIN 
-      "it_field" itf ON u.it_field_id = itf.id 
+      "it_field" itf ON u.it_field_id = itf.id
     LEFT JOIN 
       "user_technology" ut ON u.id = ut.user_id 
+    LEFT JOIN
+      "technology" t ON ut.technology_id = t.id
     LEFT JOIN 
       "user_education" ue ON u.id = ue.user_id 
+    LEFT JOIN
+    "education" e on ue.education_id =e.id
     LEFT JOIN 
       "user_social_network" usn ON u.id = usn.user_id 
     LEFT JOIN 
@@ -150,7 +164,7 @@ const getUserByUsername = async (username) => {
     WHERE 
       u.username = $1
     GROUP BY 
-      u.id, p.name, c.id, itf.id;
+      u.id, p.name, c.id, itf.id, t.name,es."name",es.id;
       `,
     values: [username]
   }
