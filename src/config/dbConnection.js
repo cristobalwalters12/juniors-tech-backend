@@ -3,7 +3,10 @@ import pg from 'pg'
 
 import { DATABASE_URL } from '../config/envs.js'
 const pool = new pg.Pool({
-  connectionString: DATABASE_URL
+  connectionString: DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 })
 
 export { pool }
