@@ -128,11 +128,11 @@ const getUserByUsername = async (username) => {
     itf."name" AS "itField",
     itf.id as "itFieldId",
     ARRAY_AGG(DISTINCT len."name") AS languages,
-    ARRAY_AGG(DISTINCT ul.language_id) AS languagesId, 
+    ARRAY_AGG(DISTINCT ul.language_id) AS "languagesId", 
     ARRAY_AGG(DISTINCT t."name") AS technologies, 
-    ARRAY_AGG(DISTINCT ut.technology_id) AS technologiesId, 
+    ARRAY_AGG(DISTINCT ut.technology_id) AS "technologiesId", 
     ARRAY_AGG(DISTINCT e."name") AS education,
-    ARRAY_AGG(DISTINCT ue.education_id) AS educationId,
+    ARRAY_AGG(DISTINCT ue.education_id) AS "educationId",
     ARRAY_AGG(DISTINCT usn.url) AS social_networks, 
     ARRAY_AGG(DISTINCT ur.role_id) AS roles
     FROM 
