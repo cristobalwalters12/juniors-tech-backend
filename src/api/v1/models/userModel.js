@@ -132,7 +132,7 @@ const getUserByUsername = async (username) => {
     ARRAY_AGG(DISTINCT t."name") AS technologies, 
     ARRAY_AGG(DISTINCT ut.technology_id) AS "technologiesId", 
     ARRAY_AGG(DISTINCT e."name") AS education,
-    ARRAY_AGG(DISTINCT ue.education_id) AS "educationId",
+    ARRAY_AGG(DISTINCT ue.education_id) AS educationId,
     ARRAY_AGG(DISTINCT usn.url) AS social_networks, 
     ARRAY_AGG(DISTINCT ur.role_id) AS roles
     FROM 
@@ -164,7 +164,7 @@ const getUserByUsername = async (username) => {
     WHERE 
       u.username = $1
     GROUP BY 
-      u.id, p.name, c.id, itf.id, t.name,es."name",es.id;
+      u.id, p.name, c.id, itf.id, es."name", es.id
       `,
     values: [username]
   }
