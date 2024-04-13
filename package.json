@@ -12,7 +12,7 @@
     "start": "node src/server.js",
     "lint": "eslint . --ext js --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "npx eslint . --fix",
-    "prepare": "husky"
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "Ayxa Chaverra R., Cristóbal Walters, Jonathan Araos, Nicolás Contreras",
