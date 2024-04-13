@@ -19,7 +19,7 @@ const createComment = async (req, res) => {
 const getComments = async (req, res) => {
   const data = await getAll({
     postId: req.params.postId,
-    currUserId: req.user.id
+    currUserId: req?.user?.id
   })
 
   res.status(200).json({
