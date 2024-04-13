@@ -26,7 +26,9 @@ app.use('/api/v1/search', searchRouter)
 app.use('/api/v1/posts', postRouter)
 app.use('/api/v1/posts/:postId/comments', commentRouter)
 app.use('/api/v1/mod', modRouter)
-
+app.get('/', (req, res) => {
+  res.send('Bienvenido a mi aplicación!')
+})
 app.use('*', notFoundHandler)
 app.use(errorHandler)
 
