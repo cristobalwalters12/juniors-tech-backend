@@ -11,18 +11,6 @@ const router = express.Router()
  */
 
 /**
- * components:
- *   schemas:
- *     Buscador:
- *       type: object
- *       properties:
- *         id:
- *           type: string
- *         name:
- *           type: string
- */
-
-/**
  * @swagger
  * /search:
  *   get:
@@ -101,8 +89,12 @@ const router = express.Router()
  *           application/json:
  *             schema:
  *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Buscador'
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 name:
+ *                   type: string
+ *
  *       '400':
  *         description: Error en la solicitud, revise los parámetros
  *       '404':

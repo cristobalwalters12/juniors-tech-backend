@@ -86,7 +86,6 @@ const updateUserController = async (req, res) => {
       })
     }
   } catch (error) {
-    console.log(error)
     res.status(500).json({ message: error.message })
   }
 }
@@ -158,7 +157,39 @@ const desactivateUserController = async (req, res) => {
         error: 403,
         message: 'No tienes permisos para realizar esta acción'
       })
+    } else {
+      const user = await validateEmailById(id)
+      if (!user) {
+        res.status(404).json({
+          error: 404,
+          message: 'El usuario no existe'
+        })
+      } else if (user.isMuted) {
+        res.status(404).json({
+          error: 404,
+          message: 'El usuario ha sido silenciado'
+        })
+      } else if (user.isDeleted) {
+        res.status(404).json({
+          error: 404,
+          message: 'El usuario ha sido eliminado'
+        })
+      } else {
+        const updatedUser = await desactivateUser(id)
+        res.json({
+          message: 'Usuario actualizado',
+          user: updatedUser
+        })
+      }
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+}
+
+const desactivateMyAccountController = async (req, res) => {
+  try {
+    const id = req._id
     const user = await validateEmailById(id)
     if (!user) {
       res.status(404).json({
@@ -198,5 +229,6 @@ export {
   demoteMod,
   muteUser,
   reportUser,
-  desactivateUserController
+  desactivateUserController,
+  desactivateMyAccountController
 }

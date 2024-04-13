@@ -1,5 +1,5 @@
 import express from 'express'
-import { getUsersController, createUserjwtController, getUserByUsernameController, updateUserController } from '../../api/v1/controllers/usuarioController'
+import { getUsersController, createUserjwtController, getUserByUsernameController, updateUserController, desactivateUserController, getMods } from '../../api/v1/controllers/userController'
 
 const router = express.Router()
 
@@ -30,6 +30,7 @@ const router = express.Router()
  *         - openToWork
  *         - languages
  *         - technologies
+ *         - role_id
  *       properties:
  *         id:
  *           type: string
@@ -58,6 +59,9 @@ const router = express.Router()
  *         technologies:
  *           type: string
  *           description: tecnologias del usuario
+ *         role_id:
+ *           type: string
+ *           description: tecnologias del usuario
  *       example:
  *         username: Jayne_Kuhic
  *         avatar: https://docs.material-tailwind.com/img/face-3.jpg
@@ -67,6 +71,7 @@ const router = express.Router()
  *         openToWork: True
  *         languages: GmF16qvoh5
  *         technologies: _84RNpgyTx
+ *         role_id: user
  */
 
 /**
@@ -112,54 +117,10 @@ const router = express.Router()
  *         username:
  *           type: string
  *           description: Nombre de usuario del usuario.
- *         score:
- *           type: number
- *           description: Puntuación del usuario.
- *         postCount:
- *           type: number
- *           description: Cantidad de publicaciones del usuario.
- *         commentCount:
- *           type: number
- *           description: Cantidad de comentarios del usuario.
- *         openToWork:
- *           type: boolean
- *           description: Indica si el usuario está abierto a oportunidades laborales.
- *         about:
- *           type: string
- *           description: Descripción o información sobre el usuario.
- *         employmentStatusId:
- *           type: string
- *           description: ID del estado laboral del usuario.
- *         pronoun:
- *           type: string
- *           description: Pronombre del usuario.
- *         avatarUrl:
- *           type: string
- *           description: URL del avatar del usuario.
- *         countryId:
- *           type: string
- *           description: ID del país del usuario.
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: Fecha de creación del usuario.
  *         mutedAt:
  *           type: string
  *           format: date-time
  *           description: Fecha en la que el usuario fue silenciado.
- *         languages:
- *           type: array
- *           items:
- *             type: string
- *           description: Lista de IDs de los idiomas que habla el usuario.
- *         itFieldId:
- *           type: string
- *           description: ID del campo de TI en el que trabaja el usuario.
- *         technologies:
- *           type: array
- *           items:
- *             type: string
- *           description: Lista de IDs de las tecnologías que utiliza el usuario.
  *         education:
  *           type: array
  *           items:
@@ -175,34 +136,6 @@ const router = express.Router()
  *           items:
  *             type: string
  *           description: Lista de IDs de los roles del usuario.
- *       example:
- *         id: abc123
- *         username: usuario123
- *         score: 100
- *         postCount: 10
- *         commentCount: 20
- *         openToWork: true
- *         about: Lorem ipsum dolor sit amet...
- *         employmentStatusId: emp123
- *         pronoun: they/them
- *         avatarUrl: http://example.com/avatar.png
- *         countryId: country123
- *         createdAt: '2024-04-06T12:00:00Z'
- *         mutedAt: '2024-04-05T12:00:00Z'
- *         languages:
- *           - GmF16qvoh5
- *           - zMnto3e8tN
- *         itFieldId: MDfP4QzwC8
- *         technologies:
- *           - _84RNpgyTx
- *           - _mnxA7nz8c
- *         education:
- *           - UWLfRUVGkb
- *           - HfozUT_PsC
- *         social_networks:
- *           - 7jstZPmPng
- *           - ep54y-_428
- *         roles: 2SbUCqylYo
  *     404:
  *       description: El usuario no existe
  */
@@ -234,21 +167,8 @@ const router = express.Router()
  *               username: jonathan
  *               birthdate: 1991-07-07
  *     responses:
- *       200:
+ *       '201':
  *         description: Cuenta creada con éxito
- *         schema:
- *           type: object
- *           properties:
- *             id:
- *               type: string
- *             username:
- *               type: string
- *             avatar:
- *               type: string
- *             roles:
- *               type: string
- *             token:
- *               type: string
  */
 
 /**
@@ -369,7 +289,135 @@ const router = express.Router()
  *                   example: Error al actualizar el usuario
  */
 
+/**
+ * @swagger
+ * /users/{id}/desactivate:
+ *   put:
+ *     summary: Desactivar un usuario
+ *     tags: [usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID del usuario a desactivar.
+ *         schema:
+ *           type: string
+ *     responses:
+ *       '200':
+ *         description: Usuario desactivado correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de confirmación.
+ *                 id:
+ *                   type: string
+ *                   description: ID del usuario.
+ *                 username:
+ *                   type: string
+ *                   description: Nombre de usuario.
+ *                 email:
+ *                   type: string
+ *                   description: Correo electrónico del usuario.
+ *                 isMuted:
+ *                   type: boolean
+ *                   description: Indica si el usuario está silenciado.
+ *                 isDeleted:
+ *                   type: boolean
+ *                   description: Indica si el usuario está eliminado.
+ *       '400':
+ *         description: Error en la solicitud.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: integer
+ *                   description: Código de error.
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       '403':
+ *         description: No tiene permisos para realizar esta acción.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: integer
+ *                   description: Código de error.
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       '404':
+ *         description: El usuario no existe o ha sido silenciado/eliminado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: integer
+ *                   description: Código de error.
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       '500':
+ *         description: Error interno del servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de error interno.
+ */
+
+/**
+ * @swagger
+ * /users/mods:
+ *   get:
+ *     summary: Obtener todos los moderadores
+ *     tags: [usuarios]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Lista de moderadores obtenida con éxito
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                   description: ID del moderador.
+ *                 username:
+ *                   type: string
+ *                   description: Nombre de usuario del moderador.
+ *       '500':
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de error interno del servidor
+ */
+
 router.get('/users', getUsersController)
 router.get('/users/:username', getUserByUsernameController)
 router.put('/users/:id', updateUserController)
 router.post('/users', createUserjwtController)
+router.put('/users/:id/desactivate', desactivateUserController)
+router.get('/users/mods', getMods)

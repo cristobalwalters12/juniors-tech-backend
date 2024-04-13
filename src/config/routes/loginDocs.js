@@ -1,5 +1,3 @@
-// fuente: https://github.com/FabianPinoP/swagger-tutorial
-
 import express from 'express'
 import { loginUser } from '../../api/v1/controllers/authController'
 
@@ -9,7 +7,7 @@ const router = express.Router()
  * @swagger
  * tags:
  *   name: Auth
- *   description: Endpoints para la autenticación de usuarios
+ *   description: Login y autenticación de usuarios
  */
 
 /**

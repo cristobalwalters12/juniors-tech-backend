@@ -9,7 +9,11 @@ const searchController = async (req, res) => {
     res.status(200).json(results)
   } catch (error) {
     console.error(error)
-    res.status(500).json({ message: 'Error al buscar en misc' })
+    if (error.message === 'Solo se puede buscar un tipo de dato a la vez') {
+      res.status(400).json({ message: 'Error: Solo se puede buscar un tipo de dato a la vez' })
+    } else {
+      res.status(500).json({ message: 'Error al buscar en misc' })
+    }
   }
 }
 

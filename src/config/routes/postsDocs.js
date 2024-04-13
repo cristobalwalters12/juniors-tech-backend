@@ -1,7 +1,5 @@
-// import { createUser } from '../../api/v1/controllers/usuarioController'
-// import { getUsers } from '../../api/v1/models/usuarioModel'
 import express from 'express'
-import { getPosts, createPost, editPostById, deletePostById } from '../../api/v1/controllers/postController'
+import { getPosts, createPost, editPostById, deletePostById, getPostById } from '../../api/v1/controllers/postController'
 
 const router = express.Router()
 
@@ -9,7 +7,7 @@ const router = express.Router()
  * @swagger
  * tags:
  *   name: Publicaciones
- *   description: manejo de publicaciones y comentarios
+ *   description: manejo de publicaciones
  */
 
 /**
@@ -76,9 +74,9 @@ const router = express.Router()
  *           type: boolean
  *           description: Indicador de si la publicación tiene reportes abiertos
  *       example:
- *         - title: hola hola
- *         - body: como estamos
- *         - category: Hojas de vida
+ *         title: hola hola
+ *         body: como estamos
+ *         category: Hojas de vida
  */
 
 /**
@@ -140,18 +138,61 @@ const router = express.Router()
  *           type: Number
  *           description: Direccion de votos
  *       example:
- *         - title: hola hola
- *         - body: como estamos
- *         - category: Hojas de vida
- *         - slug: /posts
- *         - authorUsername: bla
- *         - avatarUrl: http://bla.com
- *         - voteCount: 0
- *         - commentCount: 0
- *         - createdAt: 2024-04-05 10:30:45
- *         - updatedAt: 2024-04-06 10:30:45
- *         - hasOpenReport: False
- *         - voteDirection: 0
+ *         title: hola hola
+ *         body: como estamos
+ *         category: L1w-xYdnDH
+ *         authorUsername: bla
+ *         avatarUrl: http://bla.com
+ *         voteCount: 0
+ *         commentCount: 0
+ *         createdAt: 2024-04-05 10:30:45
+ *         updatedAt: 2024-04-06 10:30:45
+ *         hasOpenReport: False
+ *         voteDirection: 0
+ */
+
+/**
+ * @swagger
+ * /posts:
+ *   get:
+ *     summary: obtener todos las publicaciones
+ *     tags: [Publicaciones]
+ *     responses:
+ *       '200':
+ *         description: success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               $ref: '#/components/schemas/Publicaciones'
+ *       '404':
+ *         description: Error al obtener todas las publicaciones
+ */
+
+/**
+ * @swagger
+ * /posts/{postId}:
+ *   get:
+ *     summary: obtener todos las publicaciones
+ *     tags: [Publicaciones]
+ *     parameters:
+ *       - in: path
+ *         name: postId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Id de la publicacion
+ *     responses:
+ *       '200':
+ *         description: success
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Publicaciones'
+ *       '404':
+ *         description: Error al obtener todas las publicaciones
  */
 
 /**
@@ -191,25 +232,6 @@ const router = express.Router()
  *         description: Publicaciones creado exitosamente
  *       400:
  *         description: Solicitud incorrecta
- */
-
-/**
- * @swagger
- * /posts:
- *   get:
- *     summary: obtener todos las publicaciones
- *     tags: [Publicaciones]
- *     responses:
- *       '200':
- *         description: success
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Publicaciones'
- *       '404':
- *         description: Error al obtener todas las publicaciones
  */
 
 /**
@@ -276,7 +298,8 @@ const router = express.Router()
  *         description: Error interno del servidor al eliminar el post
  */
 
-router.post('/posts', createPost)
 router.get('/posts', getPosts)
+router.get('/posts/:postId', getPostById)
+router.post('/posts', createPost)
 router.put('/posts/:postId', editPostById)
 router.delete('/posts/:postId', deletePostById)

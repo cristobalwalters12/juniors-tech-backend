@@ -20,6 +20,7 @@ const options = {
     'src/config/routes/usersDocs.js',
     'src/config/routes/postsDocs.js',
     'src/config/routes/commentsDocs.js',
+    'src/config/routes/modDocs.js',
     'src/config/routes/voteDocs.js',
     'src/config/routes/searchDocs.js'
   ]
@@ -29,7 +30,7 @@ const specs = swaggerJsdoc(options)
 
 export default (app) => {
   app.use(
-    '/api/v1/docs', // url donde estaran disponibles los docs
+    '/api/v1/docs',
     swaggerUi.serve,
     swaggerUi.setup(specs, {
       explorer: true,

@@ -8,9 +8,9 @@ const jwtValidator = async (req, res, next) => {
       throw AppError.unauthorized('Bearer token not found')
     }
 
-    const { id, role } = await jwtAdapter.decodeAccessToken(token)
+    const { id, roles } = await jwtAdapter.decodeAccessToken(token)
     req._id = id
-    req._role = role
+    req._role = roles[0]
     return next()
   } catch (error) {
     next(error)
