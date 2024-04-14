@@ -230,23 +230,26 @@ const existsById = async (postId) => {
 }
 
 const getPostsByQuery = async ({ title, sort, order, category, page, limit, currUserId }) => {
-  console.log({ category })
+  const formattedTitle = `%${title}%`
   const selectPosts = `WITH counted_posts AS (
-                          SELECT
-                            *,
-                            P.id AS counted_post_id,
-                            COUNT(P.id) OVER() as total
-                          FROM aspect P
-                          LEFT JOIN vote V
-                            ON P.id = V.aspect_id AND V.user_id = $1
-                          WHERE P.title ILIKE $2
-                            AND (P.category_id = $3 OR P.category_id IS NULL OR P.category_id = '')
-                            AND P.deleted_at IS NULL
-                        )
+                        SELECT
+                          *,
+                          C.name AS category,
+                          P.id AS counted_post_id,
+                          COUNT(P.id) OVER() as total
+                        FROM aspect P
+                        LEFT JOIN category C
+                          ON P.category_id = C.id AND P.category_id = $1
+                        LEFT JOIN vote V
+                          ON P.id = V.aspect_id AND V.user_id = $2
+                        WHERE P.title ILIKE $3
+                          AND P.deleted_at IS NULL
+                      )
                         SELECT
                           CP.counted_post_id AS id,
                           CP.title,
                           CP.category_id AS "categoryId",
+                          CP.category,
                           CP.slug,
                           CP.author_id AS "authorId",
                           COALESCE(CP.vote_direction, 0) AS "voteDirection",
@@ -256,11 +259,11 @@ const getPostsByQuery = async ({ title, sort, order, category, page, limit, curr
                           CP.created_at AS "createdAt",
                           CP.updated_at AS "updatedAt",
                           CP.total::int
-                          FROM counted_posts CP
+                        FROM counted_posts CP
                         ORDER BY ${sort} ${order}
                         LIMIT ${limit}
                         OFFSET ${(page - 1) * limit};`
-  const { rows: searchResults } = await pool.query(selectPosts, [currUserId, title, category])
+  const { rows: searchResults } = await pool.query(selectPosts, [category, currUserId, formattedTitle])
   const { total } = searchResults[0]
   const posts = searchResults.map(row => {
     const { total, ...post } = row
