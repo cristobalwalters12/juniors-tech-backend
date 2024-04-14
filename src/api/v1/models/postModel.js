@@ -30,25 +30,28 @@ const create = async ({ postId, title, body, categoryId, slug, currUserId }) => 
 
 const getById = async ({ postId, currUserId }) => {
   const selectPost = `SELECT
-                        A.id,
-                        A.title,
-                        A.body,
-                        A.category_id AS "categoryId",
-                        A.slug,
-                        A.author_id AS "authorId",
+                        P.id,
+                        P.title,
+                        P.body,
+                        P.category_id AS "categoryId",
+                        C.name AS category,
+                        P.slug,
+                        P.author_id AS "authorId",
                         U.username,
                         U.avatar_url AS "avatarUrl",
-                        A.vote_count AS "voteCount",
-                        A.comment_count AS "commentCount",
-                        A.created_at AS "createdAt",
-                        A.updated_at AS "updatedAt",
-                        A.has_open_report AS "hasOpenReport",
+                        P.vote_count AS "voteCount",
+                        P.comment_count AS "commentCount",
+                        P.created_at AS "createdAt",
+                        P.updated_at AS "updatedAt",
+                        P.has_open_report AS "hasOpenReport",
                         U.deleted_at AS "userDeletedAt"
-                      FROM aspect A
+                      FROM aspect P
+                      JOIN category C
+                        ON P.category_id = C.id
                       LEFT JOIN "user" U
-                      ON A.author_id = U.id
-                      WHERE A.id = $1
-                      AND A.deleted_at IS NULL;`
+                        ON P.author_id = U.id
+                      WHERE P.id = $1
+                        AND P.deleted_at IS NULL;`
 
   const { rows: [rawPostData] } = await pool.query(selectPost, [postId])
 
@@ -87,6 +90,7 @@ const getAll = async ({ sort, order, category, page, limit, currUserId }) => {
                             P.title,
                             P.body,
                             P.category_id AS "categoryId",
+                            C.name AS category,
                             P.slug,
                             P.author_id AS "authorId",
                             A.username AS "authorUsername",
@@ -99,13 +103,14 @@ const getAll = async ({ sort, order, category, page, limit, currUserId }) => {
                             P.has_open_report AS "hasOpenReport",
                             COUNT(P.id) OVER() as total
                           FROM aspect P
+                          JOIN category C
+                            ON P.category_id = C.id
                           JOIN "user" A
                             ON P.author_id = A.id
                           LEFT JOIN vote V
                             ON P.id = V.aspect_id AND V.user_id = $1
                           LEFT JOIN "user" U
                             ON U.id = V.user_id
-                          -- WHERE (P.category_id IS NOT NULL OR $2 IS NULL)
                           WHERE (P.category_id = $2 OR $2 IS NULL OR $2 = '')
                             AND P.deleted_at IS NULL
                             AND P.deleted_at IS NULL
