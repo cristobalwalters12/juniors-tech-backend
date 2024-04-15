@@ -79,7 +79,7 @@ const validatePostPagination = async ({ query }) => await postPaginationSchema.v
 const transformPostPagination = ({ query }) => {
   const { sort, page, limit, category } = query
   query.sort = sort ? POST_SORT_OPTIONS[sort] : POST_SORT_OPTIONS.votes
-  query.order = sort ? query.order : 'desc'
+  query.order = sort && query.order ? query.order : 'desc'
   query.page = page ? +page : 1
   query.limit = limit ? +limit : 20
   query.category = CATEGORIES[category]
