@@ -263,14 +263,14 @@ const getPostsByQuery = async ({ title, sort, order, category, page, limit, curr
                         LIMIT ${limit}
                         OFFSET ${(page - 1) * limit};`
   const { rows: searchResults } = await pool.query(selectPosts, [category, currUserId, title])
-  const { total } = searchResults[0]
+  const [results] = searchResults
   const posts = searchResults.map(row => {
     const { total, ...post } = row
     return post
   })
 
   return {
-    total,
+    total: results?.total || 0,
     page,
     limit,
     posts
