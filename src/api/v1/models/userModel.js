@@ -357,6 +357,15 @@ const isAccountOwnerMuted = async (userId) => {
   }
 }
 
+const changePassword = async (id, password) => {
+  const hashedPassword = await bcryptAdapter.hash(password, 10)
+  const query = {
+    text: 'UPDATE "user" SET password = $1, updated_at = NOW() WHERE id = $2',
+    values: [hashedPassword, id]
+  }
+  await pool.query(query)
+}
+
 export {
   createUser,
   getByEmail,
@@ -367,5 +376,6 @@ export {
   updateUser,
   getUserAuthDataIfExists,
   desactivateUser,
-  isAccountOwnerMuted
+  isAccountOwnerMuted,
+  changePassword
 }
