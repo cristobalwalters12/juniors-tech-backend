@@ -196,7 +196,7 @@ const validateEmailById = async (id) => {
   const user = response.rows[0]
 
   if (!user) {
-    throw new Error('El usuario no existeeeeeeeeeeeeeeeeeeeee')
+    throw new Error('El usuario no existe')
   } else if (user.muted_at) {
     throw new Error('El usuario ha sido silenciado')
   } else if (user.deleted_at) {

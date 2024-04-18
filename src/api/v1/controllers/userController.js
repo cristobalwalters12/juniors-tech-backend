@@ -211,7 +211,7 @@ const desactivateMyAccountController = async (req, res) => {
     } else {
       const match = await bcryptAdapter.compare(password, user.password)
       if (!match) {
-        throw AppError.unauthorized('Correo o contraseña inválidos')
+        throw AppError.unauthorized('contraseña inválida')
       } else {
         const updatedUser = await desactivateUser(id)
         res.json({
