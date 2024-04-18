@@ -227,8 +227,10 @@ const updateUser = async (id, fields) => {
   const userFields = ['open_to_work', 'about', 'employment_status_id', 'pronoun_id', 'avatar_url', 'country_id', 'it_field_id']
   const providedFields = userFields.filter(field => fields[field] !== undefined)
   const userValues = providedFields.map(field => fields[field])
-  const updateUserText = `UPDATE "user" SET (${providedFields.join(', ')}) = ROW(${userValues.map((_, i) => `$${i + 2}`).join(', ')}) WHERE id = $1`
-  await pool.query(updateUserText, [id, ...userValues])
+  if (providedFields.length > 0) {
+    const updateUserText = `UPDATE "user" SET (${providedFields.join(', ')}) = ROW(${userValues.map((_, i) => `$${i + 2}`).join(', ')}) WHERE id = $1`
+    await pool.query(updateUserText, [id, ...userValues])
+  }
 
   const relations = ['language', 'technology', 'education', 'social_network']
   const relationIdFields = {
