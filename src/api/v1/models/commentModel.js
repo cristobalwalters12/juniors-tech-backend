@@ -40,25 +40,26 @@ const create = async ({ id, postId, parentId, body, currUserId }) => {
 
 const getAll = async ({ postId, currUserId }) => {
   const selectComments = `SELECT
-                            A.id,
-                            A.post_id AS "postId",
-                            A.parent_id AS "parentId",
-                            A.body,
-                            A.author_id AS "authorId",
+                            C.id,
+                            C.post_id AS "postId",
+                            C.parent_id AS "parentId",
+                            C.body,
+                            C.author_id AS "authorId",
                             U.username AS "authorUsername",
                             U.avatar_url AS "avatarUrl",
-                            A.vote_count AS "voteCount",
-                            A.comment_count AS "commentCount",
-                            A.created_at AS "createdAt",
-                            A.updated_at AS "updatedAt",
-                            A.deleted_at IS NOT NULL AS "commentDeleted",
-                            A.deleted_at AS "deletedAt",
-                            A.has_open_report AS "hasOpenReport",
+                            C.vote_count AS "voteCount",
+                            C.comment_count AS "commentCount",
+                            C.created_at AS "createdAt",
+                            C.updated_at AS "updatedAt",
+                            C.deleted_at IS NOT NULL AS "commentDeleted",
+                            C.deleted_at AS "deletedAt",
+                            C.has_open_report AS "hasOpenReport",
                             U.deleted_at IS NOT NULL AS "authorDeleted"
-                          FROM aspect A
+                          FROM aspect C
                           JOIN "user" U
-                          ON A.author_id = U.id
-                          WHERE post_id = $1;`
+                            ON C.author_id = U.id
+                          WHERE post_id = $1
+                          ORDER BY C.created_at DESC;`
   const { rows: rawCommentsData } = await pool.query(selectComments, [postId])
   const commentsVotes = {}
 
