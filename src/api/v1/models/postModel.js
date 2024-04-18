@@ -155,25 +155,31 @@ const getAll = async ({ sort, order, category, page, limit, currUserId }) => {
 }
 
 const updateById = async ({ postId, title, body, categoryId, slug, currUserId }) => {
-  const updatePost = `UPDATE aspect SET
-                        title = $1,
-                        body = $2,
-                        category_id = $3,
-                        slug = $4,
-                        updated_at = NOW()
-                      WHERE aspect.id = $5
-                      RETURNING
-                        id,
-                        title,
-                        body,
-                        category_id AS "categoryId",
-                        slug,
-                        author_id AS "authorId",
-                        vote_count AS "voteCount",
-                        comment_count AS "commentCount",
-                        created_at AS "createdAt",
-                        updated_at AS "updatedAt",
-                        has_open_report AS "hasOpenReport";`
+  const updatePost = `WITH P AS (
+                        UPDATE aspect SET
+                          title = $1,
+                          body = $2,
+                          category_id = $3,
+                          slug = $4,
+                          updated_at = NOW()
+                        WHERE aspect.id = $5
+                        RETURNING *)
+                      SELECT
+                        P.id,
+                        P.title,
+                        P.body,
+                        P.category_id AS "categoryId",
+                        C.name AS category,
+                        P.slug,
+                        P.author_id AS "authorId",
+                        P.vote_count AS "voteCount",
+                        P.comment_count AS "commentCount",
+                        P.created_at AS "createdAt",
+                        P.updated_at AS "updatedAt",
+                        P.has_open_report AS "hasOpenReport"
+                      FROM P
+                      JOIN category C
+                      ON P.category_id = C.id;`
   const { rows: [postData] } = await pool.query(updatePost, [title, body, categoryId, slug, postId])
 
   const selectUsername = `SELECT
