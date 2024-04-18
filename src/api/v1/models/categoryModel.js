@@ -58,11 +58,21 @@ const deleteCategory = async (id) => {
     throw new Error('La categoría no existe')
   }
 
-  const query = {
+  if (checkResponse.rows[0].name === 'otros') {
+    throw new Error('La categoría "otros" no puede ser eliminada')
+  }
+
+  const updateQuery = {
+    text: 'UPDATE aspect SET category_id = $1 WHERE category_id = $2',
+    values: ['8un-bW2jrj', id]
+  }
+  await pool.query(updateQuery)
+
+  const deleteQuery = {
     text: 'DELETE FROM category WHERE id = $1',
     values: [id]
   }
-  await pool.query(query)
+  await pool.query(deleteQuery)
 }
 const updateCategories = async (id, category) => {
   const checkQuery = {

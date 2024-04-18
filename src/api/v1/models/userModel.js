@@ -225,8 +225,9 @@ const updateUser = async (id, fields) => {
     throw new Error('User does not exist or is deleted or muted')
   }
   const userFields = ['open_to_work', 'about', 'employment_status_id', 'pronoun_id', 'avatar_url', 'country_id', 'it_field_id']
-  const userValues = userFields.map(field => fields[field])
-  const updateUserText = `UPDATE "user" SET (${userFields.join(', ')}) = ROW(${userValues.map((_, i) => `$${i + 2}`).join(', ')}) WHERE id = $1`
+  const providedFields = userFields.filter(field => fields[field] !== undefined)
+  const userValues = providedFields.map(field => fields[field])
+  const updateUserText = `UPDATE "user" SET (${providedFields.join(', ')}) = ROW(${userValues.map((_, i) => `$${i + 2}`).join(', ')}) WHERE id = $1`
   await pool.query(updateUserText, [id, ...userValues])
 
   const relations = ['language', 'technology', 'education', 'social_network']
@@ -237,11 +238,11 @@ const updateUser = async (id, fields) => {
     social_network: 'social_network_id'
   }
   for (const relation of relations) {
-    const relationTable = `user_${relation}`
-    const relationIdField = relationIdFields[relation]
-    const deleteRelationText = `DELETE FROM "${relationTable}" WHERE user_id = $1`
-    await pool.query(deleteRelationText, [id])
     if (Array.isArray(fields[relation])) {
+      const relationTable = `user_${relation}`
+      const relationIdField = relationIdFields[relation]
+      const deleteRelationText = `DELETE FROM "${relationTable}" WHERE user_id = $1`
+      await pool.query(deleteRelationText, [id])
       if (relation === 'social_network') {
         for (const socialNetwork of fields[relation]) {
           const url = socialNetwork.url
