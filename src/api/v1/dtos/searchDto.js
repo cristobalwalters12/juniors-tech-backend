@@ -1,10 +1,7 @@
 import Joi from 'joi'
-import { CATEGORIES, POST_SORT_OPTIONS } from '../../../config/dbConstants/entityTypeIds.js'
+import { POST_SORT_OPTIONS } from '../../../config/dbConstants/entityTypeIds.js'
 import { queryParamsValidatorBuilder } from '../../helpers/index.js'
-
-// Constants
-const queryCategories = Object.keys(CATEGORIES)
-const stringCategories = queryCategories.join(', ')
+import { uidSchema } from '../middleware/validateUids.js'
 
 // Schemas
 const querySchema = Joi.string().trim().required().messages({
@@ -19,10 +16,6 @@ const orderSchema = Joi.string().valid('asc', 'desc').insensitive().messages({
 const postSortSchema = Joi.string().valid('votes', 'date').insensitive().messages({
   'any.only': "El valor de sort solo puede ser 'votes' o 'date'",
   'string.empty': 'El valor de sort no puede estar vacío'
-})
-
-const postFilterSchema = Joi.string().valid(...queryCategories).insensitive().messages({
-  'any.only': `Las categorías disponibles son: ${stringCategories}`
 })
 
 const pageSchema = Joi.number().integer().optional().messages({
@@ -47,7 +40,7 @@ const postSearchSchema = Joi.object({
   }).messages({
     'string.empty': "El valor de 'order' no puede estar vacío"
   }),
-  category: postFilterSchema,
+  category: uidSchema.label('El valor de category'),
   page: pageSchema,
   limit: limitSchema
 }).options({ abortEarly: false }).messages({
@@ -65,7 +58,7 @@ const postPaginationSchema = Joi.object({
   }).messages({
     'string.empty': "El valor de 'order' no puede estar vacío"
   }),
-  category: postFilterSchema,
+  category: uidSchema.label('El valor de category'),
   page: pageSchema,
   limit: limitSchema
 }).options({ abortEarly: false }).messages({
@@ -77,12 +70,11 @@ const validatePostSearch = async ({ query }) => await postSearchSchema.validateA
 const validatePostPagination = async ({ query }) => await postPaginationSchema.validateAsync(query)
 
 const transformPostPagination = ({ query }) => {
-  const { sort, page, limit, category } = query
+  const { sort, page, limit } = query
   query.sort = sort ? POST_SORT_OPTIONS[sort] : POST_SORT_OPTIONS.votes
   query.order = sort && query.order ? query.order : 'desc'
   query.page = page ? +page : 1
   query.limit = limit ? +limit : 20
-  query.category = CATEGORIES[category]
   return query
 }
 
