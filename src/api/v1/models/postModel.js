@@ -232,24 +232,24 @@ const existsById = async (postId) => {
 const getPostsByQuery = async ({ title, sort, order, category, page, limit, currUserId }) => {
   const selectPosts = `WITH counted_posts AS (
                         SELECT
-                          *,
-                          C.name AS category,
-                          P.id AS counted_post_id,
-                          COUNT(P.id) OVER() as total
+                            *,
+                            C.name AS category,
+                            P.id AS counted_post_id,
+                            COUNT(P.id) OVER() as total
                         FROM aspect P
-                        LEFT JOIN category C
-                          ON P.category_id = C.id AND P.category_id = $1
-                        LEFT JOIN vote V
-                          ON P.id = V.aspect_id AND V.user_id = $2
-                        WHERE P.title ILIKE $3
-                          AND P.deleted_at IS NULL
-                      )
-                        SELECT
+                        LEFT JOIN category C ON P.category_id = C.id
+                        LEFT JOIN vote V ON P.id = V.aspect_id AND V.user_id = $1
+                        WHERE P.title ILIKE $2
+                            AND P.deleted_at IS NULL
+                            AND (P.category_id = $3 OR $3 IS NULL)
+                          )
+                          SELECT
                           CP.counted_post_id AS id,
                           CP.title,
                           CP.category_id AS "categoryId",
                           CP.category,
                           CP.slug,
+                          CP.body,
                           CP.author_id AS "authorId",
                           COALESCE(CP.vote_direction, 0) AS "voteDirection",
                           CP.vote_count AS "voteCount",
@@ -262,7 +262,7 @@ const getPostsByQuery = async ({ title, sort, order, category, page, limit, curr
                         ORDER BY ${sort} ${order}
                         LIMIT ${limit}
                         OFFSET ${(page - 1) * limit};`
-  const { rows: searchResults } = await pool.query(selectPosts, [category, currUserId, title])
+  const { rows: searchResults } = await pool.query(selectPosts, [currUserId, title, category])
   const [results] = searchResults
   const posts = searchResults.map(row => {
     const { total, ...post } = row
