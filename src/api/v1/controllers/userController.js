@@ -1,14 +1,15 @@
 import { createUser, getByEmail, getUsers, getUserByUsername, updateUser, validateEmailById, desactivateUser } from '../models/userModel.js'
 import { jwtAdapter } from '../../../config/adapters/jwtAdapter.js'
+import { bcryptAdapter } from '../../../config/adapters/bcryptAdapter.js'
 import { getAll, promoteToMod, mute, demote } from '../models/moderatorModel.js'
 import { REPORT_ACTIONS, REPORT_TYPES, ROLE_TYPES } from '../../../config/index.js'
 import { closeReasonRelatedReports, createReport } from '../models/reportModel.js'
-
+import { AppError } from '../../helpers/AppError.js'
 const createUserjwtController = async (req, res) => {
   const { email, password, username, birthdate } = req.body
   const user = await getByEmail({ email })
   if (user) {
-    res.status(400).json({ message: 'User already exists' })
+    res.status(400).json({ message: 'El usuario ya existe' })
   } else {
     const newUser = await createUser({ email, password, username, birthdate })
     const token = await jwtAdapter.generateAccessToken({ id: newUser.id, roles: [newUser.role] })
@@ -189,7 +190,8 @@ const desactivateUserController = async (req, res) => {
 
 const desactivateMyAccountController = async (req, res) => {
   try {
-    const id = req._id
+    const id = req.params.id
+    const { password } = req.body
     const user = await validateEmailById(id)
     if (!user) {
       res.status(404).json({
@@ -207,11 +209,16 @@ const desactivateMyAccountController = async (req, res) => {
         message: 'El usuario ha sido eliminado'
       })
     } else {
-      const updatedUser = await desactivateUser(id)
-      res.json({
-        message: 'Usuario actualizado',
-        user: updatedUser
-      })
+      const match = await bcryptAdapter.compare(password, user.password)
+      if (!match) {
+        throw AppError.unauthorized('contraseña inválida')
+      } else {
+        const updatedUser = await desactivateUser(id)
+        res.json({
+          message: 'Su Cuenta fue desactivada correctamente',
+          user: updatedUser
+        })
+      }
     }
   } catch (error) {
     console.log(error)
