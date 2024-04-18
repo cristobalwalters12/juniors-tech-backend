@@ -4,6 +4,7 @@ import { bcryptAdapter } from '../../../config/adapters/bcryptAdapter.js'
 import { getAll, promoteToMod, mute, demote } from '../models/moderatorModel.js'
 import { REPORT_ACTIONS, REPORT_TYPES, ROLE_TYPES } from '../../../config/index.js'
 import { closeReasonRelatedReports, createReport } from '../models/reportModel.js'
+import { getPostbyIdUser } from '../models/postModel.js'
 import { AppError } from '../../helpers/AppError.js'
 const createUserjwtController = async (req, res) => {
   const { email, password, username, birthdate } = req.body
@@ -224,6 +225,15 @@ const desactivateMyAccountController = async (req, res) => {
     res.status(500).json({ message: error.message })
   }
 }
+const getPostbyIdUserController = async (req, res) => {
+  try {
+    const id = req.params.id
+    const posts = await getPostbyIdUser(id)
+    res.status(200).json(posts)
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener los posts' })
+  }
+}
 
 export {
   createUserjwtController,
@@ -236,5 +246,6 @@ export {
   muteUser,
   reportUser,
   desactivateUserController,
-  desactivateMyAccountController
+  desactivateMyAccountController,
+  getPostbyIdUserController
 }

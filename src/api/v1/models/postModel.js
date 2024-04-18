@@ -277,4 +277,13 @@ const getPostsByQuery = async ({ title, sort, order, category, page, limit, curr
   }
 }
 
-export { create, getById, getAll, updateById, deleteById, existsById, getPostsByQuery }
+const getPostbyIdUser = async (id) => {
+  const query = {
+    text: 'SELECT * FROM aspect WHERE author_id = $1  order by vote_count desc limit 3',
+    values: [id]
+  }
+  const result = await pool.query(query)
+  return result.rows
+}
+
+export { create, getById, getAll, updateById, deleteById, existsById, getPostsByQuery, getPostbyIdUser }
