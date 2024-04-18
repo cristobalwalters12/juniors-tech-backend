@@ -36,7 +36,7 @@ const transform = async ({ body, method }) => {
   body.body = body.body.trim()
   body.slug = slugify(body.title, {
     lower: true,
-    remove: /[*+~.()'"!:@]/g,
+    remove: /[^a-zA-Z0-9\- ]*/g,
     locale: 'en'
   })
   return body
