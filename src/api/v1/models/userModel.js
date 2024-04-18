@@ -187,6 +187,7 @@ const getUserByUsername = async (username) => {
 }
 
 const validateEmailById = async (id) => {
+  console.log(id)
   const query = {
     text: 'SELECT * FROM "user" WHERE id = $1',
     values: [id]
@@ -195,7 +196,7 @@ const validateEmailById = async (id) => {
   const user = response.rows[0]
 
   if (!user) {
-    throw new Error('El usuario no existe')
+    throw new Error('El usuario no existeeeeeeeeeeeeeeeeeeeee')
   } else if (user.muted_at) {
     throw new Error('El usuario ha sido silenciado')
   } else if (user.deleted_at) {
