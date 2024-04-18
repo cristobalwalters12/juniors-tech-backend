@@ -2,21 +2,27 @@ import { ASPECT_TYPES, pool } from '../../../config/index.js'
 import { AppError } from '../../helpers/AppError.js'
 
 const create = async ({ postId, title, body, categoryId, slug, currUserId }) => {
-  const insertPost = `INSERT INTO aspect
-                        (id, aspect_type_id, title, body, category_id, slug, author_id)
-                      VALUES ($1, $2, $3, $4, $5, $6, $7)
-                      RETURNING
-                        id,
-                        title,
-                        body,
-                        category_id AS "categoryId",
-                        slug,
-                        author_id AS "authorId",
-                        vote_count AS "voteCount",
-                        comment_count AS "commentCount",
-                        created_at AS "createdAt",
-                        updated_at AS "updatedAt",
-                        has_open_report AS "hasOpenReport";`
+  const insertPost = `WITH P AS (
+                        INSERT INTO aspect
+                          (id, aspect_type_id, title, body, category_id, slug, author_id)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7)
+                        RETURNING *)
+                      SELECT
+                        P.id,
+                        P.title,
+                        P.body,
+                        P.category_id AS "categoryId",
+                        C.name AS category,
+                        P.slug,
+                        P.author_id AS "authorId",
+                        P.vote_count AS "voteCount",
+                        P.comment_count AS "commentCount",
+                        P.created_at AS "createdAt",
+                        P.updated_at AS "updatedAt",
+                        P.has_open_report AS "hasOpenReport"
+                      FROM P
+                      JOIN category C
+                        ON P.category_id = C.id;`
   const { rows: [postData] } = await pool.query(insertPost, [postId, ASPECT_TYPES.POST, title, body, categoryId, slug, currUserId])
 
   const updateAuthor = `UPDATE "user"
