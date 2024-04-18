@@ -105,7 +105,6 @@ const getUsers = async (page, size) => {
 }
 
 const getUserByUsername = async (username) => {
-  console.log(username)
   const Userquery = {
     text: `
     SELECT 
@@ -187,7 +186,6 @@ const getUserByUsername = async (username) => {
 }
 
 const validateEmailById = async (id) => {
-  console.log(id)
   const query = {
     text: 'SELECT * FROM "user" WHERE id = $1',
     values: [id]
