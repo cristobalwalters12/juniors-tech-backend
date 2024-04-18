@@ -5,8 +5,8 @@ import { uidSchema } from '../middleware/validateUids.js'
 
 // Schemas
 const querySchema = Joi.string().trim().required().messages({
-  'string.empty': "El valor de 'title' no puede estar vacío",
-  'any.required': "Debes ingresar un título en el parámetro de consulta 'title'"
+  'string.empty': "El valor de 'q' no puede estar vacío",
+  'any.required': "Debes ingresar un título en el parámetro de consulta 'q'"
 })
 
 const orderSchema = Joi.string().valid('asc', 'desc').insensitive().messages({
@@ -29,7 +29,7 @@ const limitSchema = Joi.number().integer().optional().messages({
 })
 
 const postSearchSchema = Joi.object({
-  title: querySchema,
+  q: querySchema,
   sort: postSortSchema.optional(),
   order: Joi.when('sort', {
     is: Joi.exist(),
@@ -44,7 +44,7 @@ const postSearchSchema = Joi.object({
   page: pageSchema,
   limit: limitSchema
 }).options({ abortEarly: false }).messages({
-  'object.unknown': "Las únicas queries permitidas son: 'title', 'sort', 'order', 'category', 'page' y 'limit'"
+  'object.unknown': "Las únicas queries permitidas son: 'q', 'sort', 'order', 'category', 'page' y 'limit'"
 })
 
 const postPaginationSchema = Joi.object({
@@ -62,7 +62,7 @@ const postPaginationSchema = Joi.object({
   page: pageSchema,
   limit: limitSchema
 }).options({ abortEarly: false }).messages({
-  'object.unknown': "Las únicas queries permitidas son: 'title', 'sort', 'order', 'category', 'page' y 'limit'"
+  'object.unknown': "Las únicas queries permitidas son: 'sort', 'order', 'category', 'page' y 'limit'"
 })
 
 // DTO functions
@@ -79,7 +79,7 @@ const transformPostPagination = ({ query }) => {
 }
 
 const transformPostSearch = ({ query }) => {
-  query.title = `%${query.title}%`
+  query.q = `%${query.q}%`
   return transformPostPagination({ query })
 }
 

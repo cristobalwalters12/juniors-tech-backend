@@ -241,7 +241,7 @@ const existsById = async (postId) => {
   return post
 }
 
-const getPostsByQuery = async ({ title, sort, order, category, page, limit, currUserId }) => {
+const getPostsByQuery = async ({ q, sort, order, category, page, limit, currUserId }) => {
   const selectPosts = `WITH counted_posts AS (
                         SELECT
                             *,
@@ -274,7 +274,7 @@ const getPostsByQuery = async ({ title, sort, order, category, page, limit, curr
                         ORDER BY ${sort} ${order}
                         LIMIT ${limit}
                         OFFSET ${(page - 1) * limit};`
-  const { rows: searchResults } = await pool.query(selectPosts, [currUserId, title, category])
+  const { rows: searchResults } = await pool.query(selectPosts, [currUserId, q, category])
   const [results] = searchResults
   const posts = searchResults.map(row => {
     const { total, ...post } = row
