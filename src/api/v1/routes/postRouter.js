@@ -22,7 +22,7 @@ import {
 import { postDto } from '../dtos/postDto.js'
 import { voteDto } from '../dtos/voteDto.js'
 import { createReportDto } from '../dtos/reportDto.js'
-import { postPaginationDto } from '../dtos/searchDto.js'
+import { postPaginationDto } from '../dtos/postQueryDto.js'
 
 const router = Router()
 

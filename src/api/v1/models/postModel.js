@@ -2,21 +2,27 @@ import { ASPECT_TYPES, pool } from '../../../config/index.js'
 import { AppError } from '../../helpers/AppError.js'
 
 const create = async ({ postId, title, body, categoryId, slug, currUserId }) => {
-  const insertPost = `INSERT INTO aspect
-                        (id, aspect_type_id, title, body, category_id, slug, author_id)
-                      VALUES ($1, $2, $3, $4, $5, $6, $7)
-                      RETURNING
-                        id,
-                        title,
-                        body,
-                        category_id AS "categoryId",
-                        slug,
-                        author_id AS "authorId",
-                        vote_count AS "voteCount",
-                        comment_count AS "commentCount",
-                        created_at AS "createdAt",
-                        updated_at AS "updatedAt",
-                        has_open_report AS "hasOpenReport";`
+  const insertPost = `WITH P AS (
+                        INSERT INTO aspect
+                          (id, aspect_type_id, title, body, category_id, slug, author_id)
+                        VALUES ($1, $2, $3, $4, $5, $6, $7)
+                        RETURNING *)
+                      SELECT
+                        P.id,
+                        P.title,
+                        P.body,
+                        P.category_id AS "categoryId",
+                        C.name AS category,
+                        P.slug,
+                        P.author_id AS "authorId",
+                        P.vote_count AS "voteCount",
+                        P.comment_count AS "commentCount",
+                        P.created_at AS "createdAt",
+                        P.updated_at AS "updatedAt",
+                        P.has_open_report AS "hasOpenReport"
+                      FROM P
+                      JOIN category C
+                        ON P.category_id = C.id;`
   const { rows: [postData] } = await pool.query(insertPost, [postId, ASPECT_TYPES.POST, title, body, categoryId, slug, currUserId])
 
   const updateAuthor = `UPDATE "user"
@@ -149,25 +155,31 @@ const getAll = async ({ sort, order, category, page, limit, currUserId }) => {
 }
 
 const updateById = async ({ postId, title, body, categoryId, slug, currUserId }) => {
-  const updatePost = `UPDATE aspect SET
-                        title = $1,
-                        body = $2,
-                        category_id = $3,
-                        slug = $4,
-                        updated_at = NOW()
-                      WHERE aspect.id = $5
-                      RETURNING
-                        id,
-                        title,
-                        body,
-                        category_id AS "categoryId",
-                        slug,
-                        author_id AS "authorId",
-                        vote_count AS "voteCount",
-                        comment_count AS "commentCount",
-                        created_at AS "createdAt",
-                        updated_at AS "updatedAt",
-                        has_open_report AS "hasOpenReport";`
+  const updatePost = `WITH P AS (
+                        UPDATE aspect SET
+                          title = $1,
+                          body = $2,
+                          category_id = $3,
+                          slug = $4,
+                          updated_at = NOW()
+                        WHERE aspect.id = $5
+                        RETURNING *)
+                      SELECT
+                        P.id,
+                        P.title,
+                        P.body,
+                        P.category_id AS "categoryId",
+                        C.name AS category,
+                        P.slug,
+                        P.author_id AS "authorId",
+                        P.vote_count AS "voteCount",
+                        P.comment_count AS "commentCount",
+                        P.created_at AS "createdAt",
+                        P.updated_at AS "updatedAt",
+                        P.has_open_report AS "hasOpenReport"
+                      FROM P
+                      JOIN category C
+                      ON P.category_id = C.id;`
   const { rows: [postData] } = await pool.query(updatePost, [title, body, categoryId, slug, postId])
 
   const selectUsername = `SELECT
@@ -229,27 +241,27 @@ const existsById = async (postId) => {
   return post
 }
 
-const getPostsByQuery = async ({ title, sort, order, category, page, limit, currUserId }) => {
+const getPostsByQuery = async ({ q, sort, order, category, page, limit, currUserId }) => {
   const selectPosts = `WITH counted_posts AS (
                         SELECT
-                          *,
-                          C.name AS category,
-                          P.id AS counted_post_id,
-                          COUNT(P.id) OVER() as total
+                            *,
+                            C.name AS category,
+                            P.id AS counted_post_id,
+                            COUNT(P.id) OVER() as total
                         FROM aspect P
-                        LEFT JOIN category C
-                          ON P.category_id = C.id AND P.category_id = $1
-                        LEFT JOIN vote V
-                          ON P.id = V.aspect_id AND V.user_id = $2
-                        WHERE P.title ILIKE $3
-                          AND P.deleted_at IS NULL
-                      )
-                        SELECT
+                        LEFT JOIN category C ON P.category_id = C.id
+                        LEFT JOIN vote V ON P.id = V.aspect_id AND V.user_id = $1
+                        WHERE P.title ILIKE $2
+                            AND P.deleted_at IS NULL
+                            AND (P.category_id = $3 OR $3 IS NULL)
+                          )
+                          SELECT
                           CP.counted_post_id AS id,
                           CP.title,
                           CP.category_id AS "categoryId",
                           CP.category,
                           CP.slug,
+                          CP.body,
                           CP.author_id AS "authorId",
                           COALESCE(CP.vote_direction, 0) AS "voteDirection",
                           CP.vote_count AS "voteCount",
@@ -262,7 +274,7 @@ const getPostsByQuery = async ({ title, sort, order, category, page, limit, curr
                         ORDER BY ${sort} ${order}
                         LIMIT ${limit}
                         OFFSET ${(page - 1) * limit};`
-  const { rows: searchResults } = await pool.query(selectPosts, [category, currUserId, title])
+  const { rows: searchResults } = await pool.query(selectPosts, [currUserId, q, category])
   const [results] = searchResults
   const posts = searchResults.map(row => {
     const { total, ...post } = row
