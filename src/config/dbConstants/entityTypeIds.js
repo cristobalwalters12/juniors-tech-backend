@@ -56,11 +56,16 @@ const POST_SORT_OPTIONS = {
   date: 'created_at'
 }
 
+const USER_SORT_OPTIONS = {
+  score: 'score'
+}
+
 export {
   REPORT_TYPES,
   ASPECT_TYPES,
   ROLE_TYPES,
   REPORT_ACTIONS,
   REPORT_REASONS,
-  POST_SORT_OPTIONS
+  POST_SORT_OPTIONS,
+  USER_SORT_OPTIONS
 }
