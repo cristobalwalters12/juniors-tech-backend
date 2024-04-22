@@ -5,7 +5,7 @@ import {
   methodNotAllowedHandler,
   setUserIfLoggedIn
 } from '../middleware/index.js'
-import { postSearchDto } from '../dtos/searchDto.js'
+import { postSearchDto } from '../dtos/postQueryDto.js'
 
 const router = Router()
 router.get('/', errorCatcher(searchController)).all(methodNotAllowedHandler)
