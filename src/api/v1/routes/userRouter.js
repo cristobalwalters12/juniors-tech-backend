@@ -41,5 +41,5 @@ router
 
 router.put('/:id', jwtValidator, errorCatcher(updateUserController)).all(methodNotAllowedHandler)
 router.put('/:id/desactivate', jwtValidator, errorCatcher(desactivateUserController)).all(methodNotAllowedHandler)
-router.put('/desactivateAccount', jwtValidator, errorCatcher(desactivateMyAccountController)).all(methodNotAllowedHandler)
+router.put('/:id/desactivateAccount', jwtValidator, errorCatcher(desactivateMyAccountController)).all(methodNotAllowedHandler)
 export default router

@@ -105,7 +105,6 @@ const getUsers = async (page, size) => {
 }
 
 const getUserByUsername = async (username) => {
-  console.log(username)
   const Userquery = {
     text: `
     SELECT 
@@ -224,9 +223,12 @@ const updateUser = async (id, fields) => {
     throw new Error('User does not exist or is deleted or muted')
   }
   const userFields = ['open_to_work', 'about', 'employment_status_id', 'pronoun_id', 'avatar_url', 'country_id', 'it_field_id']
-  const userValues = userFields.map(field => fields[field])
-  const updateUserText = `UPDATE "user" SET (${userFields.join(', ')}) = ROW(${userValues.map((_, i) => `$${i + 2}`).join(', ')}) WHERE id = $1`
-  await pool.query(updateUserText, [id, ...userValues])
+  const providedFields = userFields.filter(field => fields[field] !== undefined)
+  const userValues = providedFields.map(field => fields[field])
+  if (providedFields.length > 0) {
+    const updateUserText = `UPDATE "user" SET (${providedFields.join(', ')}) = ROW(${userValues.map((_, i) => `$${i + 2}`).join(', ')}) WHERE id = $1`
+    await pool.query(updateUserText, [id, ...userValues])
+  }
 
   const relations = ['language', 'technology', 'education', 'social_network']
   const relationIdFields = {
@@ -236,11 +238,11 @@ const updateUser = async (id, fields) => {
     social_network: 'social_network_id'
   }
   for (const relation of relations) {
-    const relationTable = `user_${relation}`
-    const relationIdField = relationIdFields[relation]
-    const deleteRelationText = `DELETE FROM "${relationTable}" WHERE user_id = $1`
-    await pool.query(deleteRelationText, [id])
     if (Array.isArray(fields[relation])) {
+      const relationTable = `user_${relation}`
+      const relationIdField = relationIdFields[relation]
+      const deleteRelationText = `DELETE FROM "${relationTable}" WHERE user_id = $1`
+      await pool.query(deleteRelationText, [id])
       if (relation === 'social_network') {
         for (const socialNetwork of fields[relation]) {
           const url = socialNetwork.url
@@ -427,6 +429,15 @@ const getUsersByQuery = async ({ q, sort, order, page, limit, country, otw, it, 
   }
 }
 
+const changePassword = async (id, password) => {
+  const hashedPassword = await bcryptAdapter.hash(password, 10)
+  const query = {
+    text: 'UPDATE "user" SET password = $1, updated_at = NOW() WHERE id = $2',
+    values: [hashedPassword, id]
+  }
+  await pool.query(query)
+}
+
 export {
   createUser,
   getByEmail,
@@ -438,5 +449,6 @@ export {
   updateUser,
   getUserAuthDataIfExists,
   desactivateUser,
-  isAccountOwnerMuted
+  isAccountOwnerMuted,
+  changePassword
 }
