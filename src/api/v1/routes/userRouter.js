@@ -7,7 +7,8 @@ import {
   getMods,
   reportUser,
   desactivateUserController,
-  desactivateMyAccountController
+  desactivateMyAccountController,
+  getPostbyIdUserController
 } from '../controllers/userController.js'
 import { errorCatcher } from '../../helpers/index.js'
 import {
@@ -29,6 +30,7 @@ router.get('/mods', [
   .all(methodNotAllowedHandler)
 
 router.get('/:username', errorCatcher(getUserByUsernameController)).all(methodNotAllowedHandler)
+router.get('/:id/posts', errorCatcher(getPostbyIdUserController)).all(methodNotAllowedHandler)
 
 router
   .route('/:username/report')
