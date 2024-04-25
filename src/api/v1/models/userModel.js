@@ -367,7 +367,7 @@ const getUsersByQuery = async ({ q, sort, order, page, limit, country, otw, it, 
                           U.avatar_url AS "avatarUrl",
                           U.score,
                           U.open_to_work AS "openToWork",
-                          U.country_id AS country,
+                          U.country_id AS "countryId",
                           U.it_field_id AS "itFieldId",
                           COALESCE(ARRAY_AGG(DISTINCT UL.language_id)
                             FILTER (WHERE UL.language_id IS NOT NULL), '{}'
