@@ -35,8 +35,8 @@ const userSearchSchema = searchSchema.keys({
 
 // VALIDATION FUNCTIONS
 const validateUserSearch = async ({ query }) => {
-  query.lang = query.lang?.split(',')
-  query.tech = query.tech?.split(',')
+  query.lang = query.lang && decodeURIComponent(query.lang).split(',')
+  query.tech = query.tech && decodeURIComponent(query.tech).split(',')
   await userSearchSchema.validateAsync(query)
 }
 
@@ -52,7 +52,7 @@ const transformUserPagination = transformPagination({
 const transformUserSearch = ({ query }) => {
   query.q = `%${query.q}%`
   const otw = query.otw
-  query.otw = otw !== undefined ? !!otw : undefined
+  query.otw = otw !== undefined ? Boolean(+otw) : undefined
   return transformUserPagination({ query })
 }
 
