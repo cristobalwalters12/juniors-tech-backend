@@ -1,6 +1,7 @@
 import { getPagination } from '../../helpers/getPagination.js'
 import { getPostsByQuery } from '../models/postModel.js'
 import { searchModel } from '../models/searchModel.js'
+import { getUsersByQuery } from '../models/userModel.js'
 
 const searchController = async (req, res) => {
   try {
@@ -30,4 +31,16 @@ const searchPosts = async (req, res) => {
   })
 }
 
-export { searchController, searchPosts }
+const searchUsers = async (req, res) => {
+  const { users, ...result } = await getUsersByQuery({ ...req.query })
+  const pagination = getPagination(result)
+  res.status(200).json({
+    status: 'success',
+    data: {
+      users,
+      ...pagination
+    }
+  })
+}
+
+export { searchController, searchPosts, searchUsers }

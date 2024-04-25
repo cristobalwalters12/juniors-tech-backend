@@ -359,6 +359,76 @@ const isAccountOwnerMuted = async (userId) => {
   }
 }
 
+const getUsersByQuery = async ({ q, sort, order, page, limit, country, otw, it, lang, tech }) => {
+  let selectUsers = `WITH counted_users AS (
+                        SELECT
+                          U.id,
+                          U.username,
+                          U.avatar_url AS "avatarUrl",
+                          U.score,
+                          U.open_to_work AS "openToWork",
+                          U.country_id AS country,
+                          U.it_field_id AS "itFieldId",
+                          COALESCE(ARRAY_AGG(DISTINCT UL.language_id)
+                            FILTER (WHERE UL.language_id IS NOT NULL), '{}'
+                          ) AS "languages",
+                          COALESCE(ARRAY_AGG(DISTINCT UT.technology_id)
+                            FILTER (WHERE UT.technology_id IS NOT NULL), '{}'
+                          ) AS "technologies",
+                          COUNT(U.id) OVER() as total
+                        FROM "user" U
+                        LEFT JOIN user_language UL
+                          ON U.id = UL.user_id
+                        LEFT JOIN user_technology UT
+                          ON U.id = UT.user_id
+                        WHERE U.username ILIKE $1
+                          AND U.deleted_at IS NULL `
+  let paramNumber = 2
+  const params = [q]
+  if (country) {
+    selectUsers += ` AND U.country_id = $${paramNumber++}`
+    params.push(country)
+  }
+  if (otw) {
+    selectUsers += ` AND U.open_to_work = $${paramNumber++}`
+    params.push(otw)
+  }
+  if (it) {
+    selectUsers += ` AND U.it_field_id = $${paramNumber++}`
+    params.push(it)
+  }
+  if (lang?.length > 0) {
+    const paramNumbers = lang.map(() => paramNumber++).join(', $')
+    selectUsers += ` AND UL.language_id IN ($${paramNumbers})`
+    params.push(...lang)
+  }
+  if (tech?.length > 0) {
+    const paramNumbers = tech.map(() => paramNumber++).join(', ')
+    selectUsers += ` AND UT.technology_id IN ($${paramNumbers})`
+    params.push(...tech)
+  }
+  selectUsers += ` GROUP BY U.id)
+                  SELECT
+                  *,
+                  CU.total::int
+                FROM counted_users CU
+                ORDER BY ${sort} ${order}
+                LIMIT ${limit}
+                OFFSET ${(page - 1) * limit};`
+  const { rows: searchResults } = await pool.query(selectUsers, params)
+  const total = searchResults?.[0]?.total || 0
+  const users = searchResults.map(row => {
+    const { total, ...user } = row
+    return user
+  })
+  return {
+    total,
+    page,
+    limit,
+    users
+  }
+}
+
 const changePassword = async (id, password) => {
   const hashedPassword = await bcryptAdapter.hash(password, 10)
   const query = {
@@ -374,6 +444,7 @@ export {
   byEmailLogin,
   validateEmailById,
   getUsers,
+  getUsersByQuery,
   getUserByUsername,
   updateUser,
   getUserAuthDataIfExists,
