@@ -50,7 +50,7 @@ const transformUserPagination = transformPagination({
 })
 
 const transformUserSearch = ({ query }) => {
-  query.q = `%${query.q}%`
+  query.q = `%${decodeURIComponent(query.q)}%`
   const otw = query.otw
   query.otw = otw !== undefined ? Boolean(+otw) : undefined
   return transformUserPagination({ query })
