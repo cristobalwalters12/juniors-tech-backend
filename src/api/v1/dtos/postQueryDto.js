@@ -41,7 +41,7 @@ const transformPostPagination = transformPagination({
 })
 
 const transformPostSearch = ({ query }) => {
-  query.q = `%${query.q}%`
+  query.q = `%${decodeURIComponent(query.q)}%`
   return transformPostPagination({ query })
 }
 

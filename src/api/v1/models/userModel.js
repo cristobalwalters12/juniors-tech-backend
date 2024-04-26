@@ -367,7 +367,7 @@ const getUsersByQuery = async ({ q, sort, order, page, limit, country, otw, it, 
                           U.avatar_url AS "avatarUrl",
                           U.score,
                           U.open_to_work AS "openToWork",
-                          U.country_id AS country,
+                          U.country_id AS "countryId",
                           U.it_field_id AS "itFieldId",
                           COALESCE(ARRAY_AGG(DISTINCT UL.language_id)
                             FILTER (WHERE UL.language_id IS NOT NULL), '{}'
@@ -385,15 +385,15 @@ const getUsersByQuery = async ({ q, sort, order, page, limit, country, otw, it, 
                           AND U.deleted_at IS NULL `
   let paramNumber = 2
   const params = [q]
-  if (country) {
+  if (country !== undefined) {
     selectUsers += ` AND U.country_id = $${paramNumber++}`
     params.push(country)
   }
-  if (otw) {
+  if (otw !== undefined) {
     selectUsers += ` AND U.open_to_work = $${paramNumber++}`
     params.push(otw)
   }
-  if (it) {
+  if (it !== undefined) {
     selectUsers += ` AND U.it_field_id = $${paramNumber++}`
     params.push(it)
   }
